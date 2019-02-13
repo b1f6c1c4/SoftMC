@@ -127,6 +127,41 @@ Instruction genWR(uint bank, uint col, uint8_t pattern, AUTO_PRECHARGE ap, BURST
 	return instr;
 }
 
+Instruction genWR_burst(uint bank, uint col, AUTO_PRECHARGE ap){
+	Instruction instr = (uint)INSTR_TYPE::DDR;
+	instr <<= 32 - SIGNAL_OFFSET - BANK_OFFSET - ROW_OFFSET - CMD_OFFSET;
+
+	instr |= pattern >> 2; //most significant 6 bits of the pattern
+	instr <<= SIGNAL_OFFSET;
+
+	instr |= 0x24; //to set CKE(1) CS(0)[assumed it should be Low]
+	 	     //RAS(1) CAS(0) WE(0)
+	instr <<= BANK_OFFSET;
+
+	instr |= bank;
+	instr <<= 2;
+
+	instr |= pattern & 0x3; //least significant 2 bits of the pattern
+
+	instr <<= 2;
+
+	instr |= 0x1; // to set cmd[12] to 1 (burst length 8)
+
+	instr <<= 1;
+
+	instr |= 0x1; // to set cmd[11] to 1 (long write)
+
+	instr <<= 1;
+
+	if(ap == AUTO_PRECHARGE::AP)
+		instr |= 0x1; // to set cmd[10] to 1
+
+	instr <<= COL_OFFSET;
+	instr |= col;
+
+	return instr;
+}
+
 
 //! Generates an instruction to \b read from the given bank/column address.
 /*!

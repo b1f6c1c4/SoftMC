@@ -101,6 +101,7 @@ class DramAddr{
 Instruction genACT(uint bank, uint row);
 Instruction genPRE(uint bank, PRE_TYPE pt = PRE_TYPE::SINGLE);
 Instruction genWR(uint bank, uint col, uint8_t pattern, AUTO_PRECHARGE ap = AUTO_PRECHARGE::NO_AP, BURST_LENGTH bl = BURST_LENGTH::FIXED);
+Instruction genWR_burst(uint bank, uint col, AUTO_PRECHARGE ap = AUTO_PRECHARGE::NO_AP);
 Instruction genRD(uint bank, uint col, AUTO_PRECHARGE ap = AUTO_PRECHARGE::NO_AP, BURST_LENGTH bl = BURST_LENGTH::FIXED);
 Instruction genWAIT(uint cycles);
 Instruction genBUSDIR(BUSDIR dir);

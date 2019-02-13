@@ -823,94 +823,179 @@ module tb_softMC_top;
 	  
 	  #APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b00010000000000000000000000000010; //busdir
+		app_instr = 32'b00010000000000000000000000000010; // busdir WR
 
 		#APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b01000000000000000000000000000101; //wait
+		app_instr = 32'b01000000000000000000000000000101; // wait(5)
 
 		#APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b10010001000100110000000000000000; //act
+		app_instr = 32'b10010001000100110000000000000000; // PRE(bank=3) 
 
 		#APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b01000000000000000000000000000110; //wait
+		app_instr = 32'b01000000000000000000000000000110; // wait(6)
 
 		#APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b10010001000110110000000010110010; //read
+		app_instr = 32'b10010001000110110000000010110010; // ACT(bank=3 row=0xb2)
 
 		#APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b01000000000000000000000000000101; //wait
+		app_instr = 32'b01000000000000000000000000000101; // wait(5)
 
 		#APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b10101101001000111000000000001110;
+		app_instr = 32'b10101101001000111001000000000000; // WR(bank=3, col=0x0, pattern=0x5a) bl=BURST AP=0
 
 		#APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b01000000000000000000000000000110;
+		app_instr = 32'b01000000000000000000000000000110; // wait(6)
 
 		#APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b11010011001000110100000000001000;
+		app_instr = 32'b11101001001000110101000000001000; // WR(bank=3, col=0x8, pattern=0xd1) 
 
 		#APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b01000000000000000000000000001010;
+		app_instr = 32'b01000000000000000000000000000101; // wait(5)
 
 		#APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b10010001000100110000000000000000;
+		app_instr = 32'b10110101001000111001100000010000; // WR(bank=3, col=0x10, pattern=0x6a) bl=BURST AP=0 long_write
 
 		#APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b01000000000000000000000000000101;
+		app_instr = {4{8'h01}}; // write data
+		
+		#APP_CLK_PERIOD;
+		app_en = 1;
+		app_instr = {4{8'h02}}; // write data
+		
+		#APP_CLK_PERIOD;
+		app_en = 1;
+		app_instr = {4{8'h03}}; // write data
+		
+		#APP_CLK_PERIOD;
+		app_en = 1;
+		app_instr = {4{8'h04}}; // write data
+		
+		#APP_CLK_PERIOD;
+		app_en = 1;
+		app_instr = {4{8'h05}}; // write data
+		
+		#APP_CLK_PERIOD;
+		app_en = 1;
+		app_instr = {4{8'h06}}; // write data
+		
+		#APP_CLK_PERIOD;
+		app_en = 1;
+		app_instr = {4{8'h07}}; // write data
+		
+		#APP_CLK_PERIOD;
+		app_en = 1;
+		app_instr = {4{8'h08}}; // write data
+		
+		#APP_CLK_PERIOD;
+		app_en = 1;
+		app_instr = {4{8'h09}}; // write data
+		
+		#APP_CLK_PERIOD;
+		app_en = 1;
+		app_instr = {4{8'h0a}}; // write data
+		
+		#APP_CLK_PERIOD;
+		app_en = 1;
+		app_instr = {4{8'h0b}}; // write data
+		
+		#APP_CLK_PERIOD;
+		app_en = 1;
+		app_instr = {4{8'h0c}}; // write data
+		
+		#APP_CLK_PERIOD;
+		app_en = 1;
+		app_instr = {4{8'h0d}}; // write data
+		
+		#APP_CLK_PERIOD;
+		app_en = 1;
+		app_instr = {4{8'h0e}}; // write data
+		
+		#APP_CLK_PERIOD;
+		app_en = 1;
+		app_instr = {4{8'h0f}}; // write data
+		
+		#APP_CLK_PERIOD;
+		app_en = 1;
+		app_instr = {4{8'h00}}; // write data
 
 		#APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b00010000000000000000000000000000;
+		app_instr = 32'b01000000000000000000000000000110; // wait(6)
 
 		#APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b01000000000000000000000000000101;
+		app_instr = 32'b10111101001000111001000000011000; // WR(bank=3, col=0x18, pattern=0x7a) bl=BURST AP=0
 
 		#APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b10010001000110110000000010110010;
+		app_instr = 32'b01000000000000000000000000001010; // wait(10)
 
 		#APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b01000000000000000000000000000101;
+		app_instr = 32'b10010001000100110000000000000000; // PRE(bank=3)
 
 		#APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b10000001001010110000000000001000;
+		app_instr = 32'b01000000000000000000000000000101; // wait(5)
 
 		#APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b01000000000000000000000000001010;
+		app_instr = 32'b00010000000000000000000000000000; // busdir RD
 
 		#APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b01000000000000000000000000000011;
+		app_instr = 32'b01000000000000000000000000000101; // wait(5)
 
 		#APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b10010001000100110000000000000000;
+		app_instr = 32'b10010001000110110000000010110010; // ACT(bank=3, row=0xb2)
 
 		#APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b01000000000000000000000000000101;
+		app_instr = 32'b01000000000000000000000000000101; // wait(5)
 
 		#APP_CLK_PERIOD;
 		app_en = 1;
-		app_instr = 32'b00000000000000000000000000000000;
+		app_instr = 32'b10000001001010110001000000010000; // RD(bank=3, col=0x8)
+
+		#APP_CLK_PERIOD;
+		app_en = 1;
+		app_instr = 32'b01000000000000000000000000001010; // wait(10)
+
+		#APP_CLK_PERIOD;
+		app_en = 1;
+		app_instr = 32'b01000000000000000000000000000011; // wait(3)
+
+		#APP_CLK_PERIOD;
+		app_en = 1;
+		app_instr = 32'b10010001000100110000000000000000; // PRE(bank=3)
+
+		#APP_CLK_PERIOD;
+		app_en = 1;
+		app_instr = 32'b01000000000000000000000000000101; // wait(5)
+
+		#APP_CLK_PERIOD;
+		app_en = 1;
+		app_instr = 32'b00000000000000000000000000000000; // END
 
 		#APP_CLK_PERIOD;
 		app_en = 0;
+        
+        #500000;
+        rdback_fifo_rden = 1;
+        #(APP_CLK_PERIOD*10);
+		rdback_fifo_rden = 0;
         end
   end
       

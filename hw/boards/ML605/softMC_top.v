@@ -107,7 +107,8 @@ module softMC_top #
 	output                             ddr_cas_n,
 	output                             ddr_we_n,
 	output [CS_WIDTH*nCS_PER_RANK-1:0] ddr_cs_n,
-	output [CKE_WIDTH-1:0]             ddr_cke,
+	output                             ddr_cs1_n,
+        output [CKE_WIDTH-1:0]             ddr_cke,
 	output [CS_WIDTH*nCS_PER_RANK-1:0] ddr_odt,
 	output                             ddr_reset_n,
 	//output                             ddr_parity,
@@ -145,6 +146,9 @@ module softMC_top #
     );
 	 
 	 assign ddr_dm = {DM_WIDTH{1'b0}};
+
+         // For dual rank DIMM, only access the first rank for now.
+         assign ddr_cs1_n = 1'b1;
 	 
 	 /*** CLOCK MANAGEMENT ***/
 	 
