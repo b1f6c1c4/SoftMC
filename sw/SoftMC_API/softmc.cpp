@@ -33,6 +33,27 @@ void InstructionSequence::insert(const Instruction c){
 	instrs[size++] = c;
 }
 
+void InstructionSequence::write_burst_data(uint wrdata[]){
+	int j;
+	Instruction instr;
+	for (j=0; j<16; j++) {
+		if(size == capacity){
+			Instruction* tmp = new Instruction[capacity*2];
+			
+			for(int i = 0; i < size; i++)
+				tmp[i] = instrs[i];
+
+			delete[] instrs;
+			capacity *=2;
+			instrs = tmp;
+		}
+
+		instr = wrdata[j]
+		instrs[size++] = instr;
+
+    }
+}
+
 void InstructionSequence::execute(fpga_t* fpga){
 	fpga_send(fpga, 0, (void*)instrs, INSTR_SIZE*size, 0, 1, 0);
 }

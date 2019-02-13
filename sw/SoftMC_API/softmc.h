@@ -78,6 +78,7 @@ class InstructionSequence{
 		virtual ~InstructionSequence();
 
 		void insert(const Instruction c);
+                void write_burst_data(uint wrdata[]);
 		void execute(fpga_t* fpga);
 
 		uint size;
