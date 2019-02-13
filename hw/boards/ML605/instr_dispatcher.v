@@ -391,7 +391,7 @@ module instr_dispatcher #(parameter ROW_WIDTH = 15, BANK_WIDTH = 3, CKE_WIDTH = 
 
         always @(posedge clk) begin
                 if (rst) begin
-                        write_state_r = WRITE_IDLE;
+                        write_state_r <= WRITE_IDLE;
                 end
                 else begin
                         write_state_r <= write_state_ns;
