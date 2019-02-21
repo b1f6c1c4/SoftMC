@@ -82,8 +82,6 @@ module instr_dispatcher #(parameter ROW_WIDTH = 15, BANK_WIDTH = 3, CKE_WIDTH = 
 	reg read_burst_r, read_burst_ns;
 	reg read_burst_even_r, read_burst_even_ns;
 	reg read_burst_odd_r, read_burst_odd_ns;
-	reg write_burst_r, write_burst_ns;
-	reg[7:0] write_burst_data_r, write_burst_data_ns;
 	
 	reg bus_write, bus_write_r;
 	
@@ -156,13 +154,10 @@ module instr_dispatcher #(parameter ROW_WIDTH = 15, BANK_WIDTH = 3, CKE_WIDTH = 
 		read_burst_ns = LOW;
 		read_burst_even_ns = LOW;
 		read_burst_odd_ns = LOW;
-		write_burst_ns = LOW;
-		write_burst_data_ns = write_burst_data_r;
 		
 		dfi_rddata_en = read_burst_r;
 		dfi_rddata_en_even = read_burst_even_r;
 		dfi_rddata_en_odd = read_burst_odd_r;
-		//dfi_wrdata_en = write_burst_r;
                 write_start = LOW;
 		
 		pr_rd_ack_ns = LOW;
@@ -212,12 +207,8 @@ module instr_dispatcher #(parameter ROW_WIDTH = 15, BANK_WIDTH = 3, CKE_WIDTH = 
 						
 						if(~|instr0[`CS_OFFSET +: CS_WIDTH] && instr0[`RAS_OFFSET] && ~instr0[`CAS_OFFSET] &&
 									~instr0[`WE_OFFSET] && cke0 && cke0_r) begin //check whether we have a write instruction
-							//dfi_wrdata_en = HIGH;
 							write_start = HIGH;
-                                                        write_burst_ns = HIGH;
-							
-							write_burst_data_ns = {instr0[30:25], instr0[(`ROW_OFFSET - 1) -:2]};
-							end
+						end
 					end //DDR_INSTR
 					
 					`WAIT: begin
@@ -278,12 +269,8 @@ module instr_dispatcher #(parameter ROW_WIDTH = 15, BANK_WIDTH = 3, CKE_WIDTH = 
 						
 						if(~|instr1[`CS_OFFSET +: CS_WIDTH] && instr1[`RAS_OFFSET] && ~instr1[`CAS_OFFSET] &&
 									~instr1[`WE_OFFSET] && cke1 && cke1_r) begin //check whether we have a write command
-							//dfi_wrdata_en = HIGH;
 							write_start = HIGH;
-                                                        write_burst_ns = HIGH;
-							
-							write_burst_data_ns = {instr1[30:25], instr1[(`ROW_OFFSET - 1) -:2]};
-							end
+						end
 					end //DDR_INSTR
 					
 					`WAIT: begin
@@ -337,21 +324,16 @@ module instr_dispatcher #(parameter ROW_WIDTH = 15, BANK_WIDTH = 3, CKE_WIDTH = 
 	);
 	
 	assign dfi_wrdata_mask = 0;
-	//assign dfi_wrdata = dfi_cas_n0 ? {4*(DQ_WIDTH/8){write_burst_data_r}} : {4*(DQ_WIDTH/8){write_burst_data_ns}};
-		
 
-    //assign dfi_wrdata = dfi_cas_n0 ? {4*(DQ_WIDTH/8){write_burst_data_r}} : {4*(DQ_WIDTH/8){8'b11111111}};
-
-    //TODO Add a wrdata fifo in the iseq_receiver!! 
+        // Set up the write data. 
         always@(*) begin
                 write_state_ns = WRITE_IDLE;
-                dfi_wrdata = 256'bx; // Use macro to express width
+                dfi_wrdata = {4*DQ_WIDTH{1'bx}}; 
                 dfi_wrdata_en = LOW;
                 wrdata_fifo_rd = LOW;
                 if (write_state_r == WRITE_IDLE) begin
                         if (write_start && (~dfi_cas_n0)) begin
                                 write_state_ns = WRITE_SLOT0_0;
-                                //dfi_wrdata = {{{8{8'h02}},{8{8'h01}}}, 128'bx};
                                 dfi_wrdata = {wrdata_fifo_data[127:0], 128'bx};
 				dfi_wrdata_en = HIGH;
                         end
@@ -365,24 +347,20 @@ module instr_dispatcher #(parameter ROW_WIDTH = 15, BANK_WIDTH = 3, CKE_WIDTH = 
                 else if (write_state_r == WRITE_SLOT1_0) begin
                         // Assert write_start != 1 for all later conditions
                         write_state_ns = WRITE_SLOT1_1;
-                        //dfi_wrdata = {{8{8'h04}}, {8{8'h03}}, {8{8'h02}}, {8{8'h01}}};
                         dfi_wrdata = wrdata_fifo_data[255:0];
                         dfi_wrdata_en = HIGH;
                 end
                 else if (write_state_r == WRITE_SLOT0_0) begin
                         write_state_ns = WRITE_SLOT0_1;
-                        //dfi_wrdata = {{8{8'h06}}, {8{8'h05}}, {8{8'h04}}, {8{8'h03}}};
                         dfi_wrdata = wrdata_fifo_data[383:128];
                         dfi_wrdata_en = HIGH;
                 end
                 else if (write_state_r == WRITE_SLOT1_1) begin
-                        //dfi_wrdata = {{8{8'h08}}, {8{8'h07}}, {8{8'h06}}, {8{8'h05}}};
                         dfi_wrdata = wrdata_fifo_data[511:256];
                         dfi_wrdata_en = HIGH;
                         wrdata_fifo_rd = (~wrdata_fifo_empty); // ASSERT(wrdata_fifo_empty == 0)
                 end
                 else if (write_state_r == WRITE_SLOT0_1) begin
-                        //dfi_wrdata = {{8{8'h0x}}, {8{8'h0x}}, {8{8'h8}}, {8{8'h7}}};
                         dfi_wrdata = {{8{8'h0x}}, {8{8'h0x}}, wrdata_fifo_data[511:384]};
                         dfi_wrdata_en = HIGH;
                         wrdata_fifo_rd = (~wrdata_fifo_empty); // ASSERT(wrdata_fifo_empty == 0)
@@ -430,8 +408,6 @@ module instr_dispatcher #(parameter ROW_WIDTH = 15, BANK_WIDTH = 3, CKE_WIDTH = 
 			read_burst_r <= LOW;
 			read_burst_even_r <= LOW;
 			read_burst_odd_r <= LOW;
-			write_burst_r <= LOW;
-			write_burst_data_r <= 0;
 			
 			bus_write_r <= LOW;
 			
@@ -441,8 +417,6 @@ module instr_dispatcher #(parameter ROW_WIDTH = 15, BANK_WIDTH = 3, CKE_WIDTH = 
 			read_burst_r <= read_burst_ns;
 			read_burst_even_r <= read_burst_even_ns;
 			read_burst_odd_r <= read_burst_odd_ns;
-			write_burst_r <= write_burst_ns;
-			write_burst_data_r <= write_burst_data_ns;
 			
 			bus_write_r <= bus_write;
 			

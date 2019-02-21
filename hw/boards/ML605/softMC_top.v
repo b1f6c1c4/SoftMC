@@ -2,7 +2,7 @@
 
 `include "softMC.inc"
 
-module softMC_top #
+module softMC_top # 
   (
 	parameter TCQ             = 100,
 	parameter tCK = 2500, //ps, TODO: let memory clok be 400 Mhz for now
