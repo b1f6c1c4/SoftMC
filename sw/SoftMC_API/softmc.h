@@ -81,6 +81,8 @@ class InstructionSequence{
                 void write_burst_data(uint wrdata[]);
 		void execute(fpga_t* fpga);
 
+                void print_iseq();
+
 		uint size;
 		Instruction* instrs;
 	private:

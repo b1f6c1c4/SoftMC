@@ -48,10 +48,17 @@ void InstructionSequence::write_burst_data(uint wrdata[]){
 			instrs = tmp;
 		}
 
-		instr = wrdata[j]
+		instr = wrdata[j];
 		instrs[size++] = instr;
 
     }
+}
+void InstructionSequence::print_iseq(){
+        int i;
+        for(i=0; i<size; i++)
+        {
+                printf("The %dth instruction is %x\n", i, (uint)(instrs[i]));
+        }
 }
 
 void InstructionSequence::execute(fpga_t* fpga){
@@ -150,21 +157,14 @@ Instruction genWR(uint bank, uint col, uint8_t pattern, AUTO_PRECHARGE ap, BURST
 
 Instruction genWR_burst(uint bank, uint col, AUTO_PRECHARGE ap){
 	Instruction instr = (uint)INSTR_TYPE::DDR;
-	instr <<= 32 - SIGNAL_OFFSET - BANK_OFFSET - ROW_OFFSET - CMD_OFFSET;
-
-	instr |= pattern >> 2; //most significant 6 bits of the pattern
-	instr <<= SIGNAL_OFFSET;
+	instr <<= 32 - BANK_OFFSET - ROW_OFFSET - CMD_OFFSET;
 
 	instr |= 0x24; //to set CKE(1) CS(0)[assumed it should be Low]
 	 	     //RAS(1) CAS(0) WE(0)
 	instr <<= BANK_OFFSET;
 
 	instr |= bank;
-	instr <<= 2;
-
-	instr |= pattern & 0x3; //least significant 2 bits of the pattern
-
-	instr <<= 2;
+	instr <<= 4;
 
 	instr |= 0x1; // to set cmd[12] to 1 (burst length 8)
 
