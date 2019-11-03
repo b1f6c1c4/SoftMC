@@ -44,6 +44,63 @@ TIMESPEC TS_MC_PHY_INIT_SEL = FROM "TNM_PHY_INIT_SEL" TO  FFS 10 ns;
 # Data Mask:     0
 ########################################################################
 
+#######################################################
+# I2C read module
+#######################################################
+NET "leds[0]" LOC = AC22;
+NET "leds[0]" IOSTANDARD = LVCMOS25;
+
+NET "leds[1]" LOC = AC24;
+NET "leds[1]" IOSTANDARD = LVCMOS25;
+
+NET "leds[2]" LOC = AE22;
+NET "leds[2]" IOSTANDARD = LVCMOS25;
+
+NET "leds[3]" LOC = AE23;
+NET "leds[3]" IOSTANDARD = LVCMOS25;
+
+NET "leds[4]" LOC = AB23;
+NET "leds[4]" IOSTANDARD = LVCMOS25;
+
+NET "leds[5]" LOC = AG23;
+NET "leds[5]" IOSTANDARD = LVCMOS25;
+
+NET "leds[6]" LOC = AE24;
+NET "leds[6]" IOSTANDARD = LVCMOS25;
+
+NET "leds[7]" LOC = AD24;
+NET "leds[7]" IOSTANDARD = LVCMOS25;
+
+NET "dfi_init_complete" LOC = AE21;     // E
+NET "dfi_init_complete" IOSTANDARD = LVCMOS25;
+
+NET "rdback_fifo_empty" LOC = AH28;     // S
+NET "rdback_fifo_empty" IOSTANDARD = LVCMOS25;
+
+NET "news_leds[0]" LOC = AD21;    // W
+NET "news_leds[0]" IOSTANDARD = LVCMOS25;
+ 
+NET "news_leds[1]" LOC = AH27;    // N
+NET "news_leds[1]" IOSTANDARD = LVCMOS25;
+
+NET "start" LOC = A18;          #S
+NET "start" IOSTANDARD = SSTL15;
+
+NET "next" LOC = G17;           #E
+NET "next" IOSTANDARD = SSTL15;
+
+NET "switch" LOC = A19;           #N
+NET "switch" IOSTANDARD = SSTL15;
+
+NET  "sda" IOSTANDARD = LVCMOS25;
+NET  "sda" SLEW = SLOW;
+NET  "sda" DRIVE = 6;
+NET  "sda" LOC = "AE9" ;          #Bank 34
+
+NET  "scl" IOSTANDARD = LVCMOS25;
+NET  "scl" SLEW = SLOW;
+NET  "scl" DRIVE = 6;
+NET  "scl" LOC = "AK9" ;          #Bank 34
 
 ################################################################################
 # I/O STANDARDS
@@ -367,6 +424,7 @@ NET "ddr_odt[0]" LOC = F18;
 #Bank 25
 NET "ddr_cs_n[0]" LOC = K18;
 NET "ddr_cs1_n" LOC = K17;
+
 #NET  "sys_clk_p"                                 LOC = "J9" ;          #Bank 34
 #NET  "sys_clk_n"                                 LOC = "H9" ;          #Bank 34
 #Bank 34
@@ -378,14 +436,15 @@ NET "clk_ref_n" LOC = H9;
 #Bank 34
 NET "sys_rst" LOC = H10;
 #Bank 34
-NET "dfi_init_complete" LOC = AC22;
-NET "dfi_init_complete" IOSTANDARD = LVCMOS25;
-NET "processing_iseq" LOC = AC24;
-NET "processing_iseq" IOSTANDARD = LVCMOS25;
-NET "iq_full" LOC = AE22;
-NET "iq_full" IOSTANDARD = LVCMOS25;
-NET "rdback_fifo_empty" LOC = AE23;
-NET "rdback_fifo_empty" IOSTANDARD = LVCMOS25;
+#NET "dfi_init_complete" LOC = AC22;
+#NET "dfi_init_complete" IOSTANDARD = LVCMOS25;
+#NET "processing_iseq" LOC = AC24;
+#NET "processing_iseq" IOSTANDARD = LVCMOS25;
+#NET "iq_full" LOC = AE22;
+#NET "iq_full" IOSTANDARD = LVCMOS25;
+#NET "rdback_fifo_empty" LOC = AE23;
+#NET "rdback_fifo_empty" IOSTANDARD = LVCMOS25;
+
 #Bank 26
 NET "ddr_dqs_p[0]" LOC = D12;
 #Bank 26

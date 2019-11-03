@@ -2,7 +2,7 @@
 
 `include "softMC.inc"
 
-module softMC_top # 
+module softMC_top #
   (
 	parameter TCQ             = 100,
 	parameter tCK = 2500, //ps, TODO: let memory clok be 400 Mhz for now
@@ -107,8 +107,8 @@ module softMC_top #
 	output                             ddr_cas_n,
 	output                             ddr_we_n,
 	output [CS_WIDTH*nCS_PER_RANK-1:0] ddr_cs_n,
-	output                             ddr_cs1_n,
-        output [CKE_WIDTH-1:0]             ddr_cke,
+    output                             ddr_cs1_n,
+	output [CKE_WIDTH-1:0]             ddr_cke,
 	output [CS_WIDTH*nCS_PER_RANK-1:0] ddr_odt,
 	output                             ddr_reset_n,
 	//output                             ddr_parity,
@@ -121,6 +121,14 @@ module softMC_top #
 	output										processing_iseq, //led 1
 	output 										iq_full, //led 2
 	output 										rdback_fifo_empty, //led 3
+    
+    input                               start,
+    input                               switch,
+    input                               next,
+    output  [7:0]                       leds,
+    output  [1:0]                       news_leds,
+    inout                               scl,
+    inout                               sda,
 	
 	//PCIE
 	
@@ -146,9 +154,9 @@ module softMC_top #
     );
 	 
 	 assign ddr_dm = {DM_WIDTH{1'b0}};
-
-         // For dual rank DIMM, only access the first rank for now.
-         assign ddr_cs1_n = 1'b1;
+     
+     // For dual rank DIMM, only access the first rank.
+     assign ddr_cs1_n = 1'b1;
 	 
 	 /*** CLOCK MANAGEMENT ***/
 	 
@@ -162,6 +170,39 @@ module softMC_top #
 	 wire iodelay_ctrl_rdy;
 	 wire mmcm_clk;
 	 wire sys_clk = 0;
+
+   wire rdback_fifo_empty_i2c;
+   wire [DQ_WIDTH*4 - 1:0] rdback_data_i2c;
+   wire switch_botton;
+
+   reg state_switch;
+   reg rdback_src_sel;
+
+   debounce db_next
+    (
+    .clk    (clk),
+    .reset  (reset),
+    .key_i  (switch),
+    .key_o  (switch_botton)
+    );
+
+    always @(posedge clk)
+    begin
+        if (sys_rst)
+        begin
+            rdback_src_sel <= 0;
+            state_switch <= 0;
+        end
+        else if (state_switch == 0 && switch_botton == 1'b1)
+        begin
+            rdback_src_sel <= ~rdback_src_sel;
+            state_switch <= 1'b1;
+        end
+        else if (state_switch == 1'b1 && switch_botton == 0)
+        begin
+            state_switch <= 0;
+        end
+    end
 	 
 	 //use 200MHZ refrence clock to generate mmcm_clk
 	 iodelay_ctrl #
@@ -384,7 +425,27 @@ module softMC_top #
 	wire[DQ_WIDTH*4 - 1:0] rdback_data;
 	`endif //SIM
 	
-	
+	 i2c_read spd_read
+     (
+        .clk    (clk),
+        .reset  (sys_rst),
+        .start  (start),
+        .next   (next),
+
+        .leds   (leds),
+        .news_leds (news_leds),
+
+        .rdback_data_i2c        (rdback_data_i2c),
+        .rdback_fifo_rden_i2c   (rdback_fifo_rden && (rdback_src_sel == 0)),
+        .rdback_fifo_empty_i2c  (rdback_fifo_empty_i2c),
+
+        .src_sel (rdback_src_sel),
+
+        .scl    (scl),
+        .sda    (sda)
+     );
+    
+    
 	 softMC #(.TCQ(TCQ), .tCK(tCK), .nCK_PER_CLK(nCK_PER_CLK), .RANK_WIDTH(RANK_WIDTH), .ROW_WIDTH(ROW_WIDTH), .BANK_WIDTH(BANK_WIDTH), 
 								.CKE_WIDTH(CKE_WIDTH), .CS_WIDTH(CS_WIDTH), .nCS_PER_RANK(nCS_PER_RANK), .DQ_WIDTH(DQ_WIDTH)) i_softmc(
 	.clk(clk),
@@ -436,11 +497,11 @@ module softMC_top #
 	
 	//Data read back Interface
 	.rdback_fifo_empty(rdback_fifo_empty),
-	.rdback_fifo_rden(rdback_fifo_rden),
+	.rdback_fifo_rden(rdback_fifo_rden && (rdback_src_sel == 1'b1)),
 	.rdback_data(rdback_data)
 );
 
-`ifndef SIM
+`ifndef SIM 
 
 riffa_top_v6_pcie_v2_5 #(
   .C_DATA_WIDTH(64),            // RX/TX interface data width
@@ -462,9 +523,9 @@ riffa_top_v6_pcie_v2_5 #(
 	.app_instr(app_instr),
 	
 	//Data read back Interface
-	.rdback_fifo_empty(rdback_fifo_empty),
+	.rdback_fifo_empty(rdback_src_sel == 0 ? rdback_fifo_empty_i2c : rdback_fifo_empty),
 	.rdback_fifo_rden(rdback_fifo_rden),
-	.rdback_data(rdback_data)
+	.rdback_data(rdback_src_sel == 0 ? rdback_data_i2c : rdback_data)
 );
 
 `endif //SIM
