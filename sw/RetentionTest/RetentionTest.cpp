@@ -8,6 +8,15 @@
 
 using namespace std;
 
+void prepare_data(uint wrdata[], int seed)
+{
+    for (int i=0; i<16; i++)
+    {
+        wrdata[i] = seed + i;
+    }
+}
+
+
 //Note that capacity of the instruction buffer is 8192 instructions
 void writeRow(fpga_t* fpga, uint row, uint bank, uint8_t pattern, InstructionSequence*& iseq){
 
@@ -28,12 +37,28 @@ void writeRow(fpga_t* fpga, uint row, uint bank, uint8_t pattern, InstructionSeq
 	//Wait for tRCD
 	iseq->insert(genWAIT(5));
 
-	//Write to the entire row
-	for(int i = 0; i < NUM_COLS; i+=8){ //we use 8x burst mode
-		iseq->insert(genWR(bank, i, pattern));
+	uint wrdata[16];
+        
+        //Write to the entire row
+	for(int i = 0; i < 64; i+=8){ //we use 8x burst mode
+		iseq->insert(genWR_burst(bank, i));
+
+                prepare_data(wrdata, i*32);
+                iseq->write_burst_data(wrdata);
+                
+                //iseq->insert(genWR(bank, i, 0x5a));
+
+                /*for (int j=0; j<8; j++)
+                {
+                    printf("Write Col %d, data:%x%x\n", i+j, wrdata[2*j+1], wrdata[2*j]);
+                }*/
 
 		//We need to wait for tCL and 4 cycles burst (double data-rate)
-		iseq->insert(genWAIT(6 + 4));
+		iseq->insert(genWAIT(6 + 6));
+
+                //iseq->insert(genWR(bank, i+8, 0x5a));
+
+                //iseq->insert(genWAIT(10));
 	}
 
 	//Wait some more in any case
@@ -47,6 +72,8 @@ void writeRow(fpga_t* fpga, uint row, uint bank, uint8_t pattern, InstructionSeq
 
 	//START Transaction
 	iseq->insert(genEND());
+
+        iseq->print_iseq();
 
 	iseq->execute(fpga);
 }
@@ -71,7 +98,7 @@ void readAndCompareRow(fpga_t* fpga, const uint row, const uint bank, const uint
 	iseq->insert(genWAIT(5));
 
 	//Read the entire row
-	for(int i = 0; i < NUM_COLS; i+=8){ //we use 8x burst mode
+	for(int i = 0; i < 64; i+=8){ //we use 8x burst mode
 		iseq->insert(genRD(bank, i));
 
 		//We need to wait for tCL and 4 cycles burst (double data-rate)
@@ -94,15 +121,15 @@ void readAndCompareRow(fpga_t* fpga, const uint row, const uint bank, const uint
 
 	//Receive the data
 	uint rbuf[16];
-	for(int i = 0; i < NUM_COLS; i+=8){ //we receive a single burst at two times (32 bytes each)
+	for(int i = 0; i < 64; i+=8){ //we receive a single burst at two times (32 bytes each)
 		fpga_recv(fpga, 0, (void*)rbuf, 16, 0);
 
 		//compare with the pattern
 		uint8_t* rbuf8 = (uint8_t *) rbuf;
 
 		for(int j = 0; j < 64; j++){
-			if(rbuf8[j] != pattern)
-				fprintf(stderr, "Error at Col: %d, Row: %u, Bank: %u, DATA: %x \n", i, row, bank, rbuf8[j]);
+			//if(rbuf8[j] != pattern)
+				printf("Error at Col: %d, Row: %u, Bank: %u, DATA: %x \n", i+j/8, row, bank, rbuf8[j]);
 		}
 	}
 }
@@ -142,11 +169,11 @@ void testRetention(fpga_t* fpga, const int retention){
 	GET_TIME_INIT(2);
 
 	//writing the entire row takes approximately 5 ms
-	uint group_size = ceil(retention/5.0f); //number of rows to be written in a single iteration
+	uint group_size = 1; //number of rows to be written in a single iteration
 	uint cur_row_write = 0;
-	uint cur_bank_write = 0;
+	uint cur_bank_write = 1;
 	uint cur_row_read = 0;
-	uint cur_bank_read = 0;
+	uint cur_bank_read = 1;
 
     printf("\n");
 
@@ -174,10 +201,10 @@ void testRetention(fpga_t* fpga, const int retention){
 			}
 		
 			// the entire DIMM is covered when we complete testing all of the bank
-			if(cur_bank_write == NUM_BANKS){
+			if(cur_bank_write >= 0){
 				// we are done with the entire DIMM
 				dimm_done = true;
-				break;
+				//break;
 			}
 		}
 
@@ -185,9 +212,9 @@ void testRetention(fpga_t* fpga, const int retention){
 		turnBus(fpga, BUSDIR::READ, iseq);
 
 		// wait for the specified retention time (retention)
-		do{
+		/*do{
 			GET_TIME_VAL(1);
-		} while((TIME_VAL_TO_MS(1) - TIME_VAL_TO_MS(0)) < retention);
+		} while((TIME_VAL_TO_MS(1) - TIME_VAL_TO_MS(0)) < retention);*/
 
 		// Read the data back and compare
 		for(int i = 0; i < group_size; i++){
