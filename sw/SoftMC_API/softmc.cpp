@@ -61,6 +61,12 @@ void InstructionSequence::print_iseq(){
         }
 }
 
+void InstructionSequence::pop(){
+    if(size != 0){
+        size --;
+    }
+}
+
 void InstructionSequence::execute(fpga_t* fpga){
 	fpga_send(fpga, 0, (void*)instrs, INSTR_SIZE*size, 0, 1, 0);
 }

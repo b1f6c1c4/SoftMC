@@ -28,9 +28,16 @@
 // TODO: modify the hardware to support 32-bit instructions.
 #define INSTR_SIZE 2 //2 words
 
+#define NUM_CHIPS 8
 #define NUM_ROWS 32768
 #define NUM_COLS 1024
 #define NUM_BANKS 8
+#define SUBARRAY_SIZE 512
+#define NUM_SUBARRAYS (NUM_ROWS / SUBARRAY_SIZE)
+
+
+
+
 
 typedef uint64_t Instruction;
 typedef uint32_t uint;
@@ -80,7 +87,7 @@ class InstructionSequence{
 		void insert(const Instruction c);
                 void write_burst_data(uint wrdata[]);
 		void execute(fpga_t* fpga);
-
+                void pop();
                 void print_iseq();
 
 		uint size;
