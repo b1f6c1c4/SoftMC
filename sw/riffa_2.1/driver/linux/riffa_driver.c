@@ -1338,7 +1338,7 @@ static void __devexit fpga_remove(struct pci_dev *dev)
 // MODULE INIT/EXIT FUNCTIONS
 ///////////////////////////////////////////////////////
 
-static DEFINE_PCI_DEVICE_TABLE(fpga_ids) = {
+static const struct pci_device_id fpga_ids[] = {
 	{PCI_DEVICE(VENDOR_ID0, PCI_ANY_ID)},
 	{PCI_DEVICE(VENDOR_ID1, PCI_ANY_ID)},
 	{0},
