@@ -356,7 +356,7 @@ static inline struct sg_mapping * fill_sg_buf(struct fpga_state * sc, int chnl,
 
 		// Page in the user pages.
 		down_read(&current->mm->mmap_lock);
-		num_pages = get_user_pages(current, current->mm, udata, num_pages_reqd, 1, 0, pages, NULL);
+		num_pages = get_user_pages(udata, num_pages_reqd, FOLL_WRITE, pages, NULL);
 		up_read(&current->mm->mmap_lock);
 		if (num_pages <= 0) {
 			printk(KERN_ERR "riffa: fpga:%d chnl:%d, %s unable to pin any pages in memory\n", sc->id, chnl, dir);
