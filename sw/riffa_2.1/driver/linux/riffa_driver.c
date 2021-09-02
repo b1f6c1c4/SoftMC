@@ -369,7 +369,7 @@ static inline struct sg_mapping * fill_sg_buf(struct fpga_state * sc, int chnl,
 		if ((sgl = kcalloc(num_pages, sizeof(*sgl), GFP_KERNEL)) == NULL) {
 			printk(KERN_ERR "riffa: fpga:%d chnl:%d, %s could not allocate memory for scatterlist array\n", sc->id, chnl, dir);
 			for (i = 0; i < num_pages; ++i)
-				page_cache_release(pages[i]);
+				put_page(pages[i]);
 			kfree(pages);
 			kfree(sg_map);
 			return NULL;
@@ -437,12 +437,12 @@ static inline void free_sg_buf(struct fpga_state * sc, struct sg_mapping * sg_ma
 			for (i = 0; i < sg_map->num_pages; ++i) {
 				if (!PageReserved(sg_map->pages[i]))
 					SetPageDirty(sg_map->pages[i]);
-				page_cache_release(sg_map->pages[i]);
+				put_page(sg_map->pages[i]);
 			}
 		}
 		else {
 			for (i = 0; i < sg_map->num_pages; ++i) {
-				page_cache_release(sg_map->pages[i]);
+				put_page(sg_map->pages[i]);
 			}
 		}
 	}
