@@ -327,53 +327,53 @@ module instr_dispatcher #(parameter ROW_WIDTH = 15, BANK_WIDTH = 3, CKE_WIDTH = 
 
    // Set up the write data.
    always@(*) begin
-         write_state_ns = WRITE_IDLE;
-         dfi_wrdata = {4*DQ_WIDTH{1'bx}};
-         dfi_wrdata_en = LOW;
-         wrdata_fifo_rd = LOW;
-         if (write_state_r == WRITE_IDLE) begin
-               if (write_start && (~dfi_cas_n0)) begin
-                     write_state_ns = WRITE_SLOT0_0;
-                     dfi_wrdata = {wrdata_fifo_data[127:0], 128'bx};
+      write_state_ns = WRITE_IDLE;
+      dfi_wrdata = {4*DQ_WIDTH{1'bx}};
+      dfi_wrdata_en = LOW;
+      wrdata_fifo_rd = LOW;
+      if (write_state_r == WRITE_IDLE) begin
+         if (write_start && (~dfi_cas_n0)) begin
+            write_state_ns = WRITE_SLOT0_0;
+            dfi_wrdata = {wrdata_fifo_data[127:0], 128'bx};
+            dfi_wrdata_en = HIGH;
+         end
+         else if (write_start && (~dfi_cas_n1)) begin
+            write_state_ns = WRITE_SLOT1_0;
+         end
+         else begin
+            write_state_ns = WRITE_IDLE;
+         end
+      end
+      else if (write_state_r == WRITE_SLOT1_0) begin
+         // Assert write_start != 1 for all later conditions
+         write_state_ns = WRITE_SLOT1_1;
+         dfi_wrdata = wrdata_fifo_data[255:0];
          dfi_wrdata_en = HIGH;
-               end
-               else if (write_start && (~dfi_cas_n1)) begin
-                     write_state_ns = WRITE_SLOT1_0;
-               end
-               else begin
-                     write_state_ns = WRITE_IDLE;
-               end
-         end
-         else if (write_state_r == WRITE_SLOT1_0) begin
-               // Assert write_start != 1 for all later conditions
-               write_state_ns = WRITE_SLOT1_1;
-               dfi_wrdata = wrdata_fifo_data[255:0];
-               dfi_wrdata_en = HIGH;
-         end
-         else if (write_state_r == WRITE_SLOT0_0) begin
-               write_state_ns = WRITE_SLOT0_1;
-               dfi_wrdata = wrdata_fifo_data[383:128];
-               dfi_wrdata_en = HIGH;
-         end
-         else if (write_state_r == WRITE_SLOT1_1) begin
-               dfi_wrdata = wrdata_fifo_data[511:256];
-               dfi_wrdata_en = HIGH;
-               wrdata_fifo_rd = (~wrdata_fifo_empty); // ASSERT(wrdata_fifo_empty == 0)
-         end
-         else if (write_state_r == WRITE_SLOT0_1) begin
-               dfi_wrdata = {{8{8'h0x}}, {8{8'h0x}}, wrdata_fifo_data[511:384]};
-               dfi_wrdata_en = HIGH;
-               wrdata_fifo_rd = (~wrdata_fifo_empty); // ASSERT(wrdata_fifo_empty == 0)
-         end
+      end
+      else if (write_state_r == WRITE_SLOT0_0) begin
+         write_state_ns = WRITE_SLOT0_1;
+         dfi_wrdata = wrdata_fifo_data[383:128];
+         dfi_wrdata_en = HIGH;
+      end
+      else if (write_state_r == WRITE_SLOT1_1) begin
+         dfi_wrdata = wrdata_fifo_data[511:256];
+         dfi_wrdata_en = HIGH;
+         wrdata_fifo_rd = (~wrdata_fifo_empty); // ASSERT(wrdata_fifo_empty == 0)
+      end
+      else if (write_state_r == WRITE_SLOT0_1) begin
+         dfi_wrdata = {{8{8'h0x}}, {8{8'h0x}}, wrdata_fifo_data[511:384]};
+         dfi_wrdata_en = HIGH;
+         wrdata_fifo_rd = (~wrdata_fifo_empty); // ASSERT(wrdata_fifo_empty == 0)
+      end
    end
 
    always @(posedge clk) begin
-         if (rst) begin
-               write_state_r <= WRITE_IDLE;
-         end
-         else begin
-               write_state_r <= write_state_ns;
-         end
+      if (rst) begin
+         write_state_r <= WRITE_IDLE;
+      end
+      else begin
+         write_state_r <= write_state_ns;
+      end
    end
 
    always@(posedge clk) begin
