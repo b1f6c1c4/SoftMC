@@ -1,6 +1,6 @@
 # SoftMC v1.0
 
-SoftMC is an experimental FPGA-based memory controller design that could be used to develop tests for DDR3 SODIMMs. SoftMC currently supports only the *Xilinx ML605* board. Soon, we will port SoftMC on other popularly used boards (e.g., *Xilinx VC709*). 
+SoftMC is an experimental FPGA-based memory controller design that could be used to develop tests for DDR3 SODIMMs. SoftMC currently supports only the *Xilinx ML605* board.
 
 A paper describing SoftMC in detail is published at HPCA 2017 and is available here: 
 >*Hasan Hassan, Nandita Vijaykumar, Samira Khan, Saugata Ghose, Kevin Chang, Gennady Pekhimenko, Donghyuk Lee, Oguz Ergin, and Onur Mutlu,*
@@ -9,17 +9,17 @@ A paper describing SoftMC in detail is published at HPCA 2017 and is available h
 
 If you use or build on SoftMC, please cite that paper. 
 
-We provide a) prebuilt binaries for quick installation and b) the source
-code (both in Verilog and C++) that you could modify as you wish.
+We provide the source
+code (both in Verilog and C) that you could modify as you wish.
 
 ## Prerequisites:
 - A Xilinx ML605 FPGA or other compatible board (We only tested ML605)
-- A Linux Host Machine, (We have tested on Ubuntu 12.04/14.04)
+- A Linux Host Machine,
 - SoftMC uses an 8-lane PCIe interface to communicate with the Host Machine.
   So, you would also need to attach the board to the  8x/16x PCIe slot on the
 motherboard of the Host Machine
 - Single Rank DDR3 SODIMM attached to your FPGA board
-- Xilinx ISE 14.6 (in case you want to build your own bitfile from the
+- Xilinx ISE 14.7 (in case you want to build your own bitfile from the
   source)
 
 
@@ -62,7 +62,7 @@ command below:
 
 Generating the SoftMC bitfile is straightforward:
 
-- Use Xilinx ISE 14.6 to open the project, which is located located at *hw/boards/ML605/SoftMC.xise*. Ignore *missing files* pop-up windows by clicking the "Cancel" button. The missing files will be generated once the steps below are followed. 
+- Use Xilinx ISE 14.7 to open the project, which is located located at *hw/boards/ML605/SoftMC.xise*. Ignore *missing files* pop-up windows by clicking the "Cancel" button. The missing files will be generated once the steps below are followed. 
 - Double-click on *xilinx_mig* IPCore file to open Memory Interface Generator's (MIG) configuration window. Keep clicking the "Next" button until the windows closes. Doing this will generate the necessary files required by SoftMC in ```hw/boards/ML605/ipcore_dir/xilinx_mig```.
 - Open a terminal and go to hw/boards/ML605. Run:
 
@@ -89,14 +89,6 @@ is doing the steps that we listed above.
 - Then follow the steps in **a)**
 
 *(Where necessary to simulate the SoftMC hardware, we provide a sample testbench module ("tb_softMC_top.v") that you can start with. To enable simulation, you will need to uncomment the SIM definition in "softMC.inc". This will change the I/O interface of the top module to exclude the PCIe signals and let you easily issue instructions to SoftMC)*
-
-To compile the sample application (retention time test) that we provide:
-
-```
-$ cd sw/RetentionTest
-$ make
-$ ./SoftMC_RetentionTest [Target Retention Time in milliseconds]
-``` 
 
 ## Known Issues:
 - Multi Rank SODIMMs are currently not supported.
