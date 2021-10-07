@@ -87,13 +87,12 @@ always@* begin
          app_ack = 1'b1;
          instr_en_ns = app_en;
          instr_ns = app_instr;
-         //TODO need to change the steering logic
          // This is a long write
          if (instr_en_ns && instr_ns[31] && ~instr_ns[`CAS_OFFSET]
              && ~instr_ns[`WE_OFFSET] && instr_ns[`LONG_WR_OFFSET] && instr_ns[`BURST_OFFSET]) begin
             state_ns = STATE_WRDATA;
-            wrdata_count_down_ns = 4'b1111;
-            wrdata_ns = 512'b0;
+            wrdata_count_down_ns = 15;
+            wrdata_ns = 512'h_b16b000b_abadbabe_abadcafe_b16b00b5_badbadba_beefcace_c00010ff_cafebabe_cafed00d_0d15ea5e_dead10cc_deadbabe_deadcafe_deadfa11_d00d2bad_fee1dead;
          end
          // burst write but replicate bytes
          else if (instr_en_ns && instr_ns[31] && ~instr_ns[`CAS_OFFSET]
@@ -110,16 +109,16 @@ always@* begin
       STATE_WRDATA: begin
          app_ack = 1'b1;
          if (app_en) begin
-            if (wrdata_count_down_r == 4'b0) begin
+            if (wrdata_count_down_r == 0) begin
                state_ns = STATE_APP;
                wrdata_en_ns = 1'b1;
             end
             else begin
                wrdata_count_down_ns = wrdata_count_down_r - 1;
             end
-            wrdata_ns = wrdata_r | (app_instr << ((4'b1111 - wrdata_count_down_r) * 32));
+            wrdata_ns = {app_instr,wrdata_r[16*32-1:32]};
          end
-      end // receive write data
+      end //STATE_WRDATA
 
       STATE_MAINT: begin
          maint_ack = 1'b1;
