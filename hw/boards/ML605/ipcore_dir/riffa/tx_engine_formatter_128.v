@@ -41,56 +41,56 @@
 // MODIFICATIONS.
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
-// Filename:			tx_engine_formatter_128.v
-// Version:				1.00.a
-// Verilog Standard:	Verilog-2001
-// Description:			Formats read and write request data into PCI packets.
-// Author:				Matt Jacobsen
-// History:				@mattj: Version 2.0
+// Filename:         tx_engine_formatter_128.v
+// Version:            1.00.a
+// Verilog Standard:   Verilog-2001
+// Description:         Formats read and write request data into PCI packets.
+// Author:            Matt Jacobsen
+// History:            @mattj: Version 2.0
 // Additional Comments: Very good PCIe header reference:
 // http://www.pzk-agro.com/0321156307_ch04lev1sec5.html#ch04lev4sec14
 //-----------------------------------------------------------------------------
-`define FMT_TXENGFMTR128_WR32	7'b10_00000
-`define FMT_TXENGFMTR128_RD32	7'b00_00000
-`define FMT_TXENGFMTR128_WR64	7'b11_00000
-`define FMT_TXENGFMTR128_RD64	7'b01_00000
+`define FMT_TXENGFMTR128_WR32   7'b10_00000
+`define FMT_TXENGFMTR128_RD32   7'b00_00000
+`define FMT_TXENGFMTR128_WR64   7'b11_00000
+`define FMT_TXENGFMTR128_RD64   7'b01_00000
 
-`define S_TXENGFMTR128_IDLE		1'b0
-`define S_TXENGFMTR128_WR		1'b1
+`define S_TXENGFMTR128_IDLE      1'b0
+`define S_TXENGFMTR128_WR      1'b1
 
 module tx_engine_formatter_128 #(
-	parameter C_PCI_DATA_WIDTH = 9'd128,
-	// Local parameters
-	parameter C_TRAFFIC_CLASS = 3'b0,
-	parameter C_RELAXED_ORDER = 1'b0,
-	parameter C_NO_SNOOP = 1'b0
+   parameter C_PCI_DATA_WIDTH = 9'd128,
+   // Local parameters
+   parameter C_TRAFFIC_CLASS = 3'b0,
+   parameter C_RELAXED_ORDER = 1'b0,
+   parameter C_NO_SNOOP = 1'b0
 )
 (
-	input CLK,
-	input RST,
-	input [15:0] CONFIG_COMPLETER_ID,
+   input CLK,
+   input RST,
+   input [15:0] CONFIG_COMPLETER_ID,
 
-	input VALID,		 					// Are input parameters valid?
-	input WNR,		 						// Is a write request, not a read?
-	input [7:0] TAG,		 				// External tag
-	input [3:0] CHNL,		 				// Internal tag (just channel portion)
-	input [61:0] ADDR,		 				// Request address
-	input ADDR_64,		 					// Request address is 64 bit
-	input [9:0] LEN,		 				// Request length
-	input LEN_ONE,		 					// Request length equals 1
-	input [C_PCI_DATA_WIDTH-1:0] WR_DATA,	// Request data, timed to arrive accordingly
+   input VALID,                      // Are input parameters valid?
+   input WNR,                         // Is a write request, not a read?
+   input [7:0] TAG,                   // External tag
+   input [3:0] CHNL,                   // Internal tag (just channel portion)
+   input [61:0] ADDR,                   // Request address
+   input ADDR_64,                      // Request address is 64 bit
+   input [9:0] LEN,                   // Request length
+   input LEN_ONE,                      // Request length equals 1
+   input [C_PCI_DATA_WIDTH-1:0] WR_DATA,   // Request data, timed to arrive accordingly
 
-	output [C_PCI_DATA_WIDTH-1:0] OUT_DATA,	// Formatted PCI packet data
-	output OUT_DATA_WEN 					// Write enable for formatted packet data
+   output [C_PCI_DATA_WIDTH-1:0] OUT_DATA,   // Formatted PCI packet data
+   output OUT_DATA_WEN                // Write enable for formatted packet data
 );
 
-reg									rState=`S_TXENGFMTR128_IDLE, _rState=`S_TXENGFMTR128_IDLE;
-reg									rAddr64=0, _rAddr64=0;
-reg		[C_PCI_DATA_WIDTH-1:0]		rData={C_PCI_DATA_WIDTH{1'd0}}, _rData={C_PCI_DATA_WIDTH{1'd0}};
-reg		[C_PCI_DATA_WIDTH-1:0]		rPrevData={C_PCI_DATA_WIDTH{1'd0}}, _rPrevData={C_PCI_DATA_WIDTH{1'd0}};
-reg									rDataWen=0, _rDataWen=0;
-reg		[9:0]						rLen=0, _rLen=0;
-reg									rDone=0, _rDone=0;
+reg                           rState=`S_TXENGFMTR128_IDLE, _rState=`S_TXENGFMTR128_IDLE;
+reg                           rAddr64=0, _rAddr64=0;
+reg      [C_PCI_DATA_WIDTH-1:0]      rData={C_PCI_DATA_WIDTH{1'd0}}, _rData={C_PCI_DATA_WIDTH{1'd0}};
+reg      [C_PCI_DATA_WIDTH-1:0]      rPrevData={C_PCI_DATA_WIDTH{1'd0}}, _rPrevData={C_PCI_DATA_WIDTH{1'd0}};
+reg                           rDataWen=0, _rDataWen=0;
+reg      [9:0]                  rLen=0, _rLen=0;
+reg                           rDone=0, _rDone=0;
 
 
 assign OUT_DATA = rData;
@@ -102,45 +102,45 @@ wire [63:0] wHdrData = ({WR_DATA[31:0], ADDR[29:0], 2'b00, ADDR[61:30]})>>(32*(!
 wire [C_PCI_DATA_WIDTH-1:0] wWrData = ({WR_DATA[31:0], rPrevData})>>(32*(!rAddr64));
 
 always @ (posedge CLK) begin
-	rState <= #1 (RST ? `S_TXENGFMTR128_IDLE : _rState);
-	rDataWen <= #1 (RST ? 1'd0 : _rDataWen);
-	rData <= #1 _rData;
-	rLen <= #1 _rLen;
-	rAddr64 <= #1 _rAddr64;
-	rPrevData <= #1 _rPrevData;
-	rDone <= #1 _rDone;
+   rState <= #1 (RST ? `S_TXENGFMTR128_IDLE : _rState);
+   rDataWen <= #1 (RST ? 1'd0 : _rDataWen);
+   rData <= #1 _rData;
+   rLen <= #1 _rLen;
+   rAddr64 <= #1 _rAddr64;
+   rPrevData <= #1 _rPrevData;
+   rDone <= #1 _rDone;
 end
 
 always @ (*) begin
-	_rState = rState;
-	_rLen = rLen;
-	_rData = rData;
-	_rDataWen = rDataWen;
-	_rPrevData = WR_DATA;
-	_rAddr64 = rAddr64;
-	case (rState) 
+   _rState = rState;
+   _rLen = rLen;
+   _rData = rData;
+   _rDataWen = rDataWen;
+   _rPrevData = WR_DATA;
+   _rAddr64 = rAddr64;
+   case (rState) 
 
-	`S_TXENGFMTR128_IDLE : begin // FIFO data should be available now (if it's a write)
-		_rLen = LEN - !ADDR_64; // Subtract 1 for 32 bit (HDR has one)
-		_rAddr64 = ADDR_64;
-		_rData = {wHdrData,														// DW3, DW2
-					CONFIG_COMPLETER_ID[15:3], 3'b0, TAG,
-					(LEN_ONE ? 4'b0 : 4'b1111), 4'b1111,						// DW1
-					1'b0, {WNR, ADDR_64, 5'd0}, 1'b0, C_TRAFFIC_CLASS, CHNL, 1'b0, 1'b0, // Use the reserved 4 bits before traffic class to hide the internal tag 
-					C_RELAXED_ORDER, C_NO_SNOOP, 2'b0, LEN};					// DW0
-		_rDataWen = VALID;
-		_rDone = (LEN <= {1'b1, 1'b0, !ADDR_64});
-		_rState = (VALID & WNR & (ADDR_64 | !LEN_ONE) ? `S_TXENGFMTR128_WR : `S_TXENGFMTR128_IDLE);
-	end
+   `S_TXENGFMTR128_IDLE : begin // FIFO data should be available now (if it's a write)
+      _rLen = LEN - !ADDR_64; // Subtract 1 for 32 bit (HDR has one)
+      _rAddr64 = ADDR_64;
+      _rData = {wHdrData,                                          // DW3, DW2
+               CONFIG_COMPLETER_ID[15:3], 3'b0, TAG,
+               (LEN_ONE ? 4'b0 : 4'b1111), 4'b1111,                  // DW1
+               1'b0, {WNR, ADDR_64, 5'd0}, 1'b0, C_TRAFFIC_CLASS, CHNL, 1'b0, 1'b0, // Use the reserved 4 bits before traffic class to hide the internal tag 
+               C_RELAXED_ORDER, C_NO_SNOOP, 2'b0, LEN};               // DW0
+      _rDataWen = VALID;
+      _rDone = (LEN <= {1'b1, 1'b0, !ADDR_64});
+      _rState = (VALID & WNR & (ADDR_64 | !LEN_ONE) ? `S_TXENGFMTR128_WR : `S_TXENGFMTR128_IDLE);
+   end
 
-	`S_TXENGFMTR128_WR : begin
-		_rLen = rLen - 3'd4;
-		_rDone = (rLen <= 4'd8);
-		_rData = wWrData;
-		_rState = (rDone ? `S_TXENGFMTR128_IDLE : `S_TXENGFMTR128_WR);
-	end
+   `S_TXENGFMTR128_WR : begin
+      _rLen = rLen - 3'd4;
+      _rDone = (rLen <= 4'd8);
+      _rData = wWrData;
+      _rState = (rDone ? `S_TXENGFMTR128_IDLE : `S_TXENGFMTR128_WR);
+   end
 
-	endcase
+   endcase
 end
 
 endmodule

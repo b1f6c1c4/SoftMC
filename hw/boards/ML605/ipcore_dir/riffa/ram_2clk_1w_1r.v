@@ -41,24 +41,24 @@
 // MODIFICATIONS.
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
-// Filename:			ram_2clk_1w_1r.v
-// Version:				1.00.a
-// Verilog Standard:	Verilog-2001
-// Description:			An inferrable RAM module. Dual clocks, 1 write port, 1 
-//						read port. In Xilinx designs, specify RAM_STYLE="BLOCK" 
-//						to use BRAM memory or RAM_STYLE="DISTRIBUTED" to use 
-//						LUT memory.
-// Author:				Matt Jacobsen
-// History:				@mattj: Version 2.0
+// Filename:         ram_2clk_1w_1r.v
+// Version:            1.00.a
+// Verilog Standard:   Verilog-2001
+// Description:         An inferrable RAM module. Dual clocks, 1 write port, 1 
+//                  read port. In Xilinx designs, specify RAM_STYLE="BLOCK" 
+//                  to use BRAM memory or RAM_STYLE="DISTRIBUTED" to use 
+//                  LUT memory.
+// Author:            Matt Jacobsen
+// History:            @mattj: Version 2.0
 //-----------------------------------------------------------------------------
 module ram_2clk_1w_1r (
-	CLKA,
-	ADDRA,
-	WEA,
-	DINA,
-	CLKB,
-	ADDRB,
-	DOUTB
+   CLKA,
+   ADDRA,
+   WEA,
+   DINA,
+   CLKB,
+   ADDRB,
+   DOUTB
 );
 
 `include "common_functions.v"
@@ -68,13 +68,13 @@ parameter C_RAM_DEPTH = 1024;
 //Local parameters
 parameter C_RAM_ADDR_BITS = clog2s(C_RAM_DEPTH);
 
-input							CLKA;
-input							CLKB;
-input 							WEA;
-input 	[C_RAM_ADDR_BITS-1:0]	ADDRA;
-input 	[C_RAM_ADDR_BITS-1:0]	ADDRB;
-input 	[C_RAM_WIDTH-1:0]		DINA;
-output 	[C_RAM_WIDTH-1:0]		DOUTB;
+input                     CLKA;
+input                     CLKB;
+input                      WEA;
+input    [C_RAM_ADDR_BITS-1:0]   ADDRA;
+input    [C_RAM_ADDR_BITS-1:0]   ADDRB;
+input    [C_RAM_WIDTH-1:0]      DINA;
+output    [C_RAM_WIDTH-1:0]      DOUTB;
 
 reg [C_RAM_WIDTH-1:0] rRAM [C_RAM_DEPTH-1:0];
 reg [C_RAM_WIDTH-1:0] rDout;   
@@ -83,11 +83,11 @@ assign DOUTB = rDout;
 
 always @(posedge CLKA) begin
   if (WEA)
-	 rRAM[ADDRA] <= #1 DINA;
+    rRAM[ADDRA] <= #1 DINA;
 end
 
 always @(posedge CLKB) begin
   rDout <= #1 rRAM[ADDRB];
 end
-						
+                  
 endmodule

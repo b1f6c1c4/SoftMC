@@ -41,14 +41,14 @@
 // MODIFICATIONS.
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
-// Filename:			riffa_top_v6_pcie_v2_5.v
-// Version:				1.00.a
-// Verilog Standard:	Verilog-2001
-// Description:			Top level module for RIFFA 2.0 reference design for the
-//						the Xilinx Virtex-6 Integrated Block for PCI Express 
-//						module (v6_pcie_v2_5).
-// Author:				Matt Jacobsen
-// History:				@mattj: Version 2.0
+// Filename:         riffa_top_v6_pcie_v2_5.v
+// Version:            1.00.a
+// Verilog Standard:   Verilog-2001
+// Description:         Top level module for RIFFA 2.0 reference design for the
+//                  the Xilinx Virtex-6 Integrated Block for PCI Express 
+//                  module (v6_pcie_v2_5).
+// Author:            Matt Jacobsen
+// History:            @mattj: Version 2.0
 //-----------------------------------------------------------------------------
 module riffa_top_v6_pcie_v2_5 # (
   parameter        PL_FAST_TRAIN        = "FALSE",
@@ -75,12 +75,12 @@ module riffa_top_v6_pcie_v2_5 # (
   input app_clk,
   output  app_en,
   input app_ack,
-	output[31:0] app_instr,
-	
-	//Data read back Interface
-	input rdback_fifo_empty,
-	output rdback_fifo_rden,
-	input[DQ_WIDTH*4 - 1:0] rdback_data
+   output[31:0] app_instr,
+   
+   //Data read back Interface
+   input rdback_fifo_empty,
+   output rdback_fifo_rden,
+   input[DQ_WIDTH*4 - 1:0] rdback_data
 );
 
   wire                                        user_clk;
@@ -366,7 +366,7 @@ pcie_endpoint #(
 pcie_app_v6  #(
     .C_DATA_WIDTH( C_DATA_WIDTH ),
     .KEEP_WIDTH( KEEP_WIDTH ),
-	 .DQ_WIDTH(DQ_WIDTH)
+    .DQ_WIDTH(DQ_WIDTH)
 
   )app (
 
@@ -480,12 +480,12 @@ pcie_app_v6  #(
   .app_clk(app_clk),
   .app_en(app_en),
   .app_ack(app_ack),
-	.app_instr(app_instr),
-	
-	//Data read back Interface
-	.rdback_fifo_empty(rdback_fifo_empty),
-	.rdback_fifo_rden(rdback_fifo_rden),
-	.rdback_data(rdback_data)
+   .app_instr(app_instr),
+   
+   //Data read back Interface
+   .rdback_fifo_empty(rdback_fifo_empty),
+   .rdback_fifo_rden(rdback_fifo_rden),
+   .rdback_data(rdback_data)
 
 );
 

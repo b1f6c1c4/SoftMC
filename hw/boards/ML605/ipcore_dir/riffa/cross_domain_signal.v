@@ -41,23 +41,23 @@
 // MODIFICATIONS.
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
-// Filename:			cross_domain_signal.v
-// Version:				1.00.a
-// Verilog Standard:	Verilog-2001
-// Description:			Send a signal from clock domain A into clock domain B
+// Filename:         cross_domain_signal.v
+// Version:            1.00.a
+// Verilog Standard:   Verilog-2001
+// Description:         Send a signal from clock domain A into clock domain B
 // and get the signal back into clock domain A. Domain A can know roughly when 
 // the signal is received domain B. 
-// Author:				Matt Jacobsen
-// History:				@mattj: Version 2.0
+// Author:            Matt Jacobsen
+// History:            @mattj: Version 2.0
 //-----------------------------------------------------------------------------
 
 module cross_domain_signal (
-	input CLK_A,		// Clock for domain A
-	input CLK_A_SEND,	// Signal from domain A to domain B
-	output CLK_A_RECV,	// Signal from domain B received in domain A 
-	input CLK_B,		// Clock for domain B
-	output CLK_B_RECV,	// Signal from domain A received in domain B
-	input CLK_B_SEND	// Signal from domain B to domain A
+   input CLK_A,      // Clock for domain A
+   input CLK_A_SEND,   // Signal from domain A to domain B
+   output CLK_A_RECV,   // Signal from domain B received in domain A 
+   input CLK_B,      // Clock for domain B
+   output CLK_B_RECV,   // Signal from domain A received in domain B
+   input CLK_B_SEND   // Signal from domain B to domain A
 );
 
 

@@ -41,23 +41,23 @@
 // MODIFICATIONS.
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
-// Filename:			ram_1clk_1w_1r.v
-// Version:				1.00.a
-// Verilog Standard:	Verilog-2001
-// Description:			An inferrable RAM module. Single clock, 1 write port, 1 
-//						read port. In Xilinx designs, specify RAM_STYLE="BLOCK" 
-//						to use BRAM memory or RAM_STYLE="DISTRIBUTED" to use 
-//						LUT memory.
-// Author:				Matt Jacobsen
-// History:				@mattj: Version 2.0
+// Filename:         ram_1clk_1w_1r.v
+// Version:            1.00.a
+// Verilog Standard:   Verilog-2001
+// Description:         An inferrable RAM module. Single clock, 1 write port, 1 
+//                  read port. In Xilinx designs, specify RAM_STYLE="BLOCK" 
+//                  to use BRAM memory or RAM_STYLE="DISTRIBUTED" to use 
+//                  LUT memory.
+// Author:            Matt Jacobsen
+// History:            @mattj: Version 2.0
 //-----------------------------------------------------------------------------
 module ram_1clk_1w_1r (
-	CLK,
-	ADDRA,
-	WEA,
-	DINA,
-	ADDRB,
-	DOUTB
+   CLK,
+   ADDRA,
+   WEA,
+   DINA,
+   ADDRB,
+   DOUTB
 );
 
 `include "common_functions.v"
@@ -67,12 +67,12 @@ parameter C_RAM_DEPTH = 1024;
 //Local parameters
 parameter C_RAM_ADDR_BITS = clog2s(C_RAM_DEPTH);
 
-input							CLK;
-input 	[C_RAM_ADDR_BITS-1:0]	ADDRA;
-input 							WEA;
-input 	[C_RAM_ADDR_BITS-1:0]	ADDRB;
-input 	[C_RAM_WIDTH-1:0]		DINA;
-output 	[C_RAM_WIDTH-1:0]		DOUTB;
+input                     CLK;
+input    [C_RAM_ADDR_BITS-1:0]   ADDRA;
+input                      WEA;
+input    [C_RAM_ADDR_BITS-1:0]   ADDRB;
+input    [C_RAM_WIDTH-1:0]      DINA;
+output    [C_RAM_WIDTH-1:0]      DOUTB;
 
 reg [C_RAM_WIDTH-1:0] rRAM [C_RAM_DEPTH-1:0];
 reg [C_RAM_WIDTH-1:0] rDout;   
@@ -81,8 +81,8 @@ assign DOUTB = rDout;
 
 always @(posedge CLK) begin
   if (WEA)
-	 rRAM[ADDRA] <= #1 DINA;
+    rRAM[ADDRA] <= #1 DINA;
   rDout <= #1 rRAM[ADDRB];
 end
-						
+                  
 endmodule

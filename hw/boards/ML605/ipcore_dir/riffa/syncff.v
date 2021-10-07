@@ -41,35 +41,35 @@
 // MODIFICATIONS.
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
-// Filename:			syncff.v
-// Version:				1.00.a
-// Verilog Standard:	Verilog-2001
-// Description:			A back to back FF design to mitigate metastable issues 
-// 						when crossing clock domains.
-// Author:				Matt Jacobsen
-// History:				@mattj: Version 2.0
+// Filename:         syncff.v
+// Version:            1.00.a
+// Verilog Standard:   Verilog-2001
+// Description:         A back to back FF design to mitigate metastable issues 
+//                   when crossing clock domains.
+// Author:            Matt Jacobsen
+// History:            @mattj: Version 2.0
 //-----------------------------------------------------------------------------
 module syncff(
-	CLK,
-	IN_ASYNC,
-	OUT_SYNC
+   CLK,
+   IN_ASYNC,
+   OUT_SYNC
 );
 
-input 					CLK;
-input 					IN_ASYNC;
-output 				OUT_SYNC;
+input                CLK;
+input                IN_ASYNC;
+output             OUT_SYNC;
 
-wire					wSyncFFQ;
+wire               wSyncFFQ;
 
 ff syncFF (
-	.CLK(CLK),
-	.D(IN_ASYNC),
-	.Q(wSyncFFQ)
+   .CLK(CLK),
+   .D(IN_ASYNC),
+   .Q(wSyncFFQ)
 );
 
 ff metaFF (
-	.CLK(CLK),
-	.D(wSyncFFQ),
-	.Q(OUT_SYNC)
+   .CLK(CLK),
+   .D(wSyncFFQ),
+   .Q(OUT_SYNC)
 );
 endmodule

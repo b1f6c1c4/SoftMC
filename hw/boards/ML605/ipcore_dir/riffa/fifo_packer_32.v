@@ -41,37 +41,37 @@
 // MODIFICATIONS.
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
-// Filename:			fifo_packer_32.v
-// Version:				1.00.a
-// Verilog Standard:	Verilog-2001
-// Description:			Packs 32 bit received data into a 32 bit wide FIFO. 
+// Filename:         fifo_packer_32.v
+// Version:            1.00.a
+// Verilog Standard:   Verilog-2001
+// Description:         Packs 32 bit received data into a 32 bit wide FIFO. 
 // Assumes the FIFO always has room to accommodate the data.
-// Author:				Matt Jacobsen
-// History:				@mattj: Version 2.0
+// Author:            Matt Jacobsen
+// History:            @mattj: Version 2.0
 // Additional Comments: 
 //-----------------------------------------------------------------------------
 
 module fifo_packer_32 (
-	input CLK,
-	input RST,
-	input [31:0] DATA_IN,		// Incoming data
-	input DATA_IN_EN,			// Incoming data enable
-	input DATA_IN_DONE,			// Incoming data packet end
-	input DATA_IN_ERR,			// Incoming data error
-	input DATA_IN_FLUSH,		// End of incoming data
-	output [31:0] PACKED_DATA,	// Outgoing data
-	output PACKED_WEN,			// Outgoing data write enable
-	output PACKED_DATA_DONE,	// End of outgoing data packet
-	output PACKED_DATA_ERR,		// Error in outgoing data
-	output PACKED_DATA_FLUSHED	// End of outgoing data
+   input CLK,
+   input RST,
+   input [31:0] DATA_IN,      // Incoming data
+   input DATA_IN_EN,         // Incoming data enable
+   input DATA_IN_DONE,         // Incoming data packet end
+   input DATA_IN_ERR,         // Incoming data error
+   input DATA_IN_FLUSH,      // End of incoming data
+   output [31:0] PACKED_DATA,   // Outgoing data
+   output PACKED_WEN,         // Outgoing data write enable
+   output PACKED_DATA_DONE,   // End of outgoing data packet
+   output PACKED_DATA_ERR,      // Error in outgoing data
+   output PACKED_DATA_FLUSHED   // End of outgoing data
 );
 
-reg					rPackedDone=0, _rPackedDone=0;
-reg					rPackedErr=0, _rPackedErr=0;
-reg					rPackedFlush=0, _rPackedFlush=0;
-reg					rPackedFlushed=0, _rPackedFlushed=0;
-reg		[31:0]		rDataIn=64'd0, _rDataIn=64'd0;
-reg					rDataInEn=0, _rDataInEn=0;
+reg               rPackedDone=0, _rPackedDone=0;
+reg               rPackedErr=0, _rPackedErr=0;
+reg               rPackedFlush=0, _rPackedFlush=0;
+reg               rPackedFlushed=0, _rPackedFlushed=0;
+reg      [31:0]      rDataIn=64'd0, _rDataIn=64'd0;
+reg               rDataInEn=0, _rDataInEn=0;
 
 
 assign PACKED_DATA = rDataIn;
@@ -83,24 +83,24 @@ assign PACKED_DATA_FLUSHED = rPackedFlushed;
 
 // Buffers input data to ease timing.
 always @ (posedge CLK) begin
-	rPackedDone <= #1 (RST ? 1'd0 : _rPackedDone);
-	rPackedErr <= #1 (RST ? 1'd0 : _rPackedErr);
-	rPackedFlush <= #1 (RST ? 1'd0 : _rPackedFlush);
-	rPackedFlushed <= #1 (RST ? 1'd0 : _rPackedFlushed);
-	rDataIn <= #1 _rDataIn;
-	rDataInEn <= #1 (RST ? 1'd0 : _rDataInEn);
+   rPackedDone <= #1 (RST ? 1'd0 : _rPackedDone);
+   rPackedErr <= #1 (RST ? 1'd0 : _rPackedErr);
+   rPackedFlush <= #1 (RST ? 1'd0 : _rPackedFlush);
+   rPackedFlushed <= #1 (RST ? 1'd0 : _rPackedFlushed);
+   rDataIn <= #1 _rDataIn;
+   rDataInEn <= #1 (RST ? 1'd0 : _rDataInEn);
 end
 
 always @ (*) begin
-	// Buffer and mask the input data.
-	_rDataIn = DATA_IN;
-	_rDataInEn = DATA_IN_EN;
+   // Buffer and mask the input data.
+   _rDataIn = DATA_IN;
+   _rDataInEn = DATA_IN_EN;
 
-	// Track done/error/flush signals.
-	_rPackedDone = DATA_IN_DONE;
-	_rPackedErr = DATA_IN_ERR;
-	_rPackedFlush = DATA_IN_FLUSH;
-	_rPackedFlushed = rPackedFlush;
+   // Track done/error/flush signals.
+   _rPackedDone = DATA_IN_DONE;
+   _rPackedErr = DATA_IN_ERR;
+   _rPackedFlush = DATA_IN_FLUSH;
+   _rPackedFlushed = rPackedFlush;
 end
 
 

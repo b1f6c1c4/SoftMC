@@ -205,8 +205,8 @@ module tx_qword_aligner_128
 
    always @(posedge CLK) begin
       if(wSMUpEnable) begin
-	 rOverflow[0] <= _rOverflow[0];
-	 rOverflow[1] <= _rOverflow[1];
+    rOverflow[0] <= _rOverflow[0];
+    rOverflow[1] <= _rOverflow[1];
       end
    end
 

@@ -1,7 +1,7 @@
 ############################################################################
 # Timing constraints                                                       #
 # Most of these were inherited from the constraint file which is generated #
-# after configuring Xilinx MIG IPCore													#
+# after configuring Xilinx MIG IPCore                                       #
 ############################################################################
 
 #NET "sys_clk_p" TNM_NET = TNM_sys_clk;

@@ -41,23 +41,23 @@
 // MODIFICATIONS.
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
-// Filename:			demux_1_to_n.v
-// Version:				1.00.a
-// Verilog Standard:	Verilog-2001
-// Description:			Statically sized 1 to n demultiplexer.
-// Author:				Matt Jacobsen
-// History:				@mattj: Version 2.0
+// Filename:         demux_1_to_n.v
+// Version:            1.00.a
+// Verilog Standard:   Verilog-2001
+// Description:         Statically sized 1 to n demultiplexer.
+// Author:            Matt Jacobsen
+// History:            @mattj: Version 2.0
 //-----------------------------------------------------------------------------
 module demux_1_to_n #(
-	parameter C_FACTOR = 12,
-	parameter C_WIDTH = 1,
-	// Local parameters
-	parameter C_SEL_WIDTH = clog2s(C_FACTOR)
+   parameter C_FACTOR = 12,
+   parameter C_WIDTH = 1,
+   // Local parameters
+   parameter C_SEL_WIDTH = clog2s(C_FACTOR)
 )
 (
-	input [C_WIDTH-1:0] IN,					// Inputs
-	output [(C_FACTOR*C_WIDTH)-1:0] OUT,	// Outputs
-	input [C_SEL_WIDTH-1:0] SEL				// Selector
+   input [C_WIDTH-1:0] IN,               // Inputs
+   output [(C_FACTOR*C_WIDTH)-1:0] OUT,   // Outputs
+   input [C_SEL_WIDTH-1:0] SEL            // Selector
 );
 
 `include "common_functions.v"
@@ -66,9 +66,9 @@ module demux_1_to_n #(
 
 genvar i;
 generate
-	for(i = 0; i < C_FACTOR; i = i + 1) begin: assignments
-		assign OUT[(i*C_WIDTH) +:C_WIDTH] = (SEL == i ? IN : {C_WIDTH{1'b0}});
-	end
+   for(i = 0; i < C_FACTOR; i = i + 1) begin: assignments
+      assign OUT[(i*C_WIDTH) +:C_WIDTH] = (SEL == i ? IN : {C_WIDTH{1'b0}});
+   end
 endgenerate
 
 

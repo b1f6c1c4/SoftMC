@@ -41,75 +41,75 @@
 // MODIFICATIONS.
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
-// Filename:			tx_port_buffer_32.v
-// Version:				1.00.a
-// Verilog Standard:	Verilog-2001
-// Description:			Wraps a FIFO for saving channel data and provides a 
+// Filename:         tx_port_buffer_32.v
+// Version:            1.00.a
+// Verilog Standard:   Verilog-2001
+// Description:         Wraps a FIFO for saving channel data and provides a 
 // registered read output. Data is available 3 cycles after RD_EN is asserted 
 // (not 1, like a traditional FIFO).
-// Author:				Matt Jacobsen
-// History:				@mattj: Version 2.0
+// Author:            Matt Jacobsen
+// History:            @mattj: Version 2.0
 //-----------------------------------------------------------------------------
 
 module tx_port_buffer_32 #(
-	parameter C_FIFO_DATA_WIDTH = 9'd32,
-	parameter C_FIFO_DEPTH = 512,
-	// Local parameters
-	parameter C_FIFO_DEPTH_WIDTH = clog2((2**clog2(C_FIFO_DEPTH))+1)
+   parameter C_FIFO_DATA_WIDTH = 9'd32,
+   parameter C_FIFO_DEPTH = 512,
+   // Local parameters
+   parameter C_FIFO_DEPTH_WIDTH = clog2((2**clog2(C_FIFO_DEPTH))+1)
 )
 (
-	input RST,
-	input CLK,
+   input RST,
+   input CLK,
 
-	input [C_FIFO_DATA_WIDTH-1:0] WR_DATA,		// Input data
-	input WR_EN,								// Input data write enable
-	output [C_FIFO_DEPTH_WIDTH-1:0] WR_COUNT,	// Input data FIFO is full
+   input [C_FIFO_DATA_WIDTH-1:0] WR_DATA,      // Input data
+   input WR_EN,                        // Input data write enable
+   output [C_FIFO_DEPTH_WIDTH-1:0] WR_COUNT,   // Input data FIFO is full
 
-	output [C_FIFO_DATA_WIDTH-1:0] RD_DATA,		// Output data
-	input RD_EN									// Output data read enable
+   output [C_FIFO_DATA_WIDTH-1:0] RD_DATA,      // Output data
+   input RD_EN                           // Output data read enable
 );
 
 `include "common_functions.v"
 
-reg 								rFifoRdEn=0, _rFifoRdEn=0;
-reg		[C_FIFO_DATA_WIDTH-1:0]		rFifoData={C_FIFO_DATA_WIDTH{1'd0}}, _rFifoData={C_FIFO_DATA_WIDTH{1'd0}};
-wire	[C_FIFO_DATA_WIDTH-1:0]		wFifoData;
+reg                         rFifoRdEn=0, _rFifoRdEn=0;
+reg      [C_FIFO_DATA_WIDTH-1:0]      rFifoData={C_FIFO_DATA_WIDTH{1'd0}}, _rFifoData={C_FIFO_DATA_WIDTH{1'd0}};
+wire   [C_FIFO_DATA_WIDTH-1:0]      wFifoData;
 
 assign RD_DATA = rFifoData;
 
 
 // Buffer the input signals that come from outside the tx_port.
 always @ (posedge CLK) begin
-	rFifoRdEn <= #1 (RST ? 1'd0 : _rFifoRdEn);
+   rFifoRdEn <= #1 (RST ? 1'd0 : _rFifoRdEn);
 end
 
 always @ (*) begin
-	_rFifoRdEn = RD_EN;
+   _rFifoRdEn = RD_EN;
 end
 
 
 // FIFO for storing data from the channel.
 (* RAM_STYLE="BLOCK" *)
 sync_fifo #(.C_WIDTH(C_FIFO_DATA_WIDTH), .C_DEPTH(C_FIFO_DEPTH), .C_PROVIDE_COUNT(1)) fifo (
-	.CLK(CLK),
-	.RST(RST),
-	.WR_EN(WR_EN),
-	.WR_DATA(WR_DATA),
-	.FULL(),
-	.COUNT(WR_COUNT),
-	.RD_EN(rFifoRdEn),
-	.RD_DATA(wFifoData),
-	.EMPTY()
+   .CLK(CLK),
+   .RST(RST),
+   .WR_EN(WR_EN),
+   .WR_DATA(WR_DATA),
+   .FULL(),
+   .COUNT(WR_COUNT),
+   .RD_EN(rFifoRdEn),
+   .RD_DATA(wFifoData),
+   .EMPTY()
 );
 
 
 // Buffer data from the FIFO.
 always @ (posedge CLK) begin
-	rFifoData <= #1 _rFifoData;
+   rFifoData <= #1 _rFifoData;
 end
 
 always @ (*) begin
-	_rFifoData = wFifoData;
+   _rFifoData = wFifoData;
 end
 
 

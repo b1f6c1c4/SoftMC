@@ -1,4 +1,4 @@
---- ipcore_dir/xilinx_mig/user_design/rtl/phy/phy_rdctrl_sync.v	2017-02-03 15:11:19.000000000 +0100
+--- ipcore_dir/xilinx_mig/user_design/rtl/phy/phy_rdctrl_sync.v   2017-02-03 15:11:19.000000000 +0100
 @@ -91,4 +91,8 @@
     input                      dfi_rddata_en,
 +   input                      dfi_rddata_en_even,

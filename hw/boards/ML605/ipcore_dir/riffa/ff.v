@@ -41,27 +41,27 @@
 // MODIFICATIONS.
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
-// Filename:			ff.v
-// Version:				1.00.a
-// Verilog Standard:	Verilog-2001
-// Description:			A D/Q flip flop.
-// Author:				Matt Jacobsen
-// History:				@mattj: Version 2.0
+// Filename:         ff.v
+// Version:            1.00.a
+// Verilog Standard:   Verilog-2001
+// Description:         A D/Q flip flop.
+// Author:            Matt Jacobsen
+// History:            @mattj: Version 2.0
 //-----------------------------------------------------------------------------
 module ff(
-	CLK,
-	D,
-	Q
+   CLK,
+   D,
+   Q
 );
 
-input 					CLK;
-input 					D;
-output 				Q;
+input                CLK;
+input                D;
+output             Q;
 
-reg						Q;
+reg                  Q;
 
 always @ (posedge CLK) begin 
-	Q <= #1 D; 
+   Q <= #1 D; 
 end
-	
+   
 endmodule

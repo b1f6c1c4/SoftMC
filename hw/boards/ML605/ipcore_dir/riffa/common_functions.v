@@ -40,48 +40,48 @@
 // MODIFICATIONS.
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
-// Filename:			common_functions.v
-// Version:				1.00.a
-// Verilog Standard:	Verilog-2001
-// Description:			Commonly used functions in the design. Mostly used in
-//						parameter values. Many of these functions are supported
-//						in System Verilog, but Xilinx tools do not fully
-// 						support System Verilog.
-// Author:				Matt Jacobsen
-// History:				@mattj: Version 2.0
+// Filename:         common_functions.v
+// Version:            1.00.a
+// Verilog Standard:   Verilog-2001
+// Description:         Commonly used functions in the design. Mostly used in
+//                  parameter values. Many of these functions are supported
+//                  in System Verilog, but Xilinx tools do not fully
+//                   support System Verilog.
+// Author:            Matt Jacobsen
+// History:            @mattj: Version 2.0
 //-----------------------------------------------------------------------------
 
 // clog2 -- calculate the ceiling log2 value.
 function integer clog2;
-	input [31:0] v;
-	reg [31:0] value;
-	begin
-		value = v;
-		if (value == 1) begin
-			clog2 = 0;
-		end
-		else begin
-			value = value-1;
-			for (clog2=0; value>0; clog2=clog2+1)
-				value = value>>1;
-		end
-	end
+   input [31:0] v;
+   reg [31:0] value;
+   begin
+      value = v;
+      if (value == 1) begin
+         clog2 = 0;
+      end
+      else begin
+         value = value-1;
+         for (clog2=0; value>0; clog2=clog2+1)
+            value = value>>1;
+      end
+   end
 endfunction
 
 
 // clog2s -- calculate the ceiling log2 value, min return is 1 (safe).
 function integer clog2s;
-	input [31:0] v;
-	reg [31:0] value;
-	begin
-		value = v;
-		if (value == 1) begin
-			clog2s = 1;
-		end
-		else begin
-			value = value-1;
-			for (clog2s=0; value>0; clog2s=clog2s+1)
-				value = value>>1;
-		end
-	end
+   input [31:0] v;
+   reg [31:0] value;
+   begin
+      value = v;
+      if (value == 1) begin
+         clog2s = 1;
+      end
+      else begin
+         value = value-1;
+         for (clog2s=0; value>0; clog2s=clog2s+1)
+            value = value>>1;
+      end
+   end
 endfunction
