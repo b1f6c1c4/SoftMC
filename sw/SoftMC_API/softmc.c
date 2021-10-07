@@ -1,75 +1,7 @@
 #include "softmc.h"
-#include <fstream>
-#include <iostream>
-#include <cassert>
+#include <assert.h>
 
-using namespace std;
 
-InstructionSequence::InstructionSequence() : InstructionSequence(init_cap){
-}
-
-InstructionSequence::InstructionSequence(const uint capacity){
-	instrs = new Instruction[capacity];
-	size = 0;
-	this->capacity = capacity;
-}
-
-InstructionSequence::~InstructionSequence(){
-	delete[] instrs;
-}
-
-void InstructionSequence::insert(const Instruction c){
-	if(size == capacity){
-		Instruction* tmp = new Instruction[capacity*2];
-		
-		for(int i = 0; i < size; i++)
-			tmp[i] = instrs[i];
-
-		delete[] instrs;
-		capacity *=2;
-		instrs = tmp;
-	}
-
-	instrs[size++] = c;
-}
-
-void InstructionSequence::write_burst_data(uint wrdata[]){
-	int j;
-	Instruction instr;
-	for (j=0; j<16; j++) {
-		if(size == capacity){
-			Instruction* tmp = new Instruction[capacity*2];
-			
-			for(int i = 0; i < size; i++)
-				tmp[i] = instrs[i];
-
-			delete[] instrs;
-			capacity *=2;
-			instrs = tmp;
-		}
-
-		instr = wrdata[j];
-		instrs[size++] = instr;
-
-    }
-}
-void InstructionSequence::print_iseq(){
-        int i;
-        for(i=0; i<size; i++)
-        {
-                printf("The %dth instruction is %x\n", i, (uint)(instrs[i]));
-        }
-}
-
-void InstructionSequence::pop(){
-    if(size != 0){
-        size --;
-    }
-}
-
-void InstructionSequence::execute(fpga_t* fpga){
-	fpga_send(fpga, 0, (void*)instrs, INSTR_SIZE*size, 0, 1, 0);
-}
 
 //! Generates an instruction to \b activate the row at the given address.
 /*!
@@ -78,7 +10,7 @@ void InstructionSequence::execute(fpga_t* fpga){
   \return The generated activate instruction
 */
 Instruction genACT(uint bank, uint row){
-	Instruction instr = (uint)INSTR_TYPE::DDR;
+	Instruction instr = (uint)INSTR_TYPE_DDR;
 	instr <<= 32 - CMD_OFFSET - BANK_OFFSET - ROW_OFFSET;
 	instr |= 0x23; //sets CKE(1) CS(0) RAS(0) CAS(1) WE_ACT(1)
 	instr <<= BANK_OFFSET;
@@ -97,11 +29,11 @@ Can be \e PRE_TYPE.SINGLE for a single-bank precharge, or \e PRE_TYPE.ALL
 for an all-banks precharge).
   \return The generated precharge instruction
 */
-Instruction genPRE(uint bank, PRE_TYPE pc){
-	Instruction instr = (uint)INSTR_TYPE::DDR;
+Instruction genPRE(uint bank, enum PRE_TYPE pc){
+	Instruction instr = (uint)INSTR_TYPE_DDR;
 	instr <<= 32 - CMD_OFFSET - BANK_OFFSET - ROW_OFFSET;
 	instr |= 0x22; //to set CKE(1) CS(0) RAS(0) CAS(1) WE_PRE(0)
-	if(pc == PRE_TYPE::ALL){
+	if(pc == PRE_TYPE_ALL){
 		instr <<= BANK_OFFSET + ROW_OFFSET - COL_OFFSET;
 		instr |= 0x1;
 		instr <<= COL_OFFSET;
@@ -129,8 +61,8 @@ Instruction genPRE(uint bank, PRE_TYPE pc){
  setting the burst length on-the-fly
   \return The generated write instruction
 */
-Instruction genWR(uint bank, uint col, uint8_t pattern, AUTO_PRECHARGE ap, BURST_LENGTH bl){
-	Instruction instr = (uint)INSTR_TYPE::DDR;
+Instruction genWR(uint bank, uint col, uint8_t pattern, enum AUTO_PRECHARGE ap, enum BURST_LENGTH bl){
+	Instruction instr = (uint)INSTR_TYPE_DDR;
 	instr <<= 32 - SIGNAL_OFFSET - BANK_OFFSET - ROW_OFFSET - CMD_OFFSET;
 
 	instr |= pattern >> 2; //most significant 6 bits of the pattern
@@ -147,12 +79,12 @@ Instruction genWR(uint bank, uint col, uint8_t pattern, AUTO_PRECHARGE ap, BURST
 
 	instr <<= 2;
 
-	if(bl == BURST_LENGTH::FIXED)
+	if(bl == BURST_LENGTH_FIXED)
 		instr |= 0x1; // to set cmd[12] to 1 (burst length 8)
 
 	instr <<= 2;
 
-	if(ap == AUTO_PRECHARGE::AP)
+	if(ap == AUTO_PRECHARGE_AP)
 		instr |= 0x1; // to set cmd[10] to 1
 
 	instr <<= COL_OFFSET;
@@ -161,8 +93,8 @@ Instruction genWR(uint bank, uint col, uint8_t pattern, AUTO_PRECHARGE ap, BURST
 	return instr;
 }
 
-Instruction genWR_burst(uint bank, uint col, AUTO_PRECHARGE ap){
-	Instruction instr = (uint)INSTR_TYPE::DDR;
+Instruction genWR_burst(uint bank, uint col, enum AUTO_PRECHARGE ap){
+	Instruction instr = (uint)INSTR_TYPE_DDR;
 	instr <<= 32 - BANK_OFFSET - ROW_OFFSET - CMD_OFFSET;
 
 	instr |= 0x24; //to set CKE(1) CS(0)[assumed it should be Low]
@@ -180,7 +112,7 @@ Instruction genWR_burst(uint bank, uint col, AUTO_PRECHARGE ap){
 
 	instr <<= 1;
 
-	if(ap == AUTO_PRECHARGE::AP)
+	if(ap == AUTO_PRECHARGE_AP)
 		instr |= 0x1; // to set cmd[10] to 1
 
 	instr <<= COL_OFFSET;
@@ -203,7 +135,7 @@ Instruction genWR_burst(uint bank, uint col, AUTO_PRECHARGE ap){
  setting the burst length on-the-fly. 
   \return The generated read instruction
 */
-Instruction genRD(uint bank, uint col, AUTO_PRECHARGE ap, BURST_LENGTH bl){
+Instruction genRD(uint bank, uint col, enum AUTO_PRECHARGE ap, enum BURST_LENGTH bl){
 	Instruction instr = 0x25; //to set CKE(1) CS(0)[assumed it should be Low] RAS(1) CAS(0) WE(1)
 	
 	instr <<= BANK_OFFSET;
@@ -211,18 +143,18 @@ Instruction genRD(uint bank, uint col, AUTO_PRECHARGE ap, BURST_LENGTH bl){
 
 	instr <<= 4;
 
-	if(bl == BURST_LENGTH::FIXED)
+	if(bl == BURST_LENGTH_FIXED)
 		instr |= 0x1; // to set cmd[12] to 1 (burst length 8)
 
 	instr <<= 2;
 
-	if(ap == AUTO_PRECHARGE::AP)
+	if(ap == AUTO_PRECHARGE_AP)
 		instr |= 0x1; // to set cmd[10] to 1
 
 	instr <<= COL_OFFSET;
 	instr |= col;
 
-	Instruction instr2 = (uint)INSTR_TYPE::DDR;
+	Instruction instr2 = (uint)INSTR_TYPE_DDR;
 	instr2 <<= 28;
 
 	instr2 |= instr;
@@ -240,7 +172,7 @@ Instruction genWAIT(uint cycles){ //min 1, max 1023
 	assert(cycles >= 1);
 	assert(cycles <= 1023 && "Could not wait for more than 1023 cycles since the current hardware implementation has a 10 bit counter for this purpose.");
     	
-	Instruction instr = (uint)INSTR_TYPE::WAIT;
+	Instruction instr = (uint)INSTR_TYPE_WAIT;
 	instr <<= 28;
 	instr |= cycles;
 
@@ -254,8 +186,8 @@ Instruction genWAIT(uint cycles){ //min 1, max 1023
 mode, or BUSDIR.WRITE to switch to write mode.
   \return The generated change bus direction instruction
 */
-Instruction genBUSDIR(BUSDIR dir){
-	Instruction instr = (uint)INSTR_TYPE::SET_BUS_DIR;
+Instruction genBUSDIR(enum BUSDIR dir){
+	Instruction instr = (uint)INSTR_TYPE_SET_BUS_DIR;
 	instr <<= 28;
 	instr |= (uint)dir;
 
@@ -267,7 +199,7 @@ Instruction genBUSDIR(BUSDIR dir){
   \return Instruction used to indicate the end of the instruction sequence
 */
 Instruction genEND(){
-	return (Instruction)((uint)INSTR_TYPE::END_OF_INSTRS << 28);
+	return (Instruction)((uint)INSTR_TYPE_END_OF_INSTRS << 28);
 }
 
 //! Generates an instruction to initiate DDR3 \b short-ZQ calibration.
@@ -275,7 +207,7 @@ Instruction genEND(){
   \return The generated short-ZQ instruction
 */
 Instruction genZQ(){
-	Instruction instr = (uint)INSTR_TYPE::DDR;
+	Instruction instr = (uint)INSTR_TYPE_DDR;
 	instr <<= 32 - CMD_OFFSET - BANK_OFFSET - ROW_OFFSET;
 	instr |= 0x26; //to set CKE(1) CS(0) RAS(1) CAS(1) WE(0)
 	instr <<= BANK_OFFSET + ROW_OFFSET;
@@ -288,7 +220,7 @@ Instruction genZQ(){
   \return The generated refresh instruction
 */
 Instruction genREF(){
-    Instruction instr = (uint)INSTR_TYPE::DDR;
+    Instruction instr = (uint)INSTR_TYPE_DDR;
     instr <<= 32 - CMD_OFFSET - BANK_OFFSET - ROW_OFFSET;
 
     instr |= 0x21; //to set CKE(1) CS(0) RAS(0) CAS(0) WE(1)
@@ -307,7 +239,7 @@ of tREFI and tRFC. Set tREFI to 0 to disable auto-refresh (disabled
 by default).  
   \return The generated command for auto-refresh configuration
 */
-Instruction genREF_CONFIG(uint val, REGISTER r){
+Instruction genREF_CONFIG(uint val, enum REGISTER r){
     assert(val < 0x10000000);
 
     Instruction instr = (uint) r;

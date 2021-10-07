@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <vector>
 #include <sys/time.h>
 #include <riffa.h>
 
@@ -43,82 +42,51 @@ typedef uint64_t Instruction;
 typedef uint32_t uint;
 
 //DO NOT EDIT (unless you change the verilog code)
-enum class INSTR_TYPE {
-	END_OF_INSTRS = 0,
-	SET_BUS_DIR = 1,
-	WAIT = 4,
-	DDR = 8
+enum INSTR_TYPE {
+    INSTR_TYPE_END_OF_INSTRS = 0,
+    INSTR_TYPE_SET_BUS_DIR = 1,
+    INSTR_TYPE_WAIT = 4,
+    INSTR_TYPE_DDR = 8
 };
 //END - DO NOT EDIT
 
-enum class BUSDIR {
-	READ = 0,
-	WRITE = 2
+enum BUSDIR {
+	BUSDIR_READ = 0,
+	BUSDIR_WRITE = 2
 };
 
-enum class AUTO_PRECHARGE {
-	NO_AP = 0,
-	AP = 1
+enum AUTO_PRECHARGE {
+	AUTO_PRECHARGE_NO_AP = 0,
+	AUTO_PRECHARGE_AP = 1
 };
 
-enum class PRE_TYPE {
-	SINGLE = 0,
-	ALL = 1
+enum PRE_TYPE {
+	PRE_TYPE_SINGLE = 0,
+	PRE_TYPE_ALL = 1
 };
 
-enum class BURST_LENGTH {
-	CHOP = 0,
-	FIXED = 1
+enum BURST_LENGTH {
+	BURST_LENGTH_CHOP = 0,
+	BURST_LENGTH_FIXED = 1
 };
 
-enum class REGISTER {
-	TREFI = 2,
-	TRFC = 3
+enum REGISTER {
+	REGISTER_TREFI = 2,
+	REGISTER_TRFC = 3
 };
 
-
-class InstructionSequence{
-
-	public:
-		InstructionSequence();
-		InstructionSequence(const uint capacity);
-		virtual ~InstructionSequence();
-
-		void insert(const Instruction c);
-		void write_burst_data(uint wrdata[]);
-		void execute(fpga_t* fpga);
-		void pop();
-		void print_iseq();
-
-		uint size;
-		Instruction* instrs;
-	private:
-		uint capacity;
-		const static uint init_cap = 256;
-};
-
-
-class DramAddr{
-
-	public:
-		uint row;
-		uint bank;
-
-		DramAddr() : DramAddr(0, 0){}
-		DramAddr(uint row, uint bank){ this->row = row; this->bank = bank;}
-};
 
 Instruction genACT(uint bank, uint row);
-Instruction genPRE(uint bank, PRE_TYPE pt = PRE_TYPE::SINGLE);
-Instruction genWR(uint bank, uint col, uint8_t pattern, AUTO_PRECHARGE ap = AUTO_PRECHARGE::NO_AP, BURST_LENGTH bl = BURST_LENGTH::FIXED);
-Instruction genWR_burst(uint bank, uint col, AUTO_PRECHARGE ap = AUTO_PRECHARGE::NO_AP);
-Instruction genRD(uint bank, uint col, AUTO_PRECHARGE ap = AUTO_PRECHARGE::NO_AP, BURST_LENGTH bl = BURST_LENGTH::FIXED);
+Instruction genPRE(uint bank, enum PRE_TYPE pt /* PRE_TYPE_SINGLE */);
+Instruction genWR(uint bank, uint col, uint8_t pattern, enum AUTO_PRECHARGE ap /* AUTO_PRECHARGE_NO_AP */, enum BURST_LENGTH bl /* BURST_LENGTH_FIXED */);
+Instruction genWR_burst(uint bank, uint col, enum AUTO_PRECHARGE ap /* AUTO_PRECHARGE_NO_AP */);
+Instruction genRD(uint bank, uint col, enum AUTO_PRECHARGE ap /* AUTO_PRECHARGE_NO_AP */, enum BURST_LENGTH bl /* BURST_LENGTH_FIXED */);
 Instruction genWAIT(uint cycles);
-Instruction genBUSDIR(BUSDIR dir);
+Instruction genBUSDIR(enum BUSDIR dir);
 Instruction genEND();
 Instruction genZQ();
 Instruction genREF();
-Instruction genREF_CONFIG(uint val, REGISTER r);
+Instruction genREF_CONFIG(uint val, enum REGISTER r);
 
 
 #endif //SOFTMC_H
