@@ -1,14 +1,14 @@
 /*******************************************************************************
- * This software is Copyright © 2012 The Regents of the University of 
+ * This software is Copyright © 2012 The Regents of the University of
  * California. All Rights Reserved.
- * 
- * Permission to copy, modify, and distribute this software and its 
- * documentation for educational, research and non-profit purposes, without fee, 
- * and without a written agreement is hereby granted, provided that the above 
+ *
+ * Permission to copy, modify, and distribute this software and its
+ * documentation for educational, research and non-profit purposes, without fee,
+ * and without a written agreement is hereby granted, provided that the above
  * copyright notice, this paragraph and the following three paragraphs appear in
  * all copies.
- * 
- * Permission to make commercial use of this software may be obtained by 
+ *
+ * Permission to make commercial use of this software may be obtained by
  * contacting:
  * Technology Transfer Office
  * 9500 Gilman Drive, Mail Code 0910
@@ -16,15 +16,15 @@
  * La Jolla, CA 92093-0910
  * (858) 534-5815
  * invent@ucsd.edu
- * 
+ *
  * This software program and documentation are copyrighted by The Regents of the
  * University of California. The software program and documentation are supplied
  * "as is", without any accompanying services from The Regents. The Regents does
  * not warrant that the operation of the program will be uninterrupted or error-
- * free. The end-user understands that the program was developed for research 
- * purposes and is advised not to rely exclusively on the program for any 
+ * free. The end-user understands that the program was developed for research
+ * purposes and is advised not to rely exclusively on the program for any
  * reason.
- * 
+ *
  * IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
  * ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
  * CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -34,7 +34,7 @@
  * CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
- * THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+ * THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
  * AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
  * MODIFICATIONS.
@@ -106,7 +106,7 @@ struct fpga_state {
    void __iomem *bar0;
    unsigned long long bar0_addr;
    unsigned long long bar0_len;
-   unsigned long long bar0_flags;  
+   unsigned long long bar0_flags;
    atomic_t intr_disabled;
    void * spill_buf_addr;
    dma_addr_t spill_buf_hw_addr;
@@ -131,7 +131,7 @@ static struct fpga_state * fpgas[NUM_FPGAS];
 // MEMORY ALLOCATION & HELPER FUNCTIONS
 ///////////////////////////////////////////////////////
 
-/** 
+/**
  * Returns the value at the specified address.
  */
 static inline unsigned int read_reg(struct fpga_state * sc, int offset)
@@ -139,7 +139,7 @@ static inline unsigned int read_reg(struct fpga_state * sc, int offset)
    return readl(sc->bar0 + (offset<<2));
 }
 
-/** 
+/**
  * Writes the value to the specified address.
  */
 static inline void write_reg(struct fpga_state * sc, int offset, unsigned int val)
@@ -167,7 +167,7 @@ unsigned long long __udivdi3(unsigned long long num, unsigned long long den)
  * Reads the interrupt vector and processes it. If processing VECT0, off will
  * be 0. If processing VECT1, off will be 6.
  */
-static inline void process_intr_vector(struct fpga_state * sc, int off, 
+static inline void process_intr_vector(struct fpga_state * sc, int off,
    unsigned int vect)
 {
    // VECT_0/VECT_1 are organized from right to left (LSB to MSB) as:
@@ -199,12 +199,12 @@ static inline void process_intr_vector(struct fpga_state * sc, int off,
 
    for (i = 0; i < 6 && (i+off) < sc->num_chnls; ++i) {
       chnl = i + off;
-      recv = 0; 
-      send = 0; 
+      recv = 0;
+      send = 0;
 
       // TX (PC receive) scatter gather buffer is read.
-      if (vect & (1<<((5*i)+1))) { 
-         recv = 1; 
+      if (vect & (1<<((5*i)+1))) {
+         recv = 1;
          // Keep track so the thread can handle this.
          if (push_circ_queue(sc->recv[chnl]->msgs, EVENT_SG_BUF_READ, 0)) {
             printk(KERN_ERR "riffa: fpga:%d chnl:%d, recv sg buf read msg queue full\n", sc->id, chnl);
@@ -213,8 +213,8 @@ static inline void process_intr_vector(struct fpga_state * sc, int off,
       }
 
       // TX (PC receive) transaction done.
-      if (vect & (1<<((5*i)+2))) { 
-         recv = 1; 
+      if (vect & (1<<((5*i)+2))) {
+         recv = 1;
          // Read the transferred amount.
          len = read_reg(sc, CHNL_REG(chnl, TX_TNFR_LEN_REG_OFF));
          // Notify the thread.
@@ -225,8 +225,8 @@ static inline void process_intr_vector(struct fpga_state * sc, int off,
       }
 
       // New TX (PC receive) transaction.
-      if (vect & (1<<((5*i)+0))) { 
-         recv = 1; 
+      if (vect & (1<<((5*i)+0))) {
+         recv = 1;
          // Read the offset/last and length
          offlast = read_reg(sc, CHNL_REG(chnl, TX_OFFLAST_REG_OFF));
          len = read_reg(sc, CHNL_REG(chnl, TX_LEN_REG_OFF));
@@ -241,8 +241,8 @@ static inline void process_intr_vector(struct fpga_state * sc, int off,
       }
 
       // RX (PC send) scatter gather buffer is read.
-      if (vect & (1<<((5*i)+3))) { 
-         send = 1; 
+      if (vect & (1<<((5*i)+3))) {
+         send = 1;
          // Keep track so the thread can handle this.
          if (push_circ_queue(sc->send[chnl]->msgs, EVENT_SG_BUF_READ, 0)) {
             printk(KERN_ERR "riffa: fpga:%d chnl:%d, send sg buf read msg queue full\n", sc->id, chnl);
@@ -252,7 +252,7 @@ static inline void process_intr_vector(struct fpga_state * sc, int off,
 
       // RX (PC send) transaction done.
       if (vect & (1<<((5*i)+4))) {
-         send = 1; 
+         send = 1;
          // Read the transferred amount.
          len = read_reg(sc, CHNL_REG(chnl, RX_TNFR_LEN_REG_OFF));
          // Notify the thread.
@@ -275,7 +275,7 @@ static inline void process_intr_vector(struct fpga_state * sc, int off,
  * from FPGA and wakes up waiting threads to process the data. Always returns
  * IRQ_HANDLED.
  */
-static irqreturn_t intrpt_handler(int irq, void *dev_id) 
+static irqreturn_t intrpt_handler(int irq, void *dev_id)
 {
    unsigned int vect0;
    unsigned int vect1;
@@ -318,8 +318,8 @@ static irqreturn_t intrpt_handler(int irq, void *dev_id)
  * mapped using the common spill buffer for the channel. The overflow is used
  * if we run out of space in the supplied udata pointer.
  */
-static inline struct sg_mapping * fill_sg_buf(struct fpga_state * sc, int chnl, 
-   void * sg_buf, unsigned long udata, unsigned long long length, 
+static inline struct sg_mapping * fill_sg_buf(struct fpga_state * sc, int chnl,
+   void * sg_buf, unsigned long udata, unsigned long long length,
    unsigned long long overflow, enum dma_data_direction direction) {
    const char * dir = (direction == DMA_TO_DEVICE ? "send" : "recv");
    struct sg_mapping * sg_map;
@@ -457,12 +457,12 @@ static inline void free_sg_buf(struct fpga_state * sc, struct sg_mapping * sg_ma
 
 /**
  * Reads data from the FPGA. Will block until all the data is received from the
- * FPGA unless timeout is non-zero. If timeout is non-zero, the function will 
- * block until all the data is received or until the timeout expires. Received 
+ * FPGA unless timeout is non-zero. If timeout is non-zero, the function will
+ * block until all the data is received or until the timeout expires. Received
  * data will be written directly into the user buffer, bufp, by the DMA process
- * (using scatter gather). Up to len words (each word == 32 bits) will be 
- * written. On success, the number of words received are returned. On error, 
- * returns a negative value. 
+ * (using scatter gather). Up to len words (each word == 32 bits) will be
+ * written. On success, the number of words received are returned. On error,
+ * returns a negative value.
  */
 static inline unsigned int chnl_recv(struct fpga_state * sc, int chnl,
    char  __user * bufp, unsigned int len, unsigned long long timeout)
@@ -622,7 +622,7 @@ static inline unsigned int chnl_recv(struct fpga_state * sc, int chnl,
             return (unsigned int)(recvd>>2);
          break;
 
-      default: 
+      default:
          printk(KERN_ERR "riffa: fpga:%d chnl:%d, received unknown msg: %08x\n", sc->id, chnl, msg);
          break;
       }
@@ -631,18 +631,18 @@ static inline unsigned int chnl_recv(struct fpga_state * sc, int chnl,
 }
 
 /**
- * Writes data to the FPGA channel specified. Will block until all the data is 
+ * Writes data to the FPGA channel specified. Will block until all the data is
  * sent to the FPGA unless a non-zero timeout is configured. If timeout is non-
  * zero, then the function will block until all data is sent or when the timeout
  * ms elapses. User data from the bufp pointer will be sent, up to len words
- * (each word == 32 bits). The channel will be told how much data to expect and 
- * at what offset. If last == 1, the FPGA channel will recognize this 
- * transaction as complete after sending. If last == 0, the FPGA channel will 
- * expect additional transactions. On success, returns the number of words sent. 
- * On error, returns a negative value. 
+ * (each word == 32 bits). The channel will be told how much data to expect and
+ * at what offset. If last == 1, the FPGA channel will recognize this
+ * transaction as complete after sending. If last == 0, the FPGA channel will
+ * expect additional transactions. On success, returns the number of words sent.
+ * On error, returns a negative value.
  */
 static inline unsigned int chnl_send(struct fpga_state * sc, int chnl,
-   const char  __user * bufp, unsigned int len, unsigned int offset, 
+   const char  __user * bufp, unsigned int len, unsigned int offset,
    unsigned int last, unsigned long long timeout)
 {
    struct sg_mapping * sg_map;
@@ -769,7 +769,7 @@ static inline unsigned int chnl_send(struct fpga_state * sc, int chnl,
          return (unsigned int)(sent>>2);
          break;
 
-      default: 
+      default:
          printk(KERN_ERR "riffa: fpga:%d chnl:%d, received unknown msg: %08x\n", sc->id, chnl, msg);
          break;
       }
@@ -779,8 +779,8 @@ static inline unsigned int chnl_send(struct fpga_state * sc, int chnl,
 }
 
 /**
- * Populates the fpga_info struct with the current FPGA state information. On 
- * success, returns 0. On error, returns a negative value. 
+ * Populates the fpga_info struct with the current FPGA state information. On
+ * success, returns 0. On error, returns a negative value.
  */
 static inline int list_fpgas(fpga_info_list * list)
 {
@@ -813,8 +813,8 @@ static inline int list_fpgas(fpga_info_list * list)
 }
 
 /**
- * Resets the driver for the specified FPGA. The fpga_state struct for all 
- * channels will be reset as will the FPGA itself. 
+ * Resets the driver for the specified FPGA. The fpga_state struct for all
+ * channels will be reset as will the FPGA itself.
  */
 static inline void reset(int id)
 {
@@ -843,12 +843,12 @@ static inline void reset(int id)
 }
 
 /**
- * Main entry point for reading and writing on the device. Return value depends 
+ * Main entry point for reading and writing on the device. Return value depends
  * on ioctlnum and expected behavior. See code for details.
  */
-static long fpga_ioctl(struct file *filp, unsigned int ioctlnum, 
+static long fpga_ioctl(struct file *filp, unsigned int ioctlnum,
    unsigned long ioctlparam)
-{   
+{
    int rc;
    fpga_chnl_io io;
    fpga_info_list list;
@@ -861,7 +861,7 @@ static long fpga_ioctl(struct file *filp, unsigned int ioctlnum,
          }
          if (io.id < 0 || io.id >= NUM_FPGAS || !atomic_read(&used_fpgas[io.id]))
             return 0;
-         return chnl_send(fpgas[io.id], io.chnl, io.data, io.len, io.offset, 
+         return chnl_send(fpgas[io.id], io.chnl, io.data, io.len, io.offset,
             io.last, io.timeout);
       case IOCTL_RECV:
          if ((rc = copy_from_user(&io, (void *)ioctlparam, sizeof(fpga_chnl_io)))) {
@@ -891,10 +891,10 @@ static long fpga_ioctl(struct file *filp, unsigned int ioctlnum,
 ///////////////////////////////////////////////////////
 
 /**
- * Allocates and initializes chnl_dir structs for each channel. Returns the 
+ * Allocates and initializes chnl_dir structs for each channel. Returns the
  * number of chnl_dir structs allocated.
  */
-static inline int __devinit allocate_chnls(struct pci_dev *dev, struct fpga_state * sc) 
+static inline int __devinit allocate_chnls(struct pci_dev *dev, struct fpga_state * sc)
 {
    int i;
    dma_addr_t hw_addr;
@@ -920,7 +920,7 @@ static inline int __devinit allocate_chnls(struct pci_dev *dev, struct fpga_stat
       // Allocate the send struct
       sc->send[i] = (struct chnl_dir *) kzalloc(sizeof(struct chnl_dir), GFP_KERNEL);
       if (sc->send[i] == NULL) {
-         pci_free_consistent(dev, sc->sg_buf_size, sc->recv[i]->buf_addr, 
+         pci_free_consistent(dev, sc->sg_buf_size, sc->recv[i]->buf_addr,
             (dma_addr_t)sc->recv[i]->buf_hw_addr);
          free_circ_queue(sc->recv[i]->msgs);
          kfree(sc->recv[i]);
@@ -929,7 +929,7 @@ static inline int __devinit allocate_chnls(struct pci_dev *dev, struct fpga_stat
       init_waitqueue_head(&sc->send[i]->waitq);
       if ((sc->send[i]->msgs = init_circ_queue(4)) == NULL) {
          kfree(sc->send[i]);
-         pci_free_consistent(dev, sc->sg_buf_size, sc->recv[i]->buf_addr, 
+         pci_free_consistent(dev, sc->sg_buf_size, sc->recv[i]->buf_addr,
             (dma_addr_t)sc->recv[i]->buf_hw_addr);
          free_circ_queue(sc->recv[i]->msgs);
          kfree(sc->recv[i]);
@@ -940,7 +940,7 @@ static inline int __devinit allocate_chnls(struct pci_dev *dev, struct fpga_stat
       if (sc->send[i]->buf_addr == NULL) {
          free_circ_queue(sc->send[i]->msgs);
          kfree(sc->send[i]);
-         pci_free_consistent(dev, sc->sg_buf_size, sc->recv[i]->buf_addr, 
+         pci_free_consistent(dev, sc->sg_buf_size, sc->recv[i]->buf_addr,
             (dma_addr_t)sc->recv[i]->buf_hw_addr);
          free_circ_queue(sc->recv[i]->msgs);
          kfree(sc->recv[i]);
@@ -955,7 +955,7 @@ static inline int __devinit allocate_chnls(struct pci_dev *dev, struct fpga_stat
  * Called by the OS when the device is ready for access. Returns 0 on success,
  * negative value on failure.
  */
-static int __devinit fpga_probe(struct pci_dev *dev, const struct pci_device_id *id) 
+static int __devinit fpga_probe(struct pci_dev *dev, const struct pci_device_id *id)
 {
    int i;
    int j;
@@ -1009,7 +1009,7 @@ static int __devinit fpga_probe(struct pci_dev *dev, const struct pci_device_id 
       kfree(sc);
       return (-ENODEV);
    }
-   
+
    // PCI BAR 0
    sc->bar0_addr = pci_resource_start(dev, 0);
    sc->bar0_len = pci_resource_len(dev, 0);
@@ -1032,7 +1032,7 @@ static int __devinit fpga_probe(struct pci_dev *dev, const struct pci_device_id 
       return (-ENODEV);
    }
 
-   // Setup MSI interrupts 
+   // Setup MSI interrupts
    error = pci_enable_msi(dev);
    if (error != 0) {
       printk(KERN_ERR "riffa: pci_enable_msi returned error: %d\n", error);
@@ -1069,7 +1069,7 @@ static int __devinit fpga_probe(struct pci_dev *dev, const struct pci_device_id 
       kfree(sc);
       return error;
    }
-   printk(KERN_INFO "riffa: PCIE_EXP_DEVCTL register: %x\n",devctl_result);  
+   printk(KERN_INFO "riffa: PCIE_EXP_DEVCTL register: %x\n",devctl_result);
 
    error = pcie_capability_write_dword(dev,PCI_EXP_DEVCTL,(devctl_result|PCI_EXP_DEVCTL_EXT_TAG));
    if (error != 0) {
@@ -1095,7 +1095,7 @@ static int __devinit fpga_probe(struct pci_dev *dev, const struct pci_device_id 
       kfree(sc);
       return error;
    }
-   printk(KERN_INFO "riffa: PCIE_EXP_LNKCTL register: %x\n",lnkctl_result);  
+   printk(KERN_INFO "riffa: PCIE_EXP_LNKCTL register: %x\n",lnkctl_result);
 
    error = pcie_capability_write_dword(dev,PCI_EXP_LNKCTL,(lnkctl_result|PCI_EXP_LNKCTL_RCB));
    if (error != 0) {
@@ -1175,8 +1175,8 @@ static int __devinit fpga_probe(struct pci_dev *dev, const struct pci_device_id 
    }
 
    // Create chnl_dir structs.
-   sc->recv = (struct chnl_dir **) kzalloc(sc->num_chnls*sizeof(struct chnl_dir*), GFP_KERNEL);  
-   sc->send = (struct chnl_dir **) kzalloc(sc->num_chnls*sizeof(struct chnl_dir*), GFP_KERNEL);  
+   sc->recv = (struct chnl_dir **) kzalloc(sc->num_chnls*sizeof(struct chnl_dir*), GFP_KERNEL);
+   sc->send = (struct chnl_dir **) kzalloc(sc->num_chnls*sizeof(struct chnl_dir*), GFP_KERNEL);
    if (sc->recv == NULL || sc->send == NULL) {
       printk(KERN_ERR "riffa: not enough memory to allocate chnl_dir arrays\n");
       if (sc->recv != NULL)
@@ -1198,9 +1198,9 @@ static int __devinit fpga_probe(struct pci_dev *dev, const struct pci_device_id 
       sc->num_chnls = j;
       printk(KERN_ERR "riffa: not enough memory to allocate chnl_dir structs\n");
       for (i = 0; i < sc->num_chnls; ++i) {
-         pci_free_consistent(dev, sc->sg_buf_size, sc->send[i]->buf_addr, 
+         pci_free_consistent(dev, sc->sg_buf_size, sc->send[i]->buf_addr,
             (dma_addr_t)sc->send[i]->buf_hw_addr);
-         pci_free_consistent(dev, sc->sg_buf_size, sc->recv[i]->buf_addr, 
+         pci_free_consistent(dev, sc->sg_buf_size, sc->recv[i]->buf_addr,
             (dma_addr_t)sc->recv[i]->buf_hw_addr);
          free_circ_queue(sc->send[i]->msgs);
          free_circ_queue(sc->recv[i]->msgs);
@@ -1226,9 +1226,9 @@ static int __devinit fpga_probe(struct pci_dev *dev, const struct pci_device_id 
    if (sc->spill_buf_addr == NULL) {
       printk(KERN_ERR "riffa: not enough memory to allocate spill buffer\n");
       for (i = 0; i < sc->num_chnls; ++i) {
-         pci_free_consistent(dev, sc->sg_buf_size, sc->send[i]->buf_addr, 
+         pci_free_consistent(dev, sc->sg_buf_size, sc->send[i]->buf_addr,
             (dma_addr_t)sc->send[i]->buf_hw_addr);
-         pci_free_consistent(dev, sc->sg_buf_size, sc->recv[i]->buf_addr, 
+         pci_free_consistent(dev, sc->sg_buf_size, sc->recv[i]->buf_addr,
             (dma_addr_t)sc->recv[i]->buf_hw_addr);
          free_circ_queue(sc->send[i]->msgs);
          free_circ_queue(sc->recv[i]->msgs);
@@ -1247,7 +1247,7 @@ static int __devinit fpga_probe(struct pci_dev *dev, const struct pci_device_id 
       kfree(sc);
    }
 
-   // Save pointer to structure 
+   // Save pointer to structure
    pci_set_drvdata(dev, sc);
    sc->dev = dev;
    sc->id = -1;
@@ -1261,9 +1261,9 @@ static int __devinit fpga_probe(struct pci_dev *dev, const struct pci_device_id 
    if (sc->id == -1) {
       printk(KERN_ERR "riffa: could not save FPGA information, %d is limit.\n", NUM_FPGAS);
       for (i = 0; i < sc->num_chnls; ++i) {
-         pci_free_consistent(dev, sc->sg_buf_size, sc->send[i]->buf_addr, 
+         pci_free_consistent(dev, sc->sg_buf_size, sc->send[i]->buf_addr,
             (dma_addr_t)sc->send[i]->buf_hw_addr);
-         pci_free_consistent(dev, sc->sg_buf_size, sc->recv[i]->buf_addr, 
+         pci_free_consistent(dev, sc->sg_buf_size, sc->recv[i]->buf_addr,
             (dma_addr_t)sc->recv[i]->buf_hw_addr);
          free_circ_queue(sc->send[i]->msgs);
          free_circ_queue(sc->recv[i]->msgs);
@@ -1272,7 +1272,7 @@ static int __devinit fpga_probe(struct pci_dev *dev, const struct pci_device_id 
       }
       kfree(sc->recv);
       kfree(sc->send);
-      pci_free_consistent(dev, SPILL_BUF_SIZE, sc->spill_buf_addr, 
+      pci_free_consistent(dev, SPILL_BUF_SIZE, sc->spill_buf_addr,
          (dma_addr_t)sc->spill_buf_hw_addr);
       pcie_capability_write_dword(dev,PCI_EXP_LNKCTL,lnkctl_result);
       pcie_capability_write_dword(dev,PCI_EXP_DEVCTL,devctl_result);
@@ -1294,7 +1294,7 @@ static int __devinit fpga_probe(struct pci_dev *dev, const struct pci_device_id 
 /**
  * Called when the device is unloaded.
  */
-static void __devexit fpga_remove(struct pci_dev *dev) 
+static void __devexit fpga_remove(struct pci_dev *dev)
 {
    int i;
    u32 result;
@@ -1310,9 +1310,9 @@ static void __devexit fpga_remove(struct pci_dev *dev)
       // Free structs, memory regions, etc.
       atomic_set(&used_fpgas[sc->id], 0);
       for (i = 0; i < sc->num_chnls; ++i) {
-         pci_free_consistent(dev, sc->sg_buf_size, sc->send[i]->buf_addr, 
+         pci_free_consistent(dev, sc->sg_buf_size, sc->send[i]->buf_addr,
             (dma_addr_t)sc->send[i]->buf_hw_addr);
-         pci_free_consistent(dev, sc->sg_buf_size, sc->recv[i]->buf_addr, 
+         pci_free_consistent(dev, sc->sg_buf_size, sc->recv[i]->buf_addr,
             (dma_addr_t)sc->recv[i]->buf_hw_addr);
          free_circ_queue(sc->send[i]->msgs);
          free_circ_queue(sc->recv[i]->msgs);
@@ -1321,7 +1321,7 @@ static void __devexit fpga_remove(struct pci_dev *dev)
       }
       kfree(sc->recv);
       kfree(sc->send);
-      pci_free_consistent(dev, SPILL_BUF_SIZE, sc->spill_buf_addr, 
+      pci_free_consistent(dev, SPILL_BUF_SIZE, sc->spill_buf_addr,
          (dma_addr_t)sc->spill_buf_hw_addr);
       free_irq(dev->irq, sc);
       iounmap(sc->bar0);
@@ -1358,10 +1358,10 @@ static const struct file_operations fpga_fops = {
 };
 
 /**
- * Called to initialize the PCI device. 
+ * Called to initialize the PCI device.
  */
-static int __init fpga_init(void) 
-{   
+static int __init fpga_init(void)
+{
    int i;
    int error;
 
@@ -1398,7 +1398,7 @@ static int __init fpga_init(void)
  */
 static void __exit fpga_exit(void)
 {
-   device_destroy(mymodule_class, devt); 
+   device_destroy(mymodule_class, devt);
    class_destroy(mymodule_class);
    pci_unregister_driver(&fpga_driver);
    unregister_chrdev(MAJOR_NUM, DEVICE_NAME);

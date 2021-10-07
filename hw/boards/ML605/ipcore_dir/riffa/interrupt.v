@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,7 +35,7 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
@@ -86,7 +86,7 @@ wire            wIntrDone;
 assign VECT_0 = rVect0;
 assign VECT_1 = rVect1;
 
-// Align the input signals to the interrupt vector. 
+// Align the input signals to the interrupt vector.
 // VECT_0/VECT_1 are organized from right to left (LSB to MSB) as:
 // [ 0] TX_TXN         for channel 0 in VECT_0, channel 6 in VECT_1
 // [ 1] TX_SG_BUF_RECVD   for channel 0 in VECT_0, channel 6 in VECT_1
@@ -117,7 +117,7 @@ generate
          assign wVect1[(5*(i-6))+2] = TX_TXN_DONE[i];
          assign wVect1[(5*(i-6))+3] = RX_SG_BUF_RECVD[i];
          assign wVect1[(5*(i-6))+4] = RX_TXN_DONE[i];
-      end   
+      end
    end
    for (i = C_NUM_CHNL; i < 12; i = i + 1) begin: vectZero
       if (i < 6) begin : vectZero0
@@ -133,7 +133,7 @@ generate
          assign wVect1[(5*(i-6))+2] = 1'b0;
          assign wVect1[(5*(i-6))+3] = 1'b0;
          assign wVect1[(5*(i-6))+4] = 1'b0;
-      end   
+      end
    end
    assign wVect0[30] = 1'b0;
    assign wVect0[31] = 1'b0;
@@ -159,7 +159,7 @@ always @(posedge CLK) begin
    if (RST) begin
       rVect0 <= #1 0;
       rVect1 <= #1 0;
-   end 
+   end
    else begin
       if (VECT_0_RST) begin
          rVect0 <= #1 (wVect0 | (rVect0 & ~VECT_RST));
@@ -174,7 +174,7 @@ always @(posedge CLK) begin
          rVect1 <= #1 (wVect1 | rVect1);
       end
    end
-end   
+end
 
 // Fire the interrupt when we have a non-zero vector.
 always @(posedge CLK) begin
@@ -189,6 +189,6 @@ always @(posedge CLK) begin
       `S_INTR_CLR_1 :   rState <= #1 (VECT_1_RST ? `S_INTR_IDLE : `S_INTR_CLR_1);
       endcase
    end
-end   
+end
 
 endmodule

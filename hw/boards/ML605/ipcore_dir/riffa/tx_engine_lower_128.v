@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,7 +35,7 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
@@ -45,7 +45,7 @@
 // Version:            1.00.a
 // Verilog Standard:   Verilog-2001
 // Description:         Transmit engine for completion requests and pre-formatted
-// PCIe read/write data. Muxes traffic for the AXI interface on the Xilinx PCIe 
+// PCIe read/write data. Muxes traffic for the AXI interface on the Xilinx PCIe
 // Endpoint core.
 // Author:            Matt Jacobsen
 // History:            @mattj: Version 2.0
@@ -72,7 +72,7 @@ module tx_engine_lower_128 #(
 
    input [15:0] CONFIG_COMPLETER_ID,
 
-   output [C_PCI_DATA_WIDTH-1:0] TX_DATA,               // AXI data output 
+   output [C_PCI_DATA_WIDTH-1:0] TX_DATA,               // AXI data output
    output [(C_PCI_DATA_WIDTH/8)-1:0] TX_DATA_BYTE_ENABLE,   // AXI data keep
    output TX_TLP_END_FLAG,                           // AXI data last
    output TX_DATA_VALID,                           // AXI data valid
@@ -123,7 +123,7 @@ reg [C_NUM_CHNL-1:0]               rDone=0, _rDone=0;
 reg [9:0]                          rLen=0, _rLen=0;
 reg                                rIsLast=0, _rIsLast=0;
 wire [31:0]                        wReqDataSwap;
-wire [7:0]                         wKeep = (8'b00001111<<(rLen[2:0])) | {8{!rIsLast}};         
+wire [7:0]                         wKeep = (8'b00001111<<(rLen[2:0])) | {8{!rIsLast}};
 
 
 assign TX_DATA = rData;
@@ -139,13 +139,13 @@ generate
 if(C_ALTERA == 1'b1) begin : altera_data
    assign REQ_DATA_SENT = rData[127:96];
    assign wReqDataSwap = REQ_DATA[31:0];
-end 
+end
 else begin : xilinx_data
    assign REQ_DATA_SENT = {rData[103:96], rData[111:104], rData[119:112], rData[127:120]};
    assign wReqDataSwap = {REQ_DATA[7:0], REQ_DATA[15:8], REQ_DATA[23:16], REQ_DATA[31:24]};
 end
 endgenerate
-   
+
 
 assign FIFO_REN = rFifoRen;
 assign WR_SENT = rDone;
@@ -206,7 +206,7 @@ end
 
 // Multiplex completion requests and read/write pre-formatted PCIe data onto
 // the AXI PCIe Endpoint interface. Remember that TX_DATA_READY may drop at
-// *any* time during transmission. So be sure to buffer enough data to 
+// *any* time during transmission. So be sure to buffer enough data to
 // accommodate starts and stops.
 always @ (posedge CLK) begin
    rState <= #1 (RST ? `S_TXENGLWR128_IDLE : _rState);
@@ -234,8 +234,8 @@ always @ (*) begin
    _rLen = rLen;
    _rIsLast = rIsLast;
    _rFirst = rFirst;
-  
-   case (rState) 
+
+   case (rState)
 
    `S_TXENGLWR128_IDLE : begin
       _rFifoRen = (TX_DATA_READY & !COMPL_REQ);
@@ -245,7 +245,7 @@ always @ (*) begin
          _rValid = (!COMPL_REQ & wFifoDataValid[0]);
          _rFirst = 1;
          _rLast = (!wFifoData[30] | (!wFifoData[29] & !wFifoData[36])); // Not WRITE TLP or (!64 bit & !(LEN != 1))
-         _rKeep = (4'b1111>>(!wFifoData[30] & !wFifoData[29])); // Not WRITE TLP && !64 bit 
+         _rKeep = (4'b1111>>(!wFifoData[30] & !wFifoData[29])); // Not WRITE TLP && !64 bit
          _rLen = wFifoData[9:0] - !wFifoData[29]; // LEN - !64 bit
          _rIsLast = (wFifoData[9:0] <= {1'b1, 1'b0, !wFifoData[29]}); // LEN <= 4 + !64 bit
          if (COMPL_REQ) // PIO read completions
@@ -289,7 +289,7 @@ always @ (*) begin
          _rData = wFifoData[127:0];
          _rValid = 1;
          _rLast = rIsLast;
-         _rKeep = wKeep[7:4];         
+         _rKeep = wKeep[7:4];
          _rLen = rLen - 3'd4;
          _rIsLast = (rLen <= 4'd8);
          _rState = (rIsLast ? `S_TXENGLWR128_IDLE : `S_TXENGLWR128_WR);

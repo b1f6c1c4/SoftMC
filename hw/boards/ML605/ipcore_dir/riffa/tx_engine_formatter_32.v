@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,7 +35,7 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
@@ -134,10 +134,10 @@ always @ (*) begin
    _rLenEQ1 = rLenEQ1;
    _rInitDone = rInitDone;
    _rDone = rDone;
-   
+
    _rPrevData = WR_DATA;
-   
-   case (rState) 
+
+   case (rState)
 
    `S_TXENGFMTR32_IDLE : begin
       _rLen = LEN;
@@ -146,7 +146,7 @@ always @ (*) begin
       _rWNR = WNR;
       _rTag = TAG;
       _rLenEQ1 = LEN_ONE;
-      _rData = {1'b0, {WNR, ADDR_64, 5'd0}, 1'b0, C_TRAFFIC_CLASS, CHNL, 1'b0, 1'b0, // Use the reserved 4 bits before traffic class to hide the internal tag  
+      _rData = {1'b0, {WNR, ADDR_64, 5'd0}, 1'b0, C_TRAFFIC_CLASS, CHNL, 1'b0, 1'b0, // Use the reserved 4 bits before traffic class to hide the internal tag
                C_RELAXED_ORDER, C_NO_SNOOP, 2'b0, LEN};
       _rDataWen = VALID;
       _rState = (VALID ? `S_TXENGFMTR32_HDR_0 : `S_TXENGFMTR32_IDLE);
@@ -171,7 +171,7 @@ always @ (*) begin
       _rState = (rInitDone ? `S_TXENGFMTR32_IDLE : `S_TXENGFMTR32_WR);
    end
 
-   `S_TXENGFMTR32_WR : begin 
+   `S_TXENGFMTR32_WR : begin
       _rLen = rLen - 1'd1;
       _rData = wData;
       _rDone = (rLen == 2'd2);

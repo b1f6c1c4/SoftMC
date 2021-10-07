@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,7 +35,7 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
@@ -44,8 +44,8 @@
 // Filename:         riffa_endpoint_32.v
 // Version:            1.00.a
 // Verilog Standard:   Verilog-2001
-// Description:         Connects to all the RIFFA channels and cycles through 
-//                   each to service data transfers. Supports a 32 bit data 
+// Description:         Connects to all the RIFFA channels and cycles through
+//                   each to service data transfers. Supports a 32 bit data
 //                  interface.
 // Author:            Matt Jacobsen
 // History:            @mattj: Version 2.0
@@ -54,7 +54,7 @@ module riffa_endpoint_32 #(
    parameter C_PCI_DATA_WIDTH = 9'd32,
    parameter C_NUM_CHNL = 4'd12,
    parameter C_MAX_READ_REQ_BYTES = 512,   // Max size of read requests (in bytes)
-   parameter C_TAG_WIDTH = 5,             // Number of outstanding requests 
+   parameter C_TAG_WIDTH = 5,             // Number of outstanding requests
     parameter C_ALTERA = 1'b1,            // 1 if Altera, 0 if Xilinx
    // Local parameters
    parameter C_MAX_READ_REQ = clog2s(C_MAX_READ_REQ_BYTES)-7,   // Max read: 000=128B, 001=256B, 010=512B, 011=1024B, 100=2048B, 101=4096B
@@ -71,7 +71,7 @@ module riffa_endpoint_32 #(
    input RX_DATA_VALID,
    output RX_DATA_READY,
    input RX_TLP_ERROR_POISON,
-   
+
    output [C_PCI_DATA_WIDTH-1:0] TX_DATA,
    output [(C_PCI_DATA_WIDTH/8)-1:0] TX_DATA_BYTE_ENABLE,
    output TX_TLP_END_FLAG,
@@ -79,10 +79,10 @@ module riffa_endpoint_32 #(
    output TX_DATA_VALID,
    output S_AXIS_SRC_DSC,
    input TX_DATA_READY,
-   
+
    input [15:0] CONFIG_COMPLETER_ID,
-   input CONFIG_BUS_MASTER_ENABLE,   
-   input [5:0] CONFIG_LINK_WIDTH,         // cfg_lstatus[9:4] (from Link Status Register): 000001=x1, 000010=x2, 000100=x4, 001000=x8, 001100=x12, 010000=x16, 100000=x32, others=? 
+   input CONFIG_BUS_MASTER_ENABLE,
+   input [5:0] CONFIG_LINK_WIDTH,         // cfg_lstatus[9:4] (from Link Status Register): 000001=x1, 000010=x2, 000100=x4, 001000=x8, 001100=x12, 010000=x16, 100000=x32, others=?
    input [1:0] CONFIG_LINK_RATE,         // cfg_lstatus[1:0] (from Link Status Register): 01=2.5GT/s, 10=5.0GT/s, others=?
    input [2:0] CONFIG_MAX_READ_REQUEST_SIZE,   // cfg_dcommand[14:12] (from Device Control Register): 000=128B, 001=256B, 010=512B, 011=1024B, 100=2048B, 101=4096B
    input [2:0] CONFIG_MAX_PAYLOAD_SIZE,       // cfg_dcommand[7:5] (from Device Control Register): 000=128B, 001=256B, 010=512B, 011=1024B
@@ -92,25 +92,25 @@ module riffa_endpoint_32 #(
     input                    CONFIG_CPL_BOUNDARY_SEL, // Read completion boundary (0=64 bytes, 1=128 bytes)
    input INTR_MSI_RDY,         // High when interrupt is able to be sent
    output INTR_MSI_REQUEST,            // High to request interrupt, when both INTR_MSI_RDY and INTR_MSI_REQUEST are high, interrupt is sent
-   
-   input [C_NUM_CHNL-1:0] CHNL_RX_CLK, 
-   output [C_NUM_CHNL-1:0] CHNL_RX, 
-   input [C_NUM_CHNL-1:0] CHNL_RX_ACK, 
-   output [C_NUM_CHNL-1:0] CHNL_RX_LAST, 
-   output [(C_NUM_CHNL*32)-1:0] CHNL_RX_LEN, 
-   output [(C_NUM_CHNL*31)-1:0] CHNL_RX_OFF, 
-   output [(C_NUM_CHNL*C_PCI_DATA_WIDTH)-1:0] CHNL_RX_DATA, 
-   output [C_NUM_CHNL-1:0] CHNL_RX_DATA_VALID, 
+
+   input [C_NUM_CHNL-1:0] CHNL_RX_CLK,
+   output [C_NUM_CHNL-1:0] CHNL_RX,
+   input [C_NUM_CHNL-1:0] CHNL_RX_ACK,
+   output [C_NUM_CHNL-1:0] CHNL_RX_LAST,
+   output [(C_NUM_CHNL*32)-1:0] CHNL_RX_LEN,
+   output [(C_NUM_CHNL*31)-1:0] CHNL_RX_OFF,
+   output [(C_NUM_CHNL*C_PCI_DATA_WIDTH)-1:0] CHNL_RX_DATA,
+   output [C_NUM_CHNL-1:0] CHNL_RX_DATA_VALID,
    input [C_NUM_CHNL-1:0] CHNL_RX_DATA_REN,
-   
-   input [C_NUM_CHNL-1:0] CHNL_TX_CLK, 
-   input [C_NUM_CHNL-1:0] CHNL_TX, 
+
+   input [C_NUM_CHNL-1:0] CHNL_TX_CLK,
+   input [C_NUM_CHNL-1:0] CHNL_TX,
    output [C_NUM_CHNL-1:0] CHNL_TX_ACK,
-   input [C_NUM_CHNL-1:0] CHNL_TX_LAST, 
-   input [(C_NUM_CHNL*32)-1:0] CHNL_TX_LEN, 
-   input [(C_NUM_CHNL*31)-1:0] CHNL_TX_OFF, 
-   input [(C_NUM_CHNL*C_PCI_DATA_WIDTH)-1:0] CHNL_TX_DATA, 
-   input [C_NUM_CHNL-1:0] CHNL_TX_DATA_VALID, 
+   input [C_NUM_CHNL-1:0] CHNL_TX_LAST,
+   input [(C_NUM_CHNL*32)-1:0] CHNL_TX_LEN,
+   input [(C_NUM_CHNL*31)-1:0] CHNL_TX_OFF,
+   input [(C_NUM_CHNL*C_PCI_DATA_WIDTH)-1:0] CHNL_TX_DATA,
+   input [C_NUM_CHNL-1:0] CHNL_TX_DATA_VALID,
    output [C_NUM_CHNL-1:0] CHNL_TX_DATA_REN
 );
 
@@ -220,7 +220,7 @@ wire   [C_NUM_CHNL-1:0]                      wTxnTxDoneAck; // ACK'd on length r
 reg      [4:0]                              rWideRst=0;
 reg                                       rRst=0;
 
-// The Mem/IO read/write address space should be at least 8 bits wide. This 
+// The Mem/IO read/write address space should be at least 8 bits wide. This
 // means we'll need at least 10 bits of BAR 0, at least 1024 bytes. The bottom
 // two bits must always be zero (i.e. all addresses are 4 byte word aligned).
 // The Mem/IO read/write address space is partitioned as illustrated below.
@@ -248,10 +248,10 @@ reg                                       rRst=0;
 // Generate a wide reset on PC reset.
 assign RST_OUT = rRst;
 always @ (posedge CLK) begin
-   rRst <= #1 rWideRst[4]; 
-   if (RST_IN | (wRxEngReqAddr10 & wRxEngReqRdDone)) 
+   rRst <= #1 rWideRst[4];
+   if (RST_IN | (wRxEngReqAddr10 & wRxEngReqRdDone))
       rWideRst <= #1 5'b11111;
-   else 
+   else
       rWideRst <= (rWideRst<<1);
 end
 
@@ -312,30 +312,30 @@ genvar i;
 generate
 for (i = 0; i < C_NUM_CHNL; i = i + 1) begin : channels
    channel_32 #(.C_DATA_WIDTH(C_PCI_DATA_WIDTH), .C_MAX_READ_REQ(C_MAX_READ_REQ)) channel (
-      .RST(rRst), 
-      .CLK(CLK), 
-      .CONFIG_MAX_READ_REQUEST_SIZE(CONFIG_MAX_READ_REQUEST_SIZE), 
-      .CONFIG_MAX_PAYLOAD_SIZE(CONFIG_MAX_PAYLOAD_SIZE), 
+      .RST(rRst),
+      .CLK(CLK),
+      .CONFIG_MAX_READ_REQUEST_SIZE(CONFIG_MAX_READ_REQUEST_SIZE),
+      .CONFIG_MAX_PAYLOAD_SIZE(CONFIG_MAX_PAYLOAD_SIZE),
 
-      .PIO_DATA(wRxEngReqData), 
-      .ENG_DATA(wRxEngData), 
-      
+      .PIO_DATA(wRxEngReqData),
+      .ENG_DATA(wRxEngData),
+
       .SG_RX_BUF_RECVD(wSgRxBufRecvd[i]),
       .SG_RX_BUF_LEN_VALID(wRxEngReqWr & wSgRxLenValid[i]),
       .SG_RX_BUF_ADDR_HI_VALID(wRxEngReqWr & wSgRxAddrHiValid[i]),
       .SG_RX_BUF_ADDR_LO_VALID(wRxEngReqWr & wSgRxAddrLoValid[i]),
-      
+
       .SG_TX_BUF_RECVD(wSgTxBufRecvd[i]),
       .SG_TX_BUF_LEN_VALID(wRxEngReqWr & wSgTxLenValid[i]),
       .SG_TX_BUF_ADDR_HI_VALID(wRxEngReqWr & wSgTxAddrHiValid[i]),
       .SG_TX_BUF_ADDR_LO_VALID(wRxEngReqWr & wSgTxAddrLoValid[i]),
-      
-      .TXN_RX_LEN_VALID(wRxEngReqWr & wTxnRxLenValid[i]), 
-      .TXN_RX_OFF_LAST_VALID(wRxEngReqWr & wTxnRxOffLastValid[i]), 
+
+      .TXN_RX_LEN_VALID(wRxEngReqWr & wTxnRxLenValid[i]),
+      .TXN_RX_OFF_LAST_VALID(wRxEngReqWr & wTxnRxOffLastValid[i]),
       .TXN_RX_DONE_LEN(wTxnRxDoneLen[(32*i) +:32]),
       .TXN_RX_DONE(wTxnRxDone[i]),
       .TXN_RX_DONE_ACK(wRxEngReqRdDone & wTxnRxDoneAck[i]), // ACK'd on length read
-      
+
       .TXN_TX(wTxnTx[i]),
       .TXN_TX_ACK(wRxEngReqRdDone & wTxnTxAck[i]), // ACK'd on length read
       .TXN_TX_LEN(wTxnTxLen[(32*i) +:32]),
@@ -343,51 +343,51 @@ for (i = 0; i < C_NUM_CHNL; i = i + 1) begin : channels
       .TXN_TX_DONE_LEN(wTxnTxDoneLen[(32*i) +:32]),
       .TXN_TX_DONE(wTxnTxDone[i]),
       .TXN_TX_DONE_ACK(wRxEngReqRdDone & wTxnTxDoneAck[i]), // ACK'd on length read
-      
+
       .RX_REQ(wTxEngRdReq[i]),
       .RX_REQ_ACK(wTxEngRdAck[i]),
       .RX_REQ_TAG(wTxEngRdSgChnl[(2*i) +:2]),
       .RX_REQ_ADDR(wTxEngRdAddr[(64*i) +:64]),
       .RX_REQ_LEN(wTxEngRdLen[(10*i) +:10]),
 
-      .TX_REQ(wTxEngWrReq[i]), 
+      .TX_REQ(wTxEngWrReq[i]),
       .TX_REQ_ACK(wTxEngWrAck[i]),
-      .TX_ADDR(wTxEngWrAddr[(64*i) +:64]), 
-      .TX_LEN(wTxEngWrLen[(10*i) +:10]), 
+      .TX_ADDR(wTxEngWrAddr[(64*i) +:64]),
+      .TX_LEN(wTxEngWrLen[(10*i) +:10]),
       .TX_DATA(wTxEngWrData[(C_PCI_DATA_WIDTH*i) +:C_PCI_DATA_WIDTH]),
-      .TX_DATA_REN(wTxEngWrDataRen[i]), 
+      .TX_DATA_REN(wTxEngWrDataRen[i]),
       .TX_SENT(wTxEngWrSent[i]),
-      
-      .MAIN_DATA_EN(wRxEngMainDataEn[(C_PCI_DATA_WORD_WIDTH*i) +:C_PCI_DATA_WORD_WIDTH]), 
-      .MAIN_DONE(wRxEngMainDone[i]), 
+
+      .MAIN_DATA_EN(wRxEngMainDataEn[(C_PCI_DATA_WORD_WIDTH*i) +:C_PCI_DATA_WORD_WIDTH]),
+      .MAIN_DONE(wRxEngMainDone[i]),
       .MAIN_ERR(wRxEngMainErr[i]),
-      
-      .SG_RX_DATA_EN(wRxEngSgRxDataEn[(C_PCI_DATA_WORD_WIDTH*i) +:C_PCI_DATA_WORD_WIDTH]),  
-      .SG_RX_DONE(wRxEngSgRxDone[i]), 
+
+      .SG_RX_DATA_EN(wRxEngSgRxDataEn[(C_PCI_DATA_WORD_WIDTH*i) +:C_PCI_DATA_WORD_WIDTH]),
+      .SG_RX_DONE(wRxEngSgRxDone[i]),
       .SG_RX_ERR(wRxEngSgRxErr[i]),
 
-      .SG_TX_DATA_EN(wRxEngSgTxDataEn[(C_PCI_DATA_WORD_WIDTH*i) +:C_PCI_DATA_WORD_WIDTH]), 
-      .SG_TX_DONE(wRxEngSgTxDone[i]), 
+      .SG_TX_DATA_EN(wRxEngSgTxDataEn[(C_PCI_DATA_WORD_WIDTH*i) +:C_PCI_DATA_WORD_WIDTH]),
+      .SG_TX_DONE(wRxEngSgTxDone[i]),
       .SG_TX_ERR(wRxEngSgTxErr[i]),
 
-      .CHNL_RX_CLK(CHNL_RX_CLK[i]), 
-      .CHNL_RX(CHNL_RX[i]), 
-      .CHNL_RX_ACK(CHNL_RX_ACK[i]), 
-      .CHNL_RX_LAST(CHNL_RX_LAST[i]), 
-      .CHNL_RX_LEN(CHNL_RX_LEN[(32*i) +:32]), 
-      .CHNL_RX_OFF(CHNL_RX_OFF[(31*i) +:31]), 
-      .CHNL_RX_DATA(CHNL_RX_DATA[(C_PCI_DATA_WIDTH*i) +:C_PCI_DATA_WIDTH]), 
-      .CHNL_RX_DATA_VALID(CHNL_RX_DATA_VALID[i]), 
+      .CHNL_RX_CLK(CHNL_RX_CLK[i]),
+      .CHNL_RX(CHNL_RX[i]),
+      .CHNL_RX_ACK(CHNL_RX_ACK[i]),
+      .CHNL_RX_LAST(CHNL_RX_LAST[i]),
+      .CHNL_RX_LEN(CHNL_RX_LEN[(32*i) +:32]),
+      .CHNL_RX_OFF(CHNL_RX_OFF[(31*i) +:31]),
+      .CHNL_RX_DATA(CHNL_RX_DATA[(C_PCI_DATA_WIDTH*i) +:C_PCI_DATA_WIDTH]),
+      .CHNL_RX_DATA_VALID(CHNL_RX_DATA_VALID[i]),
       .CHNL_RX_DATA_REN(CHNL_RX_DATA_REN[i]),
 
-      .CHNL_TX_CLK(CHNL_TX_CLK[i]), 
-      .CHNL_TX(CHNL_TX[i]), 
+      .CHNL_TX_CLK(CHNL_TX_CLK[i]),
+      .CHNL_TX(CHNL_TX[i]),
       .CHNL_TX_ACK(CHNL_TX_ACK[i]),
-      .CHNL_TX_LAST(CHNL_TX_LAST[i]), 
-      .CHNL_TX_LEN(CHNL_TX_LEN[(32*i) +:32]), 
-      .CHNL_TX_OFF(CHNL_TX_OFF[(31*i) +:31]), 
-      .CHNL_TX_DATA(CHNL_TX_DATA[(C_PCI_DATA_WIDTH*i) +:C_PCI_DATA_WIDTH]), 
-      .CHNL_TX_DATA_VALID(CHNL_TX_DATA_VALID[i]), 
+      .CHNL_TX_LAST(CHNL_TX_LAST[i]),
+      .CHNL_TX_LEN(CHNL_TX_LEN[(32*i) +:32]),
+      .CHNL_TX_OFF(CHNL_TX_OFF[(31*i) +:31]),
+      .CHNL_TX_DATA(CHNL_TX_DATA[(C_PCI_DATA_WIDTH*i) +:C_PCI_DATA_WIDTH]),
+      .CHNL_TX_DATA_VALID(CHNL_TX_DATA_VALID[i]),
       .CHNL_TX_DATA_REN(CHNL_TX_DATA_REN[i])
    );
 end
@@ -398,32 +398,32 @@ endgenerate
 assign wRxEngReqWrDone = wRxEngReqWr;
 assign wRxEngReqRdDone = wTxEngReqDone;
 rx_engine_32 #(
-   .C_PCI_DATA_WIDTH(C_PCI_DATA_WIDTH), 
+   .C_PCI_DATA_WIDTH(C_PCI_DATA_WIDTH),
    .C_NUM_CHNL(C_NUM_CHNL),
    .C_MAX_READ_REQ_BYTES(C_MAX_READ_REQ_BYTES),
    .C_TAG_WIDTH(C_TAG_WIDTH)
 ) rxEng (
-   .CLK(CLK), 
-   .RST(rRst), 
-   .RX_DATA(RX_DATA), 
-   .RX_TLP_END_FLAG(RX_TLP_END_FLAG), 
-   .RX_DATA_VALID(RX_DATA_VALID), 
-   .RX_DATA_READY(RX_DATA_READY), 
+   .CLK(CLK),
+   .RST(rRst),
+   .RX_DATA(RX_DATA),
+   .RX_TLP_END_FLAG(RX_TLP_END_FLAG),
+   .RX_DATA_VALID(RX_DATA_VALID),
+   .RX_DATA_READY(RX_DATA_READY),
    .RX_TLP_ERROR_POISON(RX_TLP_ERROR_POISON),
-   
-   .REQ_WR(wRxEngReqWr), 
-   .REQ_WR_DONE(wRxEngReqWrDone), 
-   .REQ_RD(wRxEngReqRd), 
-   .REQ_RD_DONE(wRxEngReqRdDone), 
-   .REQ_LEN(wRxEngReqLen), 
-   .REQ_ADDR(wRxEngReqAddr), 
-   .REQ_DATA(wRxEngReqData), 
-   .REQ_BE(wRxEngReqBE), 
-   .REQ_TC(wRxEngReqTC), 
-   .REQ_TD(wRxEngReqTD), 
-   .REQ_EP(wRxEngReqEP), 
-   .REQ_ATTR(wRxEngReqAttr), 
-   .REQ_ID(wRxEngReqId), 
+
+   .REQ_WR(wRxEngReqWr),
+   .REQ_WR_DONE(wRxEngReqWrDone),
+   .REQ_RD(wRxEngReqRd),
+   .REQ_RD_DONE(wRxEngReqRdDone),
+   .REQ_LEN(wRxEngReqLen),
+   .REQ_ADDR(wRxEngReqAddr),
+   .REQ_DATA(wRxEngReqData),
+   .REQ_BE(wRxEngReqBE),
+   .REQ_TC(wRxEngReqTC),
+   .REQ_TD(wRxEngReqTD),
+   .REQ_EP(wRxEngReqEP),
+   .REQ_ATTR(wRxEngReqAttr),
+   .REQ_ID(wRxEngReqId),
    .REQ_TAG(wRxEngReqTag),
 
    .INT_TAG(wIntTag),
@@ -434,13 +434,13 @@ rx_engine_32 #(
    .ENG_DATA(wRxEngData),
     .ENG_RD_COMPLETE(wRxEngRdComplete),
    .MAIN_DATA_EN(wRxEngMainDataEn),
-   .MAIN_DONE(wRxEngMainDone), 
-   .MAIN_ERR(wRxEngMainErr), 
+   .MAIN_DONE(wRxEngMainDone),
+   .MAIN_ERR(wRxEngMainErr),
    .SG_RX_DATA_EN(wRxEngSgRxDataEn),
-   .SG_RX_DONE(wRxEngSgRxDone), 
-   .SG_RX_ERR(wRxEngSgRxErr), 
+   .SG_RX_DONE(wRxEngSgRxDone),
+   .SG_RX_ERR(wRxEngSgRxErr),
    .SG_TX_DATA_EN(wRxEngSgTxDataEn),
-   .SG_TX_DONE(wRxEngSgTxDone), 
+   .SG_TX_DONE(wRxEngSgTxDone),
    .SG_TX_ERR(wRxEngSgTxErr)
 );
 
@@ -452,31 +452,31 @@ tx_engine_32 #(
    .C_TAG_WIDTH(C_TAG_WIDTH),
    .C_ALTERA(C_ALTERA)
 ) txEng (
-   .CLK(CLK), 
-   .RST(rRst), 
+   .CLK(CLK),
+   .RST(rRst),
    .CONFIG_COMPLETER_ID(CONFIG_COMPLETER_ID),
    .CONFIG_MAX_PAYLOAD_SIZE(CONFIG_MAX_PAYLOAD_SIZE),
 
-   .TX_DATA(TX_DATA), 
-   .TX_DATA_BYTE_ENABLE(TX_DATA_BYTE_ENABLE), 
-   .TX_TLP_END_FLAG(TX_TLP_END_FLAG), 
-   .TX_TLP_START_FLAG(TX_TLP_START_FLAG), 
-   .TX_DATA_VALID(TX_DATA_VALID), 
-   .S_AXIS_SRC_DSC(S_AXIS_SRC_DSC), 
-   .TX_DATA_READY(TX_DATA_READY), 
+   .TX_DATA(TX_DATA),
+   .TX_DATA_BYTE_ENABLE(TX_DATA_BYTE_ENABLE),
+   .TX_TLP_END_FLAG(TX_TLP_END_FLAG),
+   .TX_TLP_START_FLAG(TX_TLP_START_FLAG),
+   .TX_DATA_VALID(TX_DATA_VALID),
+   .S_AXIS_SRC_DSC(S_AXIS_SRC_DSC),
+   .TX_DATA_READY(TX_DATA_READY),
 
-   .WR_REQ(wTxEngWrReq), 
-   .WR_ADDR(wTxEngWrAddr), 
+   .WR_REQ(wTxEngWrReq),
+   .WR_ADDR(wTxEngWrAddr),
    .WR_LEN(wTxEngWrLen),
-   .WR_DATA(wTxEngWrData), 
-   .WR_DATA_REN(wTxEngWrDataRen), 
+   .WR_DATA(wTxEngWrData),
+   .WR_DATA_REN(wTxEngWrDataRen),
    .WR_ACK(wTxEngWrAck),
-   .WR_SENT(wTxEngWrSent), 
-   
-   .RD_REQ(wTxEngRdReq), 
+   .WR_SENT(wTxEngWrSent),
+
+   .RD_REQ(wTxEngRdReq),
    .RD_SG_CHNL(wTxEngRdSgChnl),
-   .RD_ADDR(wTxEngRdAddr), 
-   .RD_LEN(wTxEngRdLen), 
+   .RD_ADDR(wTxEngRdAddr),
+   .RD_LEN(wTxEngRdLen),
    .RD_ACK(wTxEngRdAck),
 
     .TX_ENG_RD_REQ_SENT(wTxEngRdReqSent),
@@ -487,18 +487,18 @@ tx_engine_32 #(
    .EXT_TAG(wExtTag),
    .EXT_TAG_VALID(wExtTagValid),
 
-   .COMPL_REQ(rTxEngReq[1]), 
+   .COMPL_REQ(rTxEngReq[1]),
    .COMPL_DONE(wTxEngReqDone),
-   .REQ_TC(wRxEngReqTC), 
-   .REQ_TD(wRxEngReqTD), 
-   .REQ_EP(wRxEngReqEP), 
-   .REQ_ATTR(wRxEngReqAttr), 
-   .REQ_LEN(wRxEngReqLen), 
-   .REQ_ID(wRxEngReqId), 
-   .REQ_TAG(wRxEngReqTag), 
-   .REQ_BE(wRxEngReqBE), 
-   .REQ_ADDR(wRxEngReqAddr), 
-   .REQ_DATA(rTxEngReqData), 
+   .REQ_TC(wRxEngReqTC),
+   .REQ_TD(wRxEngReqTD),
+   .REQ_EP(wRxEngReqEP),
+   .REQ_ATTR(wRxEngReqAttr),
+   .REQ_LEN(wRxEngReqLen),
+   .REQ_ID(wRxEngReqId),
+   .REQ_TAG(wRxEngReqTag),
+   .REQ_BE(wRxEngReqBE),
+   .REQ_ADDR(wRxEngReqAddr),
+   .REQ_DATA(rTxEngReqData),
    .REQ_DATA_SENT(wTxEngReqDataSent)
 );
 
@@ -522,7 +522,7 @@ interrupt #(.C_NUM_CHNL(C_NUM_CHNL)) intr (
    .INTR_MSI_RDY(INTR_MSI_RDY),
    .INTR_MSI_REQUEST(INTR_MSI_REQUEST)
 );
-   
+
 // Track receive buffer flow control credits (header & Data)
 recv_credit_flow_ctrl rc_fc (
    // Outputs

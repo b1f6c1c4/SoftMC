@@ -1,29 +1,29 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    19:27:32 06/14/2012 
-// Design Name: 
+// Company:
+// Engineer:
+//
+// Create Date:    19:27:32 06/14/2012
+// Design Name:
 // Module Name:    reorder_queue_input
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
+// Project Name:
+// Target Devices:
+// Tool versions:
 // Description:
-// Demuxes input TLPs into the appropriate slot/bucket/RAM-position according 
+// Demuxes input TLPs into the appropriate slot/bucket/RAM-position according
 // to its tag.
 //
-// Dependencies: 
+// Dependencies:
 // reorder_queue.v
 //
-// Revision: 
+// Revision:
 // Revision 0.01 - File Created
-// Additional Comments: 
+// Additional Comments:
 //
 //////////////////////////////////////////////////////////////////////////////////
 module reorder_queue_input #(
    parameter C_PCI_DATA_WIDTH = 9'd128,
-   parameter C_TAG_WIDTH = 5,                                  // Number of outstanding requests 
+   parameter C_TAG_WIDTH = 5,                                  // Number of outstanding requests
    parameter C_TAG_DW_COUNT_WIDTH = 8,                           // Width of max count DWs per packet
    parameter C_DATA_ADDR_STRIDE_WIDTH = 5,                        // Width of max num stored data addr positions per tag
    parameter C_DATA_ADDR_WIDTH = 10,                           // Width of stored data address
@@ -141,7 +141,7 @@ always @ (posedge CLK) begin
    rDECount <= #1 (rDECount<<C_PCI_DATA_COUNT_WIDTH) | DATA_EN_COUNT;
    rDone <= #1 (rDone<<1) | DONE;
    rErr <= #1 (rErr<<1) | ERR;
-   
+
    rDEShifted <= #1 (rDEShifted<<C_PCI_DATA_WORD) | rDEShift;
    rWords <= #1 (rWords<<C_TAG_DW_COUNT_WIDTH) | rCount;
    rShifted <= #1 (rShifted<<C_PCI_DATA_WORD_WIDTH) | rShift;
@@ -153,7 +153,7 @@ always @ (posedge CLK) begin
    // STAGE 0: Register the incoming data
 
    // STAGE 1: Request existing count from RAM
-   // To cover the gap b/t reads and writes to RAM, next cycle we might need 
+   // To cover the gap b/t reads and writes to RAM, next cycle we might need
    // to use the existing or even the previous rCount value if the tags match.
    rUseCurrCount <= #1 (rTag[0*C_TAG_WIDTH +:C_TAG_WIDTH] == rTag[1*C_TAG_WIDTH +:C_TAG_WIDTH] && rValid[1]);
    rUsePrevCount <= #1 (rTag[0*C_TAG_WIDTH +:C_TAG_WIDTH] == rTag[2*C_TAG_WIDTH +:C_TAG_WIDTH] && rValid[2]);
@@ -161,7 +161,7 @@ always @ (posedge CLK) begin
    // See if we need to reset the count
    rCountValid <= #1 (RST ? 1'd0 : rCountRst>>rTag[0*C_TAG_WIDTH +:C_TAG_WIDTH]);
    rValidCount <= #1 (RST ? 0 : rValid[0]<<rTag[0*C_TAG_WIDTH +:C_TAG_WIDTH]);
-   
+
    // STAGE 2: Calculate new count (saves next cycle)
    if (rUseCurrCount) begin
       rShift <= #1 rCount[0 +:C_PCI_DATA_WORD_WIDTH];
@@ -175,17 +175,17 @@ always @ (posedge CLK) begin
       rShift <= #1 wCountClr[0 +:C_PCI_DATA_WORD_WIDTH];
       rCount <= #1 wCountClr + rDECount[1*C_PCI_DATA_COUNT_WIDTH +:C_PCI_DATA_COUNT_WIDTH];
    end
-   
+
    // STAGE 3: Request existing positions from RAM
    // Barrel shift the DE
-   rDEShift <= #1 (rDE[2*C_PCI_DATA_WORD +:C_PCI_DATA_WORD]<<rShift) | 
+   rDEShift <= #1 (rDE[2*C_PCI_DATA_WORD +:C_PCI_DATA_WORD]<<rShift) |
       (rDE[2*C_PCI_DATA_WORD +:C_PCI_DATA_WORD]>>(C_PCI_DATA_WORD-rShift));
-   // To cover the gap b/t reads and writes to RAM, next cycle we might need 
+   // To cover the gap b/t reads and writes to RAM, next cycle we might need
    // to use the existing or even the previous rPos values if the tags match.
    rUseCurrPos <= #1 (rTag[2*C_TAG_WIDTH +:C_TAG_WIDTH] == rTag[3*C_TAG_WIDTH +:C_TAG_WIDTH] && rValid[3]);
    rUsePrevPos <= #1 (rTag[2*C_TAG_WIDTH +:C_TAG_WIDTH] == rTag[4*C_TAG_WIDTH +:C_TAG_WIDTH] && rValid[4]);
    for (i = 0; i < C_PCI_DATA_WORD; i = i + 1) begin
-      rPrevPos[C_DATA_ADDR_STRIDE_WIDTH*i +:C_DATA_ADDR_STRIDE_WIDTH] <= #1 
+      rPrevPos[C_DATA_ADDR_STRIDE_WIDTH*i +:C_DATA_ADDR_STRIDE_WIDTH] <= #1
          (RST ? wZero[C_DATA_ADDR_STRIDE_WIDTH-1:0] : rPos[C_DATA_ADDR_STRIDE_WIDTH*i +:C_DATA_ADDR_STRIDE_WIDTH]);
    end
    // See if we need to reset the positions
@@ -195,25 +195,25 @@ always @ (posedge CLK) begin
    // STAGE 4: Calculate new positions (saves next cycle)
    if (rUseCurrPos) begin
       for (i = 0; i < C_PCI_DATA_WORD; i = i + 1) begin
-         rPosNow[C_DATA_ADDR_STRIDE_WIDTH*i +:C_DATA_ADDR_STRIDE_WIDTH] <= #1 
+         rPosNow[C_DATA_ADDR_STRIDE_WIDTH*i +:C_DATA_ADDR_STRIDE_WIDTH] <= #1
             (RST ? wZero[C_DATA_ADDR_STRIDE_WIDTH-1:0] : rPos[C_DATA_ADDR_STRIDE_WIDTH*i +:C_DATA_ADDR_STRIDE_WIDTH]);
-         rPos[C_DATA_ADDR_STRIDE_WIDTH*i +:C_DATA_ADDR_STRIDE_WIDTH] <= #1 
+         rPos[C_DATA_ADDR_STRIDE_WIDTH*i +:C_DATA_ADDR_STRIDE_WIDTH] <= #1
             (RST ? wZero[C_DATA_ADDR_STRIDE_WIDTH-1:0] : rPos[C_DATA_ADDR_STRIDE_WIDTH*i +:C_DATA_ADDR_STRIDE_WIDTH] + rDEShift[i]);
       end
    end
    else if (rUsePrevPos) begin
       for (i = 0; i < C_PCI_DATA_WORD; i = i + 1) begin
-         rPosNow[C_DATA_ADDR_STRIDE_WIDTH*i +:C_DATA_ADDR_STRIDE_WIDTH] <= #1 
+         rPosNow[C_DATA_ADDR_STRIDE_WIDTH*i +:C_DATA_ADDR_STRIDE_WIDTH] <= #1
             (RST ? wZero[C_DATA_ADDR_STRIDE_WIDTH-1:0] : rPrevPos[C_DATA_ADDR_STRIDE_WIDTH*i +:C_DATA_ADDR_STRIDE_WIDTH]);
-         rPos[C_DATA_ADDR_STRIDE_WIDTH*i +:C_DATA_ADDR_STRIDE_WIDTH] <= #1 
+         rPos[C_DATA_ADDR_STRIDE_WIDTH*i +:C_DATA_ADDR_STRIDE_WIDTH] <= #1
             (RST ? wZero[C_DATA_ADDR_STRIDE_WIDTH-1:0] : rPrevPos[C_DATA_ADDR_STRIDE_WIDTH*i +:C_DATA_ADDR_STRIDE_WIDTH] + rDEShift[i]);
       end
    end
    else begin
       for (i = 0; i < C_PCI_DATA_WORD; i = i + 1) begin
-         rPosNow[C_DATA_ADDR_STRIDE_WIDTH*i +:C_DATA_ADDR_STRIDE_WIDTH] <= #1 
+         rPosNow[C_DATA_ADDR_STRIDE_WIDTH*i +:C_DATA_ADDR_STRIDE_WIDTH] <= #1
             (RST ? wZero[C_DATA_ADDR_STRIDE_WIDTH-1:0] : wPosClr[i*C_DATA_ADDR_STRIDE_WIDTH +:C_DATA_ADDR_STRIDE_WIDTH]);
-         rPos[C_DATA_ADDR_STRIDE_WIDTH*i +:C_DATA_ADDR_STRIDE_WIDTH] <= #1 
+         rPos[C_DATA_ADDR_STRIDE_WIDTH*i +:C_DATA_ADDR_STRIDE_WIDTH] <= #1
             (RST ? wZero[C_DATA_ADDR_STRIDE_WIDTH-1:0] : wPosClr[i*C_DATA_ADDR_STRIDE_WIDTH +:C_DATA_ADDR_STRIDE_WIDTH] + rDEShift[i]);
       end
    end
@@ -225,10 +225,10 @@ always @ (posedge CLK) begin
 
    // STAGE 5: Prepare to write data, final info
    for (i = 0; i < C_PCI_DATA_WORD; i = i + 1) begin
-      rAddr[C_DATA_ADDR_WIDTH*i +:C_DATA_ADDR_WIDTH] <= #1 
+      rAddr[C_DATA_ADDR_WIDTH*i +:C_DATA_ADDR_WIDTH] <= #1
          rPosNow[C_DATA_ADDR_STRIDE_WIDTH*i +:C_DATA_ADDR_STRIDE_WIDTH] + rBaseAddr;
    end
-   rDataShifted <= #1 (rData[4*C_PCI_DATA_WIDTH +:C_PCI_DATA_WIDTH]<<rShiftUp) | 
+   rDataShifted <= #1 (rData[4*C_PCI_DATA_WIDTH +:C_PCI_DATA_WIDTH]<<rShiftUp) |
       (rData[4*C_PCI_DATA_WIDTH +:C_PCI_DATA_WIDTH]>>rShiftDown);
    rLTE1Pkt <= #1 (rWords[1*C_TAG_DW_COUNT_WIDTH +:C_TAG_DW_COUNT_WIDTH] <= C_PCI_DATA_WORD);
    rLTE2Pkt <= #1 (rWords[1*C_TAG_DW_COUNT_WIDTH +:C_TAG_DW_COUNT_WIDTH] <= (C_PCI_DATA_WORD*2));

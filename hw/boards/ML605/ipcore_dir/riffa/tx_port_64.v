@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,7 +35,7 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
@@ -44,7 +44,7 @@
 // Filename:         tx_port_64.v
 // Version:            1.00.a
 // Verilog Standard:   Verilog-2001
-// Description:         Receives data from the tx_engine and buffers the input 
+// Description:         Receives data from the tx_engine and buffers the input
 //                  for the RIFFA channel.
 // Author:            Matt Jacobsen
 // History:            @mattj: Version 2.0
@@ -60,7 +60,7 @@ module tx_port_64 #(
    input CLK,
    input RST,
    input [2:0] CONFIG_MAX_PAYLOAD_SIZE,   // Maximum write payload: 000=128B, 001=256B, 010=512B, 011=1024B
-   
+
    output TXN,                        // Write transaction notification
    input TXN_ACK,                     // Write transaction acknowledged
    output [31:0] TXN_LEN,               // Write transaction length
@@ -69,12 +69,12 @@ module tx_port_64 #(
    output TXN_DONE,                  // Write transaction done
    input TXN_DONE_ACK,                  // Write transaction actual transfer length read
 
-   input [C_DATA_WIDTH-1:0] SG_DATA,      // Scatter gather data 
+   input [C_DATA_WIDTH-1:0] SG_DATA,      // Scatter gather data
    input SG_DATA_EMPTY,               // Scatter gather buffer empty
    output SG_DATA_REN,                  // Scatter gather data read enable
    output SG_RST,                     // Scatter gather reset
    input SG_ERR,                     // Scatter gather read encountered an error
-   
+
    output TX_REQ,                     // Outgoing write request
    input TX_REQ_ACK,                  // Outgoing write request acknowledged
    output [63:0] TX_ADDR,               // Outgoing write high address
@@ -127,15 +127,15 @@ reg                           rRst=0;
 
 // Generate a wide reset from the input reset.
 always @ (posedge CLK) begin
-   rRst <= #1 rWideRst[4]; 
-   if (RST) 
+   rRst <= #1 rWideRst[4];
+   if (RST)
       rWideRst <= #1 5'b11111;
-   else 
+   else
       rWideRst <= (rWideRst<<1);
 end
 
 
-// Capture channel transaction open/close events as well as channel data. 
+// Capture channel transaction open/close events as well as channel data.
 tx_port_channel_gate_64 #(.C_DATA_WIDTH(C_DATA_WIDTH)) gate (
    .RST(rRst),
    .RD_CLK(CLK),
@@ -177,7 +177,7 @@ tx_port_monitor_64 #(.C_DATA_WIDTH(C_DATA_WIDTH), .C_FIFO_DEPTH(C_FIFO_DEPTH)) m
 
 
 // Buffer the incoming channel data. Also make sure to discard only as
-// much data as is needed for a transfer (which may involve non-integral 
+// much data as is needed for a transfer (which may involve non-integral
 // packets (i.e. reading only 1 word out of the packet).
 tx_port_buffer_64 #(.C_FIFO_DATA_WIDTH(C_DATA_WIDTH), .C_FIFO_DEPTH(C_FIFO_DEPTH)) buffer (
    .CLK(CLK),

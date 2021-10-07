@@ -191,7 +191,7 @@ module GTX_TX_SYNC_RATE_V6
         nextwaitcounter2=0;
 
       end
-      
+
       // Have to hold for 1024 clocks before asserting GTXTEST[1]
       BEFORE_GTXTEST_PULSE1_1024CLKS : begin
 
@@ -243,7 +243,7 @@ module GTX_TX_SYNC_RATE_V6
 
       end
 
-      // Assert GTXTEST[1] for 256 clocks a second time.  Figure 3-9 UG366 
+      // Assert GTXTEST[1] for 256 clocks a second time.  Figure 3-9 UG366
       GTXTEST_PULSE_2: begin
 
         OUT_DIV_RESET_c=1;

@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,7 +35,7 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
@@ -44,12 +44,12 @@
 // Filename:         riffa_adapter_v6_pcie_v2_5.v
 // Version:            1.00.a
 // Verilog Standard:   Verilog-2001
-// Description:         Adapts the Xilinx Virtex-6 Integrated Block for PCI 
-//                  Express module (v6_pcie_v2_5) to the riffa_endpoint 
+// Description:         Adapts the Xilinx Virtex-6 Integrated Block for PCI
+//                  Express module (v6_pcie_v2_5) to the riffa_endpoint
 //                  module.
 //                  NOTE: You must uncomment the C_NUM_CHNL parameter and
 //                  set a value as appropriate to your design. See the end
-//                  of the file for an example of how to connect to 
+//                  of the file for an example of how to connect to
 //                  channels. You may bring in any additional signals, but
 //                  be sure to leave all existing signals connected.
 // Author:            Matt Jacobsen
@@ -163,12 +163,12 @@ module pcie_app_v6 #(
    input                  pl_received_hot_rst,
 
    output   [63:0]            cfg_dsn,
-   
+
    input app_clk,
    output  app_en,
    input app_ack,
    output[31:0] app_instr,
-   
+
    //Data read back Interface
    input rdback_fifo_empty,
    output rdback_fifo_rden,
@@ -200,7 +200,7 @@ assign cfg_err_locked = 1'b0;               // Never qualify cfg_err_ur or cfg_e
 
 assign cfg_err_tlp_cpl_header = 48'h0;         // Not sending back CLPs for app level errors
 
-assign cfg_trn_pending = 1'b0;               // Not trying to recover from missing request data... 
+assign cfg_trn_pending = 1'b0;               // Not trying to recover from missing request data...
 
 assign cfg_err_atomic_egress_blocked = 1'b0;   // Never report Atomic TLP blocked
 assign cfg_err_internal_cor = 1'b0;            // Never report internal error occurred
@@ -249,7 +249,7 @@ wire   [(C_NUM_CHNL*31)-1:0]               chnl_rx_off;
 wire   [(C_NUM_CHNL*C_DATA_WIDTH)-1:0]         chnl_rx_data;
 wire   [C_NUM_CHNL-1:0]                  chnl_rx_data_valid;
 wire   [C_NUM_CHNL-1:0]                  chnl_rx_data_ren;
-   
+
 wire   [C_NUM_CHNL-1:0]                  chnl_tx_clk;
 wire   [C_NUM_CHNL-1:0]                  chnl_tx;
 wire   [C_NUM_CHNL-1:0]                  chnl_tx_ack;
@@ -265,10 +265,10 @@ wire         user_lnk_up_int1;
 wire         user_reset_intl;
 wire         reset = (!user_lnk_up_int1 | user_reset_intl);
 FDCP #(.INIT(1'b1)) user_lnk_up_n_int_i (
-   .Q (user_lnk_up_int1), 
-   .D (user_lnk_up), 
-   .C (user_clk), 
-   .CLR (1'b0), 
+   .Q (user_lnk_up_int1),
+   .D (user_lnk_up),
+   .C (user_clk),
+   .CLR (1'b0),
    .PRE (1'b0)
 );
 FDCP #(.INIT(1'b1)) user_reset_n_i (
@@ -326,7 +326,7 @@ riffa_endpoint #(
    .IS_SOF(is_sof),
    .IS_EOF(is_eof),
    .RERR_FWD(rerr_fwd),
-   
+
    .S_AXIS_TX_TDATA(s_axis_tx_tdata),
    .S_AXIS_TX_TKEEP(s_axis_tx_tkeep),
    .S_AXIS_TX_TLAST(s_axis_tx_tlast),
@@ -339,14 +339,14 @@ riffa_endpoint #(
    .CFG_LINK_WIDTH(cfg_link_width),
    .CFG_LINK_RATE(cfg_link_rate),
    .MAX_READ_REQUEST_SIZE(cfg_max_rd_req_size),
-   .MAX_PAYLOAD_SIZE(cfg_prg_max_payload_size), 
+   .MAX_PAYLOAD_SIZE(cfg_prg_max_payload_size),
    .CFG_INTERRUPT_MSIEN(cfg_interrupt_msienable),
    .CFG_INTERRUPT_RDY(cfg_interrupt_rdy),
    .CFG_INTERRUPT(cfg_interrupt),
    .RCB(rcb),
    .MAX_RC_CPLD(rc_cpld),
    .MAX_RC_CPLH(rc_cplh),
-   
+
    .RX_ST_DATA(bus_zero),
    .RX_ST_EOP(1'd0),
    .RX_ST_SOP(1'd0),
@@ -367,24 +367,24 @@ riffa_endpoint #(
    .APP_MSI_ACK(1'd0),
    .APP_MSI_REQ(),
 
-   .CHNL_RX_CLK(chnl_rx_clk), 
-   .CHNL_RX(chnl_rx), 
+   .CHNL_RX_CLK(chnl_rx_clk),
+   .CHNL_RX(chnl_rx),
    .CHNL_RX_ACK(chnl_rx_ack),
-   .CHNL_RX_LAST(chnl_rx_last), 
-   .CHNL_RX_LEN(chnl_rx_len), 
-   .CHNL_RX_OFF(chnl_rx_off), 
-   .CHNL_RX_DATA(chnl_rx_data), 
-   .CHNL_RX_DATA_VALID(chnl_rx_data_valid), 
+   .CHNL_RX_LAST(chnl_rx_last),
+   .CHNL_RX_LEN(chnl_rx_len),
+   .CHNL_RX_OFF(chnl_rx_off),
+   .CHNL_RX_DATA(chnl_rx_data),
+   .CHNL_RX_DATA_VALID(chnl_rx_data_valid),
    .CHNL_RX_DATA_REN(chnl_rx_data_ren),
-   
-   .CHNL_TX_CLK(chnl_tx_clk), 
-   .CHNL_TX(chnl_tx), 
+
+   .CHNL_TX_CLK(chnl_tx_clk),
+   .CHNL_TX(chnl_tx),
    .CHNL_TX_ACK(chnl_tx_ack),
-   .CHNL_TX_LAST(chnl_tx_last), 
-   .CHNL_TX_LEN(chnl_tx_len), 
-   .CHNL_TX_OFF(chnl_tx_off), 
-   .CHNL_TX_DATA(chnl_tx_data), 
-   .CHNL_TX_DATA_VALID(chnl_tx_data_valid), 
+   .CHNL_TX_LAST(chnl_tx_last),
+   .CHNL_TX_LEN(chnl_tx_len),
+   .CHNL_TX_OFF(chnl_tx_off),
+   .CHNL_TX_DATA(chnl_tx_data),
+   .CHNL_TX_DATA_VALID(chnl_tx_data_valid),
    .CHNL_TX_DATA_REN(chnl_tx_data_ren)
 );
 ////////////////////////////////////
@@ -409,26 +409,26 @@ generate
          .CLK(user_clk),
          .RST(riffa_reset),   // riffa_reset includes riffa_endpoint resets
          // Rx interface
-         .CHNL_RX_CLK(chnl_rx_clk[i]), 
-         .CHNL_RX(chnl_rx[i]), 
-         .CHNL_RX_ACK(chnl_rx_ack[i]), 
-         .CHNL_RX_LAST(chnl_rx_last[i]), 
-         .CHNL_RX_LEN(chnl_rx_len[32*i +:32]), 
-         .CHNL_RX_OFF(chnl_rx_off[31*i +:31]), 
-         .CHNL_RX_DATA(chnl_rx_data[C_DATA_WIDTH*i +:C_DATA_WIDTH]), 
-         .CHNL_RX_DATA_VALID(chnl_rx_data_valid[i]), 
+         .CHNL_RX_CLK(chnl_rx_clk[i]),
+         .CHNL_RX(chnl_rx[i]),
+         .CHNL_RX_ACK(chnl_rx_ack[i]),
+         .CHNL_RX_LAST(chnl_rx_last[i]),
+         .CHNL_RX_LEN(chnl_rx_len[32*i +:32]),
+         .CHNL_RX_OFF(chnl_rx_off[31*i +:31]),
+         .CHNL_RX_DATA(chnl_rx_data[C_DATA_WIDTH*i +:C_DATA_WIDTH]),
+         .CHNL_RX_DATA_VALID(chnl_rx_data_valid[i]),
          .CHNL_RX_DATA_REN(chnl_rx_data_ren[i]),
          // Tx interface
-         .CHNL_TX_CLK(chnl_tx_clk[i]), 
-         .CHNL_TX(chnl_tx[i]), 
-         .CHNL_TX_ACK(chnl_tx_ack[i]), 
-         .CHNL_TX_LAST(chnl_tx_last[i]), 
-         .CHNL_TX_LEN(chnl_tx_len[32*i +:32]), 
-         .CHNL_TX_OFF(chnl_tx_off[31*i +:31]), 
-         .CHNL_TX_DATA(chnl_tx_data[C_DATA_WIDTH*i +:C_DATA_WIDTH]), 
-         .CHNL_TX_DATA_VALID(chnl_tx_data_valid[i]), 
+         .CHNL_TX_CLK(chnl_tx_clk[i]),
+         .CHNL_TX(chnl_tx[i]),
+         .CHNL_TX_ACK(chnl_tx_ack[i]),
+         .CHNL_TX_LAST(chnl_tx_last[i]),
+         .CHNL_TX_LEN(chnl_tx_len[32*i +:32]),
+         .CHNL_TX_OFF(chnl_tx_off[31*i +:31]),
+         .CHNL_TX_DATA(chnl_tx_data[C_DATA_WIDTH*i +:C_DATA_WIDTH]),
+         .CHNL_TX_DATA_VALID(chnl_tx_data_valid[i]),
          .CHNL_TX_DATA_REN(chnl_tx_data_ren[i])
-      );   
+      );
    end
 endgenerate*/
 
@@ -436,32 +436,32 @@ softMC_pcie_app #(.C_PCI_DATA_WIDTH(C_DATA_WIDTH), .DQ_WIDTH(DQ_WIDTH)
 ) i_soft_pcie(
    .clk(app_clk),
    .rst(riffa_reset),
-   
-   .CHNL_RX_CLK(chnl_rx_clk), 
-   .CHNL_RX(chnl_rx), 
-   .CHNL_RX_ACK(chnl_rx_ack), 
-   .CHNL_RX_LAST(chnl_rx_last), 
-   .CHNL_RX_LEN(chnl_rx_len[0 +:32]), 
-   .CHNL_RX_OFF(chnl_rx_off[0 +:31]), 
-   .CHNL_RX_DATA(chnl_rx_data[0 +:C_DATA_WIDTH]), 
-   .CHNL_RX_DATA_VALID(chnl_rx_data_valid), 
+
+   .CHNL_RX_CLK(chnl_rx_clk),
+   .CHNL_RX(chnl_rx),
+   .CHNL_RX_ACK(chnl_rx_ack),
+   .CHNL_RX_LAST(chnl_rx_last),
+   .CHNL_RX_LEN(chnl_rx_len[0 +:32]),
+   .CHNL_RX_OFF(chnl_rx_off[0 +:31]),
+   .CHNL_RX_DATA(chnl_rx_data[0 +:C_DATA_WIDTH]),
+   .CHNL_RX_DATA_VALID(chnl_rx_data_valid),
    .CHNL_RX_DATA_REN(chnl_rx_data_ren),
    // Tx interface
-   .CHNL_TX_CLK(chnl_tx_clk), 
-   .CHNL_TX(chnl_tx), 
-   .CHNL_TX_ACK(chnl_tx_ack), 
-   .CHNL_TX_LAST(chnl_tx_last), 
-   .CHNL_TX_LEN(chnl_tx_len[0 +:32]), 
-   .CHNL_TX_OFF(chnl_tx_off[0 +:31]), 
-   .CHNL_TX_DATA(chnl_tx_data[0 +:C_DATA_WIDTH]), 
-   .CHNL_TX_DATA_VALID(chnl_tx_data_valid), 
+   .CHNL_TX_CLK(chnl_tx_clk),
+   .CHNL_TX(chnl_tx),
+   .CHNL_TX_ACK(chnl_tx_ack),
+   .CHNL_TX_LAST(chnl_tx_last),
+   .CHNL_TX_LEN(chnl_tx_len[0 +:32]),
+   .CHNL_TX_OFF(chnl_tx_off[0 +:31]),
+   .CHNL_TX_DATA(chnl_tx_data[0 +:C_DATA_WIDTH]),
+   .CHNL_TX_DATA_VALID(chnl_tx_data_valid),
    .CHNL_TX_DATA_REN(chnl_tx_data_ren),
-   
-   
+
+
    .app_en(app_en),
    .app_ack(app_ack),
    .app_instr(app_instr),
-   
+
    //Data read back Interface
    .rdback_fifo_empty(rdback_fifo_empty),
    .rdback_fifo_rden(rdback_fifo_rden),

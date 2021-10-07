@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,7 +35,7 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
@@ -45,7 +45,7 @@
 // Version:            1.00.a
 // Verilog Standard:   Verilog-2001
 // Description:         Top level module for RIFFA 2.0 reference design for the
-//                  the Xilinx Virtex-6 Integrated Block for PCI Express 
+//                  the Xilinx Virtex-6 Integrated Block for PCI Express
 //                  module (v6_pcie_v2_5).
 // Author:            Matt Jacobsen
 // History:            @mattj: Version 2.0
@@ -71,12 +71,12 @@ module riffa_top_v6_pcie_v2_5 # (
   input                                       sys_clk_p,
   input                                       sys_clk_n,
   input                                       sys_reset_n,
-  
+
   input app_clk,
   output  app_en,
   input app_ack,
    output[31:0] app_instr,
-   
+
    //Data read back Interface
    input rdback_fifo_empty,
    output rdback_fifo_rden,
@@ -476,12 +476,12 @@ pcie_app_v6  #(
   .pl_directed_link_speed( pl_directed_link_speed ),
   .pl_directed_link_width( pl_directed_link_width ),
   .pl_upstream_prefer_deemph( pl_upstream_prefer_deemph ),
-  
+
   .app_clk(app_clk),
   .app_en(app_en),
   .app_ack(app_ack),
    .app_instr(app_instr),
-   
+
    //Data read back Interface
    .rdback_fifo_empty(rdback_fifo_empty),
    .rdback_fifo_rden(rdback_fifo_rden),

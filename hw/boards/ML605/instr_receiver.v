@@ -5,23 +5,23 @@
 module instr_receiver (
    input clk,
    input rst,
-   
+
    input dispatcher_ready,
-   
+
    input app_en,
    output reg app_ack,
    input[31:0] app_instr,
-   
+
    input maint_en,
    output reg maint_ack,
    input[31:0] maint_instr,
-   
+
    output instr0_fifo_en,
    output[31:0] instr0_fifo_data,
-   
+
    output instr1_fifo_en,
    output[31:0] instr1_fifo_data,
-   
+
 
    output wrdata_fifo_en,
    output[511:0] wrdata_fifo_data,
@@ -50,15 +50,15 @@ reg[511:0] wrdata_ns, wrdata_r;
 
 always@* begin
    process_iseq_ns = 1'b0;
-   
+
    state_ns = state_r;
-   
+
    instr_en_ns = 1'b0;
    instr_ns = instr_r;
-   
+
    app_ack = 1'b0;
    maint_ack = 1'b0;
-   
+
    wrdata_count_down_ns = wrdata_count_down_r;
    wrdata_ns = wrdata_r;
    wrdata_en_ns = 1'b0;
@@ -70,19 +70,19 @@ always@* begin
                state_ns = STATE_APP;
                instr_en_ns = app_en;
                instr_ns = app_instr;
-               
+
                app_ack = 1'b1;
             end
             else if(maint_en) begin
                state_ns = STATE_MAINT;
                instr_en_ns = maint_en;
                instr_ns = maint_instr;
-               
+
                maint_ack = 1'b1;
             end
          end //dispatcher_ready
       end //STATE_IDLE
-      
+
       STATE_APP: begin
          app_ack = 1'b1;
          instr_en_ns = app_en;
@@ -120,20 +120,20 @@ always@* begin
             wrdata_ns = wrdata_r | (app_instr << ((4'b1111 - wrdata_count_down_r) * 32));
          end
       end // receive write data
-      
+
       STATE_MAINT: begin
          maint_ack = 1'b1;
-         
+
          instr_en_ns = maint_en;
          instr_ns = maint_instr;
-         
+
          if(instr_en_ns & (instr_ns[31:28] == `END_ISEQ)) begin
             instr_en_ns = 1'b0;
             process_iseq_ns = 1'b1;
             state_ns = STATE_IDLE;
          end
       end //STATE_MAINT
-   
+
    endcase //state_r
 end //always
 
@@ -149,8 +149,8 @@ always@(posedge clk) begin
    if(rst) begin
       process_iseq_r <= 1'b0;
       sel_fifo <= 1'b0;
-      state_r <= STATE_IDLE; 
-      
+      state_r <= STATE_IDLE;
+
       instr_en_r <= 1'b0;
       instr_r <= 0;
 
@@ -161,14 +161,14 @@ always@(posedge clk) begin
    else begin
       state_r <= state_ns;
       process_iseq_r <= process_iseq_ns;
-      
+
       instr_en_r <= instr_en_ns;
       instr_r <= instr_ns;
 
       wrdata_count_down_r <= wrdata_count_down_ns;
       wrdata_en_r <= wrdata_en_ns;
       wrdata_r <= wrdata_ns;
-      
+
       if(process_iseq_r)
          sel_fifo <= 1'b0;
       else if(instr_en_r)

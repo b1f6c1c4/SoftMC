@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,7 +35,7 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
@@ -45,7 +45,7 @@
 // Version:            1.00.a
 // Verilog Standard:   Verilog-2001
 // Description:         Handles the RX lifecycle and issuing requests for receiving
-// data input. 
+// data input.
 //                  for the RIFFA channel.
 // Author:            Matt Jacobsen
 // History:            @mattj: Version 2.0
@@ -78,7 +78,7 @@ module rx_port_reader #(
    input CLK,
    input RST,
    input [2:0] CONFIG_MAX_READ_REQUEST_SIZE,         // Maximum read payload: 000=128B, 001=256B, 010=512B, 011=1024B, 100=2048B, 101=4096B
-   
+
    input [31:0] TXN_DATA,                  // Read transaction data
    input TXN_LEN_VALID,                  // Read transaction length valid
    input TXN_OFF_LAST_VALID,               // Read transaction offset/last valid
@@ -206,7 +206,7 @@ always @ (posedge CLK) begin
    rTxnData <= #1 _rTxnData;
    rTxnOffLastValid <= #1 _rTxnOffLastValid;
    rTxnLenValid <= #1 _rTxnLenValid;
-   rTxnDoneAck <= #1 (RST ? 1'd0 : _rTxnDoneAck);   
+   rTxnDoneAck <= #1 (RST ? 1'd0 : _rTxnDoneAck);
    rRxDataEn <= #1 _rRxDataEn;
 end
 
@@ -214,7 +214,7 @@ always @ (*) begin
    _rTxnData = TXN_DATA;
    _rTxnOffLastValid = TXN_OFF_LAST_VALID;
    _rTxnLenValid = TXN_LEN_VALID;
-   _rTxnDoneAck = TXN_DONE_ACK;   
+   _rTxnDoneAck = TXN_DONE_ACK;
    _rRxDataEn = RX_DATA_EN;
 end
 
@@ -235,7 +235,7 @@ always @ (*) begin
    _rMainState = rMainState;
    _rDoneLen = rDoneLen;
    _rTxnDone = rTxnDone;
-   
+
    _rOffLast = (rTxnOffLastValid ? rTxnData : rOffLast);
    _rReadWords = (rMainState[0] & rTxnLenValid ? rTxnData : rReadWords);
    _rReadWordsZero = (rReadWords == 0);
@@ -258,7 +258,7 @@ always @ (*) begin
       else
          _rMainState = `S_RXPORTRD_MAIN_IDLE;
    end
-   
+
    `S_RXPORTRD_MAIN_READ: begin // Issue read transfers, wait for data to arrive
       if (rRxState[7] & rLastDoneRead) begin // S_RXPORTRD_RX_DONE
          _rDoneLen = rRecvdWords;
@@ -330,16 +330,16 @@ always @ (*) begin
 
    _rValsProp = ((rValsProp<<1) | rRxState[2]); // S_RXPORTRD_RX_ADJ_0
    _rLargeBuf = (SG_ELEM_LEN > rWords);
-      {_rCarry[0], _rAddr[15:0]} = (rRxState[1] ? SG_ELEM_ADDR[15:0] : (rAddr[15:0] + ({12{RX_REQ_ACK}} & {rLen,2'd0}))); 
+      {_rCarry[0], _rAddr[15:0]} = (rRxState[1] ? SG_ELEM_ADDR[15:0] : (rAddr[15:0] + ({12{RX_REQ_ACK}} & {rLen,2'd0})));
    {_rCarry[1], _rAddr[31:16]} = (rRxState[1] ? SG_ELEM_ADDR[31:16] : (rAddr[31:16] + rCarry[0]));
    {_rCarry[2], _rAddr[47:32]} = (rRxState[1] ? SG_ELEM_ADDR[47:32] : (rAddr[47:32] + rCarry[1]));
              _rAddr[63:48] = (rRxState[1] ? SG_ELEM_ADDR[63:48] : (rAddr[63:48] + rCarry[2]));
    _rWords = (rRxState[0] ? rReadWords : (rWords - ({10{RX_REQ_ACK}} & rLen)));
    _rBufWordsInit = (rLargeBuf ? rWords : SG_ELEM_LEN);
     _rBufWords = (rCopyBufWords ? rBufWordsInit : rBufWords) - ({10{RX_REQ_ACK}} & rLen);
-   _rPageRem = (wAddrLoInv + 1'd1);   
-   _rPageSpillInit = (rBufWordsInit > rPageRem);   
-   _rPageSpill = (rBufWords > rPageRem);   
+   _rPageRem = (wAddrLoInv + 1'd1);
+   _rPageSpillInit = (rBufWordsInit > rPageRem);
+   _rPageSpill = (rBufWords > rPageRem);
    _rPreLen = ((rPageSpillInit & rUseInit) | (rPageSpill & !rUseInit) ? rPageRem : rBufWords[10:0]);
    _rMaxPayloadTrain = (CONFIG_MAX_READ_REQUEST_SIZE > 3'd4 ? 3'd4 : CONFIG_MAX_READ_REQUEST_SIZE);
    _rMaxPayloadShift = (C_MAX_READ_REQ[2:0] < rMaxPayloadTrain ? C_MAX_READ_REQ[2:0] : rMaxPayloadTrain);
@@ -375,8 +375,8 @@ always @ (*) begin
       _rRxState = `S_RXPORTRD_RX_ADJ_1;
    end
 
-   // (bufwords and pagerem valid here) 
-   `S_RXPORTRD_RX_ADJ_1: begin // Wait for the value to propagate 
+   // (bufwords and pagerem valid here)
+   `S_RXPORTRD_RX_ADJ_1: begin // Wait for the value to propagate
       // Check for page boundary crossing
       // Fix for page boundary crossing
       // Check for max read payload
@@ -411,11 +411,11 @@ always @ (*) begin
       if (rMainState[3]) // S_RXPORTRD_MAIN_FLUSH
          _rRxState = `S_RXPORTRD_RX_IDLE;
    end
-   
+
    default: begin
       _rRxState = `S_RXPORTRD_RX_IDLE;
    end
-   
+
    endcase
 end
 
@@ -432,7 +432,7 @@ always @ (posedge CLK) begin
    rAvailWords <= #1 _rAvailWords;
    rCarryInv <= #1 _rCarryInv;
    rSpaceAvail <= #1 _rSpaceAvail;
-   rLastDoneRead <= #1 (RST ? 1'd1 : _rLastDoneRead);   
+   rLastDoneRead <= #1 (RST ? 1'd1 : _rLastDoneRead);
 end
 
 always @ (*) begin
@@ -471,8 +471,8 @@ end
 
 
 // Facilitate sending a TXN_DONE when we receive a TXN_ACK after the transaction
-// has begun sending. This will happen when the workstation detects that it has 
-// sent/used all its currently mapped scatter gather elements, but it's not enough 
+// has begun sending. This will happen when the workstation detects that it has
+// sent/used all its currently mapped scatter gather elements, but it's not enough
 // to complete the transaction. The TXN_DONE will let the workstation know it can
 // release the current scatter gather mappings and allocate new ones.
 always @ (posedge CLK) begin
@@ -481,10 +481,10 @@ always @ (posedge CLK) begin
 end
 
 always @ (*) begin
-   // Signal TXN_DONE after we've recieved the (seemingly superfluous) TXN_ACK 
+   // Signal TXN_DONE after we've recieved the (seemingly superfluous) TXN_ACK
    // and received the corresponding amount of words.
    _rPartialDone = (rReqPartialDone & rPartWordsRecvd);
-   
+
    // Keep track of (seemingly superfluous) TXN_ACK requests.
    if ((rReqPartialDone & rPartWordsRecvd) | rMainState[0]) // S_RXPORTRD_MAIN_IDLE
       _rReqPartialDone = 0;

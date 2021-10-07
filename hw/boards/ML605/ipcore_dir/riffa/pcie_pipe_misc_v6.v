@@ -78,9 +78,9 @@ module pcie_pipe_misc_v6 #
     output  wire        pipe_tx_deemph_o         ,
     output  wire [2:0]  pipe_tx_margin_o         ,
     output  wire        pipe_tx_swing_o          ,
- 
-    input   wire        pipe_clk                , 
-    input   wire        rst_n 
+
+    input   wire        pipe_clk                ,
+    input   wire        rst_n
 );
 
 //******************************************************************//
@@ -129,7 +129,7 @@ module pcie_pipe_misc_v6 #
             pipe_tx_swing_q <= #TCQ 0;
 
           end else begin
-       
+
             pipe_tx_rcvr_det_q <= #TCQ pipe_tx_rcvr_det_i;
             pipe_tx_reset_q  <= #TCQ pipe_tx_reset_i;
             pipe_tx_rate_q <= #TCQ pipe_tx_rate_i;
@@ -138,7 +138,7 @@ module pcie_pipe_misc_v6 #
             pipe_tx_swing_q <= #TCQ pipe_tx_swing_i;
 
           end
-       
+
         end
 
         assign pipe_tx_rcvr_det_o = pipe_tx_rcvr_det_q;
@@ -169,7 +169,7 @@ module pcie_pipe_misc_v6 #
             pipe_tx_swing_qq <= #TCQ 0;
 
           end else begin
-       
+
             pipe_tx_rcvr_det_q <= #TCQ pipe_tx_rcvr_det_i;
             pipe_tx_reset_q  <= #TCQ pipe_tx_reset_i;
             pipe_tx_rate_q <= #TCQ pipe_tx_rate_i;
@@ -185,7 +185,7 @@ module pcie_pipe_misc_v6 #
             pipe_tx_swing_qq <= #TCQ pipe_tx_swing_q;
 
           end
-       
+
         end
 
         assign pipe_tx_rcvr_det_o = pipe_tx_rcvr_det_qq;

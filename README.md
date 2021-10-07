@@ -2,12 +2,12 @@
 
 SoftMC is an experimental FPGA-based memory controller design that could be used to develop tests for DDR3 SODIMMs. SoftMC currently supports only the *Xilinx ML605* board.
 
-A paper describing SoftMC in detail is published at HPCA 2017 and is available here: 
+A paper describing SoftMC in detail is published at HPCA 2017 and is available here:
 >*Hasan Hassan, Nandita Vijaykumar, Samira Khan, Saugata Ghose, Kevin Chang, Gennady Pekhimenko, Donghyuk Lee, Oguz Ergin, and Onur Mutlu,*
 **"[SoftMC: A Flexible and Practical Open-Source Infrastructure for Enabling Experimental DRAM Studies](https://people.inf.ethz.ch/omutlu/projects.htm)"**
 *Proceedings of the 23rd International Symposium on High-Performance Computer Architecture (HPCA), Austin, TX, USA, February 2017.*
 
-If you use or build on SoftMC, please cite that paper. 
+If you use or build on SoftMC, please cite that paper.
 
 We provide the source
 code (both in Verilog and C) that you could modify as you wish.
@@ -62,7 +62,7 @@ command below:
 
 Generating the SoftMC bitfile is straightforward:
 
-- Use Xilinx ISE 14.7 to open the project, which is located located at *hw/boards/ML605/SoftMC.xise*. Ignore *missing files* pop-up windows by clicking the "Cancel" button. The missing files will be generated once the steps below are followed. 
+- Use Xilinx ISE 14.7 to open the project, which is located located at *hw/boards/ML605/SoftMC.xise*. Ignore *missing files* pop-up windows by clicking the "Cancel" button. The missing files will be generated once the steps below are followed.
 - Double-click on *xilinx_mig* IPCore file to open Memory Interface Generator's (MIG) configuration window. Keep clicking the "Next" button until the windows closes. Doing this will generate the necessary files required by SoftMC in ```hw/boards/ML605/ipcore_dir/xilinx_mig```.
 - Open a terminal and go to hw/boards/ML605. Run:
 

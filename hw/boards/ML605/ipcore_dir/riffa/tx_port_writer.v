@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,7 +35,7 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
@@ -45,7 +45,7 @@
 // Version:            1.00.a
 // Verilog Standard:   Verilog-2001
 // Description:         Handles receiving new transaction events and data, and
-// making requests to tx engine. 
+// making requests to tx engine.
 //                  for the RIFFA channel.
 // Author:            Matt Jacobsen
 // History:            @mattj: Version 2.0
@@ -97,7 +97,7 @@ module tx_port_writer (
    output SG_ELEM_REN,               // Scatter gather element read enable
    output SG_RST,                  // Scatter gather data reset
    input SG_ERR,                  // Scatter gather read encountered an error
-   
+
    output TX_REQ,                  // Outgoing write request
    input TX_REQ_ACK,               // Outgoing write request acknowledged
    output [63:0] TX_ADDR,            // Outgoing write high address
@@ -180,7 +180,7 @@ assign SG_ELEM_REN = rTxState[2]; // S_TXPORTWR_TX_ADJ_0
 assign SG_RST = rMainState[3]; // S_TXPORTWR_MAIN_NEW_ACK
 
 assign TX_REQ = !rNotRequesting;
-assign TX_ADDR = rReqAddr; 
+assign TX_ADDR = rReqAddr;
 assign TX_LEN = rReqLen;
 assign TX_LAST = rReqLast;
 
@@ -201,7 +201,7 @@ always @ (*) begin
    _rTxReqAck = TX_REQ_ACK;
    _rTxSent = TX_SENT;
 end
-   
+
 
 // Wait for a NEW_TXN request. Then request transfers until all the data is sent
 // or until the specified length is reached. Then signal TXN_DONE.
@@ -270,11 +270,11 @@ always @ (*) begin
       if (NEW_TXN_DONE)
          _rMainState = `S_TXPORTWR_MAIN_IDLE;
    end
-   
+
    default: begin
       _rMainState = `S_TXPORTWR_MAIN_IDLE;
    end
-   
+
    endcase
 end
 
@@ -285,7 +285,7 @@ end
 // data already written to the buffer.
 wire [9:0] wLastLen = (NEW_TXN_WORDS_RECVD - rSentWords);
 wire [9:0] wAddrLoInv = ~rAddr[11:2];
-wire [10:0] wPageRem = (wAddrLoInv + 1'd1);   
+wire [10:0] wPageRem = (wAddrLoInv + 1'd1);
 always @ (posedge CLK) begin
    rTxState <= #1 (RST | rSgErr ? `S_TXPORTWR_TX_IDLE : _rTxState);
    rSentWords <= #1 (rMainState[0] ? 0 : _rSentWords);
@@ -322,7 +322,7 @@ always @ (*) begin
    _rTxState = rTxState;
    _rCopyBufWords = rCopyBufWords;
    _rUseInit = rUseInit;
-   
+
    _rValsProp = ((rValsProp<<1) | rTxState[3]); // S_TXPORTWR_TX_ADJ_1
    _rValsPropagated = (rValsProp == 6'd0);
    _rLargeBuf = (SG_ELEM_LEN > rWords);
@@ -332,11 +332,11 @@ always @ (*) begin
              _rAddr[63:48] = (rTxState[1] ? SG_ELEM_ADDR[63:48] : (rAddr[63:48] + rCarry[2]));
    _rSentWords = (rTxState[7] ? NEW_TXN_WORDS_RECVD : rSentWords) + ({10{rTxState[6]}} & rLen); // S_TXPORTWR_TX_WRITE
    _rWords = (NEW_TXN_ACK ? NEW_TXN_LEN : (rWords - ({10{rTxState[6]}} & rLen))); // S_TXPORTWR_TX_WRITE
-   _rBufWordsInit = (rLargeBuf ? rWords : SG_ELEM_LEN); 
+   _rBufWordsInit = (rLargeBuf ? rWords : SG_ELEM_LEN);
    _rBufWords = (rCopyBufWords ? rBufWordsInit : rBufWords) - ({10{rTxState[6]}} & rLen); // S_TXPORTWR_TX_WRITE
-   _rPageRem = wPageRem;   
-   _rPageSpillInit = (rBufWordsInit > wPageRem);   
-   _rPageSpill = (rBufWords > wPageRem);   
+   _rPageRem = wPageRem;
+   _rPageSpillInit = (rBufWordsInit > wPageRem);
+   _rPageSpill = (rBufWords > wPageRem);
    _rPreLen = ((rPageSpillInit & rUseInit) | (rPageSpill & !rUseInit) ? rPageRem : rBufWords[10:0]);
    _rMaxPayloadSize = CONFIG_MAX_PAYLOAD_SIZE;
    _rMaxPayloadShift = (rMaxPayloadSize > 3'd4 ? 3'd4 : rMaxPayloadSize);
@@ -351,7 +351,7 @@ always @ (*) begin
    _rLastLenEQ0 = (rLastLen == 10'd0);
    _rLenEQWords = (rLen == rWords);
    _rLenEQBufWords = (rLen == rBufWords);
-   
+
    case (rTxState)
 
    `S_TXPORTWR_TX_IDLE: begin // Wait for channel write request
@@ -405,11 +405,11 @@ always @ (*) begin
    `S_TXPORTWR_TX_WRITE_REM: begin // Send remaining data and finish
       _rTxState = `S_TXPORTWR_TX_IDLE;
    end
-   
+
    default: begin
       _rTxState = `S_TXPORTWR_TX_IDLE;
    end
-   
+
    endcase
 end
 
@@ -455,15 +455,15 @@ always @ (*) begin
       _rAckCount = 0;
    else
       _rAckCount = rAckCount + rTxState[6] + rTxState[7] - rTxSent; // S_TXPORTWR_TX_WRITE, S_TXPORTWR_TX_WRITE_REM
-      
+
    // Track when the user reads the actual transfer amount.
    _rLastDoneRead = (rMainState[6] ? 1'd0 : (rLastDoneRead | rTxnDoneAck)); // S_TXPORTWR_MAIN_SIG_DONE
 end
 
 
 // Facilitate sending a TXN_DONE when we receive a TXN_ACK after the transaction
-// has begun sending. This will happen when the workstation detects that it has 
-// sent/used all its currently mapped scatter gather elements, but it's not enough 
+// has begun sending. This will happen when the workstation detects that it has
+// sent/used all its currently mapped scatter gather elements, but it's not enough
 // to complete the transaction. The TXN_DONE will let the workstation know it can
 // release the current scatter gather mappings and allocate new ones.
 always @ (posedge CLK) begin
@@ -472,11 +472,11 @@ always @ (posedge CLK) begin
 end
 
 always @ (*) begin
-   // Signal TXN_DONE after we've recieved the (seemingly superfluous) TXN_ACK, 
+   // Signal TXN_DONE after we've recieved the (seemingly superfluous) TXN_ACK,
    // we have no outstanding transfer requests, we're not currently requesting a
    // transfer, and there are no more scatter gather elements.
    _rPartialDone = (rReqPartialDone & rDone & rNotRequesting & SG_ELEM_EMPTY & rTxState[1]); // S_TXPORTWR_TX_BUF
-   
+
    // Keep track of (seemingly superfluous) TXN_ACK requests.
    if ((rReqPartialDone & rDone & rNotRequesting & SG_ELEM_EMPTY & rTxState[1]) | rMainState[0]) // S_TXPORTWR_MAIN_IDLE
       _rReqPartialDone = 0;

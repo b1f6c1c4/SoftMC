@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,21 +35,21 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
 //----------------------------------------------------------------------------
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    19:27:32 05/15/2014 
-// Design Name: 
+// Company:
+// Engineer:
+//
+// Create Date:    19:27:32 05/15/2014
+// Design Name:
 // Module Name:    tx_qword_aligner_128
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
+// Project Name:
+// Target Devices:
+// Tool versions:
 // Description:
 // Shifts the data payload of outgoing TLP's to conform to Altera's Quad-word
 // alignment requirement. This module has a 2 cycle latency. It also handles the
@@ -57,9 +57,9 @@
 //
 // Dependencies: None
 //
-// Revision: 
+// Revision:
 // Revision 0.01 - File Created
-// Additional Comments: 
+// Additional Comments:
 //
 //////////////////////////////////////////////////////////////////////////////////
 `define S_TXALIGNER128UP_IDLE 2'b00
@@ -87,7 +87,7 @@ module tx_qword_aligner_128
     input                         TX_TLP_END_FLAG,
     input                         TX_TLP_START_FLAG,
 
-    output [C_PCI_DATA_WIDTH-1:0] TX_ST_DATA, 
+    output [C_PCI_DATA_WIDTH-1:0] TX_ST_DATA,
     output [0:0]                  TX_ST_VALID,
     input                         TX_ST_READY,
     output [0:0]                  TX_ST_EOP,
@@ -107,7 +107,7 @@ module tx_qword_aligner_128
    reg [1:0]                      rOverflow=0, _rOverflow=0;
    reg [9:0]                      rRealLength=0, _rRealLength=0;
    reg [9:0]                      rAdjLength=0, _rAdjLength=0;
-   reg                            rInsBlank=0,_rInsBlank=0;                              
+   reg                            rInsBlank=0,_rInsBlank=0;
 
    // State (controls pipeline)
    reg [1:0]                      rUpState=0, _rUpState=0;
@@ -124,7 +124,7 @@ module tx_qword_aligner_128
    reg                            rTxStSop=0,_rTxStSop=0;
    reg                            rTxStEmpty=0,_rTxStEmpty=0;
 
-   wire [1:0]                     wRegEn;   
+   wire [1:0]                     wRegEn;
 
    // Wires (unregistered) from input
    wire [2:0]                     wFMT;
@@ -143,10 +143,10 @@ module tx_qword_aligner_128
    wire                           wOverflow;
 
    wire                           wSMLowEnable;
-   wire                           wSMUpEnable; 
+   wire                           wSMUpEnable;
    wire                           wTxStEopCondition;
 
-   wire [255:0]                   wAlignBufMux;     
+   wire [255:0]                   wAlignBufMux;
 
    // Wires from the unregistered TLP Header
    assign wFMT = TX_DATA[31:29];
@@ -167,7 +167,7 @@ module tx_qword_aligner_128
    assign TX_DATA_READY = wRegEn[0];
 
    // Unconditional input capture
-   always @(*) begin 
+   always @(*) begin
       _rTxStReady = (rTxStReady << 1) | TX_ST_READY;
    end
 
@@ -176,7 +176,7 @@ module tx_qword_aligner_128
    end
 
    // All of these signals are "valid" when rTxTlpStartFlag and rTxDataValid is high
-   always @(*) begin 
+   always @(*) begin
       _rInsBlank = wInsBlank & TX_TLP_START_FLAG & TX_DATA_VALID;
       _rRealLength = wLength + {7'd0,{w4DWH,~w4DWH,~w4DWH}};
       _rAdjLength = wLength + {9'd0,wInsBlank} + {7'd0,{w4DWH,~w4DWH,~w4DWH}};
@@ -190,17 +190,17 @@ module tx_qword_aligner_128
       rInsBlank <= _rInsBlank;
       rRealLength <= _rRealLength;
       rAdjLength <= _rAdjLength;
-      
+
       if(wRegEn[0]) begin
          rTxData <= _rTxData;
          rTxTlpEndFlag <= _rTxTlpEndFlag;
          rTxTlpStartFlag <= _rTxTlpStartFlag;
       end
    end
-   
+
    always @(*) begin
       _rOverflow[0] = TX_TLP_START_FLAG & TX_TLP_END_FLAG & w3DWHInsBlank;
-      _rOverflow[1] = rTxTlpStartFlag & (rRealLength[9:2] < rAdjLength[9:2]); 
+      _rOverflow[1] = rTxTlpStartFlag & (rRealLength[9:2] < rAdjLength[9:2]);
    end // always @ begin
 
    always @(posedge CLK) begin
@@ -262,7 +262,7 @@ module tx_qword_aligner_128
 
    // These signals comprise the lower aligner
    assign wSMLowEnable = rTxStReady[C_TX_READY_LATENCY-1] | ~rTxStValid;
-   assign wRegEn[1] = ~(rLowState == `S_TXALIGNER128LOW_PREOVFL & rTrigger) & (wSMLowEnable); 
+   assign wRegEn[1] = ~(rLowState == `S_TXALIGNER128LOW_PREOVFL & rTrigger) & (wSMLowEnable);
 
    assign wOverflow = (rOverflow[0] | rOverflow[1]);
    assign wAlignBufMux = ({{rTxData[95:0],rAlignBuffer[159:128]},rTxData}) >> ({rSel,7'd0});
@@ -273,11 +273,11 @@ module tx_qword_aligner_128
 
    always @(posedge CLK) begin
       if(wSMLowEnable) begin
-         rAlignBuffer <= _rAlignBuffer; 
+         rAlignBuffer <= _rAlignBuffer;
       end
    end
 
-   assign wTxStEopCondition = (rLowState == `S_TXALIGNER128LOW_PREOVFL & rTrigger) | 
+   assign wTxStEopCondition = (rLowState == `S_TXALIGNER128LOW_PREOVFL & rTrigger) |
                               (rLowState != `S_TXALIGNER128LOW_PREOVFL & {rTxTlpEndFlag,wOverflow,rTxDataValid} == 3'b101);
 
    // Valid never goes down inside of a TLP.
@@ -314,7 +314,7 @@ module tx_qword_aligner_128
       end else if (wSMLowEnable & wTxStEopCondition) begin
          _rSel = 1'b0;
       end
-      
+
       case (rLowState)
         `S_TXALIGNER128LOW_IDLE : begin
            if(wSMLowEnable) begin
@@ -333,7 +333,7 @@ module tx_qword_aligner_128
                 3'bxx0: _rLowState = `S_TXALIGNER128LOW_IDLE;    // If the next cycle is not valid Eop must have been set this cycle and we should go to idle
                 3'b001: _rLowState = `S_TXALIGNER128LOW_PROC;    // Continue processing
                 3'b011: _rLowState = `S_TXALIGNER128LOW_PREOVFL; // Don't set rTxStEop (set trigger)
-                3'b101: _rLowState = `S_TXALIGNER128LOW_PROC;    // set rTxStEop 
+                3'b101: _rLowState = `S_TXALIGNER128LOW_PROC;    // set rTxStEop
                 3'b111: _rLowState = `S_TXALIGNER128LOW_PREOVFL; // Don't set rTxStEop (set trigger)
               endcase
            end
@@ -358,7 +358,7 @@ module tx_qword_aligner_128
         end
       endcase
    end // always @ begin
-   
+
    always @(posedge CLK) begin
       if(RST_IN) begin
          rLowState <= `S_TXALIGNER128LOW_IDLE;

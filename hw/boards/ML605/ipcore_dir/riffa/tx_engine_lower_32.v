@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,7 +35,7 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
@@ -45,7 +45,7 @@
 // Version:            1.00.a
 // Verilog Standard:   Verilog-2001
 // Description:         Transmit engine for completion requests and pre-formatted
-// PCIe read/write data. Muxes traffic for the AXI interface on the Xilinx PCIe 
+// PCIe read/write data. Muxes traffic for the AXI interface on the Xilinx PCIe
 // Endpoint core.
 // Author:            Matt Jacobsen
 // History:            @mattj: Version 2.0
@@ -79,7 +79,7 @@ module tx_engine_lower_32 #(
 
    input [15:0] CONFIG_COMPLETER_ID,
 
-   output [C_PCI_DATA_WIDTH-1:0] TX_DATA,            // AXI data output 
+   output [C_PCI_DATA_WIDTH-1:0] TX_DATA,            // AXI data output
    output [(C_PCI_DATA_WIDTH/8)-1:0] TX_DATA_BYTE_ENABLE,   // AXI data keep
    output TX_TLP_END_FLAG,                        // AXI data last
     output TX_TLP_START_FLAG,                           // AXI data start
@@ -202,7 +202,7 @@ end
 
 // Multiplex completion requests and read/write pre-formatted PCIe data onto
 // the AXI PCIe Endpoint interface. Remember that TX_DATA_READY may drop at
-// *any* time during transmission. So be sure to buffer enough data to 
+// *any* time during transmission. So be sure to buffer enough data to
 // accommodate starts and stops.
 always @ (posedge CLK) begin
    rState <= #1 (RST ? `S_TXENGLWR32_IDLE : _rState);
@@ -232,8 +232,8 @@ always @ (*) begin
    _rRNW = rRNW;
    _rLen = rLen;
    _rIsLast = rIsLast;
-   
-   case (rState) 
+
+   case (rState)
 
    `S_TXENGLWR32_IDLE : begin
       _rFifoRen = (TX_DATA_READY & !COMPL_REQ);
@@ -329,7 +329,7 @@ always @ (*) begin
          _rState = `S_TXENGLWR32_IDLE;
       end
    end
-   
+
    `S_TXENGLWR32_WR_0 : begin
       _rFifoRen = TX_DATA_READY;
       if (TX_DATA_READY) begin // Check for throttling
@@ -366,7 +366,7 @@ always @ (*) begin
          _rState = (rIsLast ? `S_TXENGLWR32_IDLE : `S_TXENGLWR32_WR_2);
       end
    end
-   
+
    default : begin
       _rState = `S_TXENGLWR32_IDLE;
    end

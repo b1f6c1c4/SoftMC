@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,7 +35,7 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
@@ -44,8 +44,8 @@
 // Filename:         tx_port_buffer_128.v
 // Version:            1.00.a
 // Verilog Standard:   Verilog-2001
-// Description:         Wraps a FIFO for saving channel data and provides a 
-// registered read output. Retains unread words from reads that are a length 
+// Description:         Wraps a FIFO for saving channel data and provides a
+// registered read output. Retains unread words from reads that are a length
 // which is not a multiple of the data bus width (C_FIFO_DATA_WIDTH). Data is
 // available 5 cycles after RD_EN is asserted (not 1, like a traditional FIFO).
 // Author:            Matt Jacobsen
@@ -88,7 +88,7 @@ reg    [3:0]                  rLenLSB1=0, _rLenLSB1=0;
 reg    [3:0]                  rLenLast=0, _rLenLast=0;
 reg                           rLenValid=0, _rLenValid=0;
 
-reg                           rRen=0, _rRen=0;   
+reg                           rRen=0, _rRen=0;
 reg    [2:0]                  rCount=0, _rCount=0;
 reg    [(C_COUNT_HIST*3)-1:0]      rCountHist={C_COUNT_HIST{3'd0}}, _rCountHist={C_COUNT_HIST{3'd0}};
 reg    [C_LEN_LAST_HIST-1:0]      rLenLastHist={C_LEN_LAST_HIST{1'd0}}, _rLenLastHist={C_LEN_LAST_HIST{1'd0}};
@@ -160,7 +160,7 @@ always @ (*) begin
    // Track read enables in the pipeline.
    _rRdEnHist = ((rRdEnHist<<1) | rRen);
    _rFifoRdEnHist = ((rFifoRdEnHist<<1) | rFifoRdEn);
-   
+
    // Track delayed length last value
    _rLenLastHist = ((rLenLastHist<<1) | wLenLast);
 

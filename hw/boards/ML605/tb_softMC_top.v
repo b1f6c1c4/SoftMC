@@ -3,7 +3,7 @@
 `include "softMC.inc"
 
 module tb_softMC_top;
-   
+
   parameter REFCLK_FREQ           = 200;
                                     // # = 200 for all design frequencies of
                                     //         -1 speed grade devices
@@ -204,15 +204,15 @@ module tb_softMC_top;
   //**************************************************************************//
   reg app_en;
   wire app_ack;
-  reg[31:0] app_instr; 
+  reg[31:0] app_instr;
   wire iq_full;
   wire processing_iseq;
-      
+
   //Data read back Interface
   wire rdback_fifo_empty;
   reg rdback_fifo_rden;
   wire[255:0] rdback_data;
-  
+
   reg sys_clk;
   reg clk_ref;
   reg sys_rst_n;
@@ -424,8 +424,8 @@ module tb_softMC_top;
   endgenerate
   assign sda = 1'b1;
   assign scl = 1'b1;
-  
-  
+
+
   // Instantiate the Unit Under Test (UUT)
    softMC_top #
     (
@@ -470,36 +470,36 @@ module tb_softMC_top;
      .DATA_WIDTH                (DATA_WIDTH),
      .PAYLOAD_WIDTH             (PAYLOAD_WIDTH)
      ) uut (
-      .sys_clk_p(sys_clk_p), 
-      .sys_clk_n(sys_clk_n), 
-      .clk_ref_p(clk_ref_p), 
-      .clk_ref_n(clk_ref_n), 
-      .sys_rst(sys_rst), 
+      .sys_clk_p(sys_clk_p),
+      .sys_clk_n(sys_clk_n),
+      .clk_ref_p(clk_ref_p),
+      .clk_ref_n(clk_ref_n),
+      .sys_rst(sys_rst),
       .sys_reset_n(1'b1),
-      .ddr_ck_p(ddr3_ck_p_fpga), 
-      .ddr_ck_n(ddr3_ck_n_fpga), 
-      .ddr_addr(ddr3_addr_fpga), 
-      .ddr_ba(ddr3_ba_fpga), 
-      .ddr_ras_n(ddr3_ras_n_fpga), 
-      .ddr_cas_n(ddr3_cas_n_fpga), 
-      .ddr_we_n(ddr3_we_n_fpga), 
-      .ddr_cs_n(ddr3_cs_n_fpga), 
-      .ddr_cke(ddr3_cke_fpga), 
-      .ddr_odt(ddr3_odt_fpga), 
-      .ddr_reset_n(ddr3_reset_n), 
-      //.ddr_parity(), 
-      .ddr_dm(), 
-      .ddr_dqs_p(ddr3_dqs_p_fpga), 
-      .ddr_dqs_n(ddr3_dqs_n_fpga), 
+      .ddr_ck_p(ddr3_ck_p_fpga),
+      .ddr_ck_n(ddr3_ck_n_fpga),
+      .ddr_addr(ddr3_addr_fpga),
+      .ddr_ba(ddr3_ba_fpga),
+      .ddr_ras_n(ddr3_ras_n_fpga),
+      .ddr_cas_n(ddr3_cas_n_fpga),
+      .ddr_we_n(ddr3_we_n_fpga),
+      .ddr_cs_n(ddr3_cs_n_fpga),
+      .ddr_cke(ddr3_cke_fpga),
+      .ddr_odt(ddr3_odt_fpga),
+      .ddr_reset_n(ddr3_reset_n),
+      //.ddr_parity(),
+      .ddr_dm(),
+      .ddr_dqs_p(ddr3_dqs_p_fpga),
+      .ddr_dqs_n(ddr3_dqs_n_fpga),
       .ddr_dq(ddr3_dq_fpga),
       .dfi_init_complete(phy_init_done),
       .iq_full(iq_full),
       .processing_iseq(processing_iseq),
-      
+
       .app_en(app_en),
       .app_ack(app_ack),
       .app_instr(app_instr),
-      
+
       .rdback_fifo_rden(rdback_fifo_rden),
       .rdback_data(rdback_data),
       .rdback_fifo_empty(rdback_fifo_empty)
@@ -801,7 +801,7 @@ module tb_softMC_top;
       end
     end
   endgenerate
-   
+
 
    //***************************************************************************
   // Reporting the test case status
@@ -814,13 +814,13 @@ module tb_softMC_top;
         begin : calibration_done
            wait (phy_init_done);
            $display("Calibration Done");
-           
+
            #1000000;
-           
-           
+
+
      app_en = 0;
      #(APP_CLK_PERIOD*1000);
-     
+
      #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'b00010000000000000000000000000010; // busdir WR
@@ -855,7 +855,7 @@ module tb_softMC_top;
 
       #APP_CLK_PERIOD;
       app_en = 1;
-      app_instr = 32'b11101001001000110101000000001000; // WR(bank=3, col=0x8, pattern=0xd1) 
+      app_instr = 32'b11101001001000110101000000001000; // WR(bank=3, col=0x8, pattern=0xd1)
 
       #APP_CLK_PERIOD;
       app_en = 1;
@@ -868,63 +868,63 @@ module tb_softMC_top;
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd0; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd1; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd2; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd3; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd4; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd5; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd6; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd7; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd8; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd9; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd10; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd11; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd12; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd13; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd14; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd15; // write data
@@ -940,63 +940,63 @@ module tb_softMC_top;
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd0; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd1; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd2; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd3; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd4; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd5; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd6; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd7; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd8; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd9; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd10; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd11; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd12; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd13; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd14; // write data
-      
+
       #APP_CLK_PERIOD;
       app_en = 1;
       app_instr = 32'd15; // write data
@@ -1079,13 +1079,13 @@ module tb_softMC_top;
 
       #APP_CLK_PERIOD;
       app_en = 0;
-        
+
         #500000;
         rdback_fifo_rden = 1;
         #(APP_CLK_PERIOD*10);
       rdback_fifo_rden = 0;
         end
   end
-      
+
 endmodule
 

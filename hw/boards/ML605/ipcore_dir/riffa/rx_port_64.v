@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,7 +35,7 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
@@ -44,7 +44,7 @@
 // Filename:         rx_port_64.v
 // Version:            1.00.a
 // Verilog Standard:   Verilog-2001
-// Description:         Receives data from the rx_engine and buffers the output 
+// Description:         Receives data from the rx_engine and buffers the output
 //                  for the RIFFA channel.
 // Author:            Matt Jacobsen
 // History:            @mattj: Version 2.0
@@ -81,7 +81,7 @@ module rx_port_64 #(
    input SG_DATA_REN,                        // Scatter gather TX buffer data read enable
    input SG_RST,                           // Scatter gather TX buffer data reset
    output SG_ERR,                           // Scatter gather TX encountered an error
-   
+
    input [31:0] TXN_DATA,                     // Read transaction data
    input TXN_LEN_VALID,                     // Read transaction length valid
    input TXN_OFF_LAST_VALID,                  // Read transaction offset/last valid
@@ -91,19 +91,19 @@ module rx_port_64 #(
 
    output RX_REQ,                           // Read request
    input RX_REQ_ACK,                        // Read request accepted
-   output [1:0] RX_REQ_TAG,                  // Read request data tag 
+   output [1:0] RX_REQ_TAG,                  // Read request data tag
    output [63:0] RX_REQ_ADDR,                  // Read request address
    output [9:0] RX_REQ_LEN,                  // Read request length
 
-   input [C_DATA_WIDTH-1:0] MAIN_DATA,            // Main incoming data 
+   input [C_DATA_WIDTH-1:0] MAIN_DATA,            // Main incoming data
    input [C_DATA_WORD_WIDTH-1:0] MAIN_DATA_EN,      // Main incoming data enable
    input MAIN_DONE,                        // Main incoming data complete
    input MAIN_ERR,                           // Main incoming data completed with error
-   input [C_DATA_WIDTH-1:0] SG_RX_DATA,         // Scatter gather for RX incoming data 
+   input [C_DATA_WIDTH-1:0] SG_RX_DATA,         // Scatter gather for RX incoming data
    input [C_DATA_WORD_WIDTH-1:0] SG_RX_DATA_EN,   // Scatter gather for RX incoming data enable
    input SG_RX_DONE,                        // Scatter gather for RX incoming data complete
    input SG_RX_ERR,                        // Scatter gather for RX incoming data completed with error
-   input [C_DATA_WIDTH-1:0] SG_TX_DATA,         // Scatter gather for TX incoming data 
+   input [C_DATA_WIDTH-1:0] SG_TX_DATA,         // Scatter gather for TX incoming data
    input [C_DATA_WORD_WIDTH-1:0] SG_TX_DATA_EN,   // Scatter gather for TX incoming data enable
    input SG_TX_DONE,                        // Scatter gather for TX incoming data complete
    input SG_TX_ERR,                        // Scatter gather for TX incoming data completed with error
@@ -196,15 +196,15 @@ reg                           rRst=0;
 
 // Generate a wide reset from the input reset.
 always @ (posedge CLK) begin
-   rRst <= #1 rWideRst[4]; 
-   if (RST) 
+   rRst <= #1 rWideRst[4];
+   if (RST)
       rWideRst <= #1 5'b11111;
-   else 
+   else
       rWideRst <= (rWideRst<<1);
 end
 
 
-// Pack received data tightly into our FIFOs 
+// Pack received data tightly into our FIFOs
 fifo_packer_64 mainFifoPacker (
    .CLK(CLK),
    .RST(rRst),
@@ -341,19 +341,19 @@ sg_list_requester #(.C_FIFO_DATA_WIDTH(C_DATA_WIDTH), .C_FIFO_DEPTH(C_SG_FIFO_DE
 
 // A read requester for the channel and scatter gather requesters.
 rx_port_requester_mux requesterMux (
-   .RST(rRst), 
-   .CLK(CLK), 
-   .SG_RX_REQ(wSgRxReq), 
-   .SG_RX_LEN(wSgRxReqLen), 
-   .SG_RX_ADDR(wSgRxReqAddr), 
+   .RST(rRst),
+   .CLK(CLK),
+   .SG_RX_REQ(wSgRxReq),
+   .SG_RX_LEN(wSgRxReqLen),
+   .SG_RX_ADDR(wSgRxReqAddr),
    .SG_RX_REQ_PROC(wSgRxReqProc),
-   .SG_TX_REQ(wSgTxReq), 
-   .SG_TX_LEN(wSgTxReqLen), 
-   .SG_TX_ADDR(wSgTxReqAddr), 
+   .SG_TX_REQ(wSgTxReq),
+   .SG_TX_LEN(wSgTxReqLen),
+   .SG_TX_ADDR(wSgTxReqAddr),
    .SG_TX_REQ_PROC(wSgTxReqProc),
-   .MAIN_REQ(wMainReq), 
-   .MAIN_LEN(wMainReqLen), 
-   .MAIN_ADDR(wMainReqAddr), 
+   .MAIN_REQ(wMainReq),
+   .MAIN_LEN(wMainReqLen),
+   .MAIN_ADDR(wMainReqAddr),
    .MAIN_REQ_PROC(wMainReqProc),
    .RX_REQ(RX_REQ),
    .RX_REQ_ACK(RX_REQ_ACK),
@@ -382,12 +382,12 @@ sg_list_reader_64 #(.C_DATA_WIDTH(C_DATA_WIDTH)) sgListReader (
 
 // Main port reader logic
 rx_port_reader #(.C_DATA_WIDTH(C_DATA_WIDTH), .C_FIFO_DEPTH(C_MAIN_FIFO_DEPTH), .C_MAX_READ_REQ(C_MAX_READ_REQ)) reader (
-   .CLK(CLK), 
-   .RST(rRst), 
+   .CLK(CLK),
+   .RST(rRst),
    .CONFIG_MAX_READ_REQUEST_SIZE(CONFIG_MAX_READ_REQUEST_SIZE),
-   .TXN_DATA(TXN_DATA), 
-   .TXN_LEN_VALID(TXN_LEN_VALID), 
-   .TXN_OFF_LAST_VALID(TXN_OFF_LAST_VALID), 
+   .TXN_DATA(TXN_DATA),
+   .TXN_LEN_VALID(TXN_LEN_VALID),
+   .TXN_OFF_LAST_VALID(TXN_OFF_LAST_VALID),
    .TXN_DONE_LEN(TXN_DONE_LEN),
    .TXN_DONE(TXN_DONE),
    .TXN_ERR(wTxnErr),
@@ -398,48 +398,48 @@ rx_port_reader #(.C_DATA_WIDTH(C_DATA_WIDTH), .C_FIFO_DEPTH(C_MAIN_FIFO_DEPTH), 
    .RX_ADDR(wMainReqAddr),
    .RX_LEN(wMainReqLen),
    .RX_REQ_ACK(wReqAck & wMainReqProc),
-   .RX_DATA_EN(MAIN_DATA_EN), 
+   .RX_DATA_EN(MAIN_DATA_EN),
    .RX_DONE(wPackedMainDone),
    .RX_ERR(wPackedMainErr),
-   .SG_DONE(wPackedSgRxDone), 
-   .SG_ERR(wPackedSgRxErr), 
-   .SG_ELEM_ADDR(wSgElemAddr), 
+   .SG_DONE(wPackedSgRxDone),
+   .SG_ERR(wPackedSgRxErr),
+   .SG_ELEM_ADDR(wSgElemAddr),
    .SG_ELEM_LEN(wSgElemLen),
    .SG_ELEM_RDY(wSgElemRdy),
    .SG_ELEM_REN(wSgElemRen),
    .SG_RST(wSgRst),
-   .CHNL_RX(wChnlRx), 
-   .CHNL_RX_LEN(wChnlRxLen), 
+   .CHNL_RX(wChnlRx),
+   .CHNL_RX_LEN(wChnlRxLen),
    .CHNL_RX_LAST(wChnlRxLast),
-   .CHNL_RX_OFF(wChnlRxOff), 
-   .CHNL_RX_RECVD(wChnlRxRecvd), 
-   .CHNL_RX_ACK_RECVD(wChnlRxAckRecvd), 
+   .CHNL_RX_OFF(wChnlRxOff),
+   .CHNL_RX_RECVD(wChnlRxRecvd),
+   .CHNL_RX_ACK_RECVD(wChnlRxAckRecvd),
    .CHNL_RX_CONSUMED(wChnlRxConsumed)
 );
 
 
 // Manage the CHNL_RX* signals in the CHNL_CLK domain.
 rx_port_channel_gate #(.C_DATA_WIDTH(C_DATA_WIDTH)) gate (
-   .RST(rRst), 
-   .CLK(CLK), 
-   .RX(wChnlRx), 
-   .RX_RECVD(wChnlRxRecvd), 
-   .RX_ACK_RECVD(wChnlRxAckRecvd), 
-   .RX_LAST(wChnlRxLast), 
-   .RX_LEN(wChnlRxLen), 
-   .RX_OFF(wChnlRxOff), 
-   .RX_CONSUMED(wChnlRxConsumed), 
-   .RD_DATA(wMainData), 
-   .RD_EMPTY(wMainDataEmpty), 
-   .RD_EN(wMainDataRen), 
-   .CHNL_CLK(CHNL_CLK), 
-   .CHNL_RX(CHNL_RX), 
-   .CHNL_RX_ACK(CHNL_RX_ACK), 
-   .CHNL_RX_LAST(CHNL_RX_LAST), 
-   .CHNL_RX_LEN(CHNL_RX_LEN), 
-   .CHNL_RX_OFF(CHNL_RX_OFF), 
-   .CHNL_RX_DATA(CHNL_RX_DATA), 
-   .CHNL_RX_DATA_VALID(CHNL_RX_DATA_VALID), 
+   .RST(rRst),
+   .CLK(CLK),
+   .RX(wChnlRx),
+   .RX_RECVD(wChnlRxRecvd),
+   .RX_ACK_RECVD(wChnlRxAckRecvd),
+   .RX_LAST(wChnlRxLast),
+   .RX_LEN(wChnlRxLen),
+   .RX_OFF(wChnlRxOff),
+   .RX_CONSUMED(wChnlRxConsumed),
+   .RD_DATA(wMainData),
+   .RD_EMPTY(wMainDataEmpty),
+   .RD_EN(wMainDataRen),
+   .CHNL_CLK(CHNL_CLK),
+   .CHNL_RX(CHNL_RX),
+   .CHNL_RX_ACK(CHNL_RX_ACK),
+   .CHNL_RX_LAST(CHNL_RX_LAST),
+   .CHNL_RX_LEN(CHNL_RX_LEN),
+   .CHNL_RX_OFF(CHNL_RX_OFF),
+   .CHNL_RX_DATA(CHNL_RX_DATA),
+   .CHNL_RX_DATA_VALID(CHNL_RX_DATA_VALID),
    .CHNL_RX_DATA_REN(CHNL_RX_DATA_REN)
 );
 

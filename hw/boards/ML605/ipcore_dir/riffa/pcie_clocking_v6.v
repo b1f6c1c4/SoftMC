@@ -72,7 +72,7 @@ module pcie_clocking_v6 # (
   input  wire        sys_clk,
   input  wire        gt_pll_lock,
   input  wire        sel_lnk_rate,
-  input  wire [1:0]  sel_lnk_width, 
+  input  wire [1:0]  sel_lnk_width,
 
   output wire        sys_clk_bufg,
   output wire        pipe_clk,
@@ -80,7 +80,7 @@ module pcie_clocking_v6 # (
   output wire        block_clk,
   output wire        drp_clk,
   output wire        clock_locked
-   
+
 );
 
   parameter TCQ = 1;
@@ -93,24 +93,24 @@ module pcie_clocking_v6 # (
   wire               clk_250;
   wire               clk_125;
   wire               user_clk_prebuf;
-  wire               sel_lnk_rate_d; 
+  wire               sel_lnk_rate_d;
 
   reg  [1:0]         reg_clock_locked = 2'b11;
 
 
   // MMCM Configuration
 
-  localparam         mmcm_clockin_period  = (REF_CLK_FREQ == 0) ? 10 : 
-                                            (REF_CLK_FREQ == 1) ? 8 : 
+  localparam         mmcm_clockin_period  = (REF_CLK_FREQ == 0) ? 10 :
+                                            (REF_CLK_FREQ == 1) ? 8 :
                                             (REF_CLK_FREQ == 2) ? 4 : 0;
 
-  localparam         mmcm_clockfb_mult = (REF_CLK_FREQ == 0) ? 10 : 
-                                         (REF_CLK_FREQ == 1) ? 8 : 
+  localparam         mmcm_clockfb_mult = (REF_CLK_FREQ == 0) ? 10 :
+                                         (REF_CLK_FREQ == 1) ? 8 :
                                          (REF_CLK_FREQ == 2) ? 8 : 0;
 
-  
-  localparam         mmcm_divclk_divide = (REF_CLK_FREQ == 0) ? 1 : 
-                                          (REF_CLK_FREQ == 1) ? 1 : 
+
+  localparam         mmcm_divclk_divide = (REF_CLK_FREQ == 0) ? 1 :
+                                          (REF_CLK_FREQ == 1) ? 1 :
                                           (REF_CLK_FREQ == 2) ? 2 : 0;
 
   localparam         mmcm_clock0_div = 4;
@@ -123,7 +123,7 @@ module pcie_clocking_v6 # (
 
   // MMCM Reset
 
-  assign             mmcm_reset = 1'b0; 
+  assign             mmcm_reset = 1'b0;
 
   generate
 
@@ -134,7 +134,7 @@ module pcie_clocking_v6 # (
 
       BUFG pipe_clk_bufg (.O(pipe_clk),.I(clk_125));
 
-    end else if (CAP_LINK_SPEED == 4'h2) begin : GEN2_LINK 
+    end else if (CAP_LINK_SPEED == 4'h2) begin : GEN2_LINK
 
       SRL16E #(.INIT(0)) sel_lnk_rate_delay (.Q(sel_lnk_rate_d),
              .D(sel_lnk_rate), .CLK(pipe_clk),.CE(clock_locked), .A3(1'b1),.A2(1'b1),.A1(1'b1),.A0(1'b1));
@@ -163,59 +163,59 @@ module pcie_clocking_v6 # (
       BUFG user_clk_bufg (.O(user_clk),.I(clk_125));
 
     end else if ((CAP_LINK_WIDTH == 6'h01) && (CAP_LINK_SPEED == 4'h1) && (USER_CLK_FREQ == 3)) begin : x1_GEN1_250_00
-    
+
       BUFG user_clk_bufg (.O(user_clk),.I(clk_250));
 
     end else if ((CAP_LINK_WIDTH == 6'h01) && (CAP_LINK_SPEED == 4'h2) && (USER_CLK_FREQ == 1)) begin : x1_GEN2_62_50
 
       BUFG user_clk_bufg (.O(user_clk),.I(user_clk_prebuf));
-    
+
     end else if ((CAP_LINK_WIDTH == 6'h01) && (CAP_LINK_SPEED == 4'h2) && (USER_CLK_FREQ == 2)) begin : x1_GEN2_125_00
-    
+
       BUFG user_clk_bufg (.O(user_clk),.I(clk_125));
 
     end else if ((CAP_LINK_WIDTH == 6'h01) && (CAP_LINK_SPEED == 4'h2) && (USER_CLK_FREQ == 3)) begin : x1_GEN2_250_00
-    
+
       BUFG user_clk_bufg (.O(user_clk),.I(clk_250));
 
     end else if ((CAP_LINK_WIDTH == 6'h02) && (CAP_LINK_SPEED == 4'h1) && (USER_CLK_FREQ == 1)) begin : x2_GEN1_62_50
 
       BUFG user_clk_bufg (.O(user_clk),.I(user_clk_prebuf));
-    
+
     end else if ((CAP_LINK_WIDTH == 6'h02) && (CAP_LINK_SPEED == 4'h1) && (USER_CLK_FREQ == 2)) begin : x2_GEN1_125_00
-    
+
       BUFG user_clk_bufg (.O(user_clk),.I(clk_125));
 
     end else if ((CAP_LINK_WIDTH == 6'h02) && (CAP_LINK_SPEED == 4'h1) && (USER_CLK_FREQ == 3)) begin : x2_GEN1_250_00
 
       BUFG user_clk_bufg (.O(user_clk),.I(clk_250));
-    
+
     end else if ((CAP_LINK_WIDTH == 6'h02) && (CAP_LINK_SPEED == 4'h2) && (USER_CLK_FREQ == 2)) begin : x2_GEN2_125_00
 
       BUFG user_clk_bufg (.O(user_clk),.I(clk_125));
-    
+
     end else if ((CAP_LINK_WIDTH == 6'h02) && (CAP_LINK_SPEED == 4'h2) && (USER_CLK_FREQ == 3)) begin : x2_GEN2_250_00
-    
+
       BUFG user_clk_bufg (.O(user_clk),.I(clk_250));
 
     end else if ((CAP_LINK_WIDTH == 6'h04) && (CAP_LINK_SPEED == 4'h1) && (USER_CLK_FREQ == 2)) begin : x4_GEN1_125_00
-    
+
       BUFG user_clk_bufg (.O(user_clk),.I(clk_125));
 
     end else if ((CAP_LINK_WIDTH == 6'h04) && (CAP_LINK_SPEED == 4'h1) && (USER_CLK_FREQ == 3)) begin : x4_GEN1_250_00
-    
+
       BUFG user_clk_bufg (.O(user_clk),.I(clk_250));
 
     end else if ((CAP_LINK_WIDTH == 6'h04) && (CAP_LINK_SPEED == 4'h2) && (USER_CLK_FREQ == 3)) begin : x4_GEN2_250_00
-    
+
       BUFG user_clk_bufg (.O(user_clk),.I(clk_250));
 
     end else if ((CAP_LINK_WIDTH == 6'h08) && (CAP_LINK_SPEED == 4'h1) && (USER_CLK_FREQ == 3)) begin : x8_GEN1_250_00
-    
+
       BUFG user_clk_bufg (.O(user_clk),.I(clk_250));
 
     end else if ((CAP_LINK_WIDTH == 6'h08) && (CAP_LINK_SPEED == 4'h2) && (USER_CLK_FREQ == 4)) begin : x8_GEN2_250_00
-    
+
       BUFG user_clk_bufg (.O(user_clk),.I(clk_250));
       BUFG block_clk_bufg (.O(block_clk),.I(clk_500));
 
@@ -248,7 +248,7 @@ module pcie_clocking_v6 # (
     .CLKIN1_PERIOD (mmcm_clockin_period),
     .CLKIN2_PERIOD (mmcm_clockin_period),
 
-    // 500 MHz / mmcm_clockx_div  
+    // 500 MHz / mmcm_clockx_div
     .CLKOUT0_DIVIDE_F (mmcm_clock0_div),
     .CLKOUT0_PHASE (0),
 

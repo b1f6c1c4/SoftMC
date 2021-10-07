@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,7 +35,7 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
@@ -44,7 +44,7 @@
 // Filename:         rx_engine_128.v
 // Version:            1.00.a
 // Verilog Standard:   Verilog-2001
-// Description:         Receive engine for PCIe using AXI interface from Xilinx 
+// Description:         Receive engine for PCIe using AXI interface from Xilinx
 //                  PCIe Endpoint core.
 // Author:            Matt Jacobsen
 // History:            @mattj: Version 2.0
@@ -73,7 +73,7 @@ module rx_engine_128 #(
    parameter C_PCI_DATA_WIDTH = 9'd128,
    parameter C_NUM_CHNL = 4'd12,
    parameter C_MAX_READ_REQ_BYTES = 512,         // Max size of read requests (in bytes)
-   parameter C_TAG_WIDTH = 5,                   // Number of outstanding requests 
+   parameter C_TAG_WIDTH = 5,                   // Number of outstanding requests
    parameter C_ALTERA = 1'b1,                  // 1 if Altera, 0 if Xilinx
    // Local parameters
    parameter C_PCI_DATA_WORD = C_PCI_DATA_WIDTH/32,
@@ -108,12 +108,12 @@ module rx_engine_128 #(
    output [7:0] REQ_TAG,                                 // Memory packet tag
    // Tag exchange
    input [5:0] INT_TAG,                                 // Internal tag to exchange with external
-   input INT_TAG_VALID,                                 // High to signal tag exchange 
+   input INT_TAG_VALID,                                 // High to signal tag exchange
    output [C_TAG_WIDTH-1:0] EXT_TAG,                        // External tag to provide in exchange for internal tag
    output EXT_TAG_VALID,                                 // High to signal external tag is valid
    // Received read completions
     output ENG_RD_COMPLETE,
-   output [C_PCI_DATA_WIDTH-1:0] ENG_DATA,                     // Engine data 
+   output [C_PCI_DATA_WIDTH-1:0] ENG_DATA,                     // Engine data
    output [(C_NUM_CHNL*C_PCI_DATA_COUNT_WIDTH)-1:0] MAIN_DATA_EN,   // Main data enable
    output [C_NUM_CHNL-1:0] MAIN_DONE,                        // Main data complete
    output [C_NUM_CHNL-1:0] MAIN_ERR,                        // Main data completed with error
@@ -194,7 +194,7 @@ wire [31:0]                         wReqData;
 wire [C_PCI_DATA_WIDTH-1:0]         wDataOut;
 
 assign wReqData = wALTERA? rReqData :{rReqData[7:0], rReqData[15:8], rReqData[23:16], rReqData[31:24]};
-assign wDataOut = wALTERA? rDataOut :{rDataOut[103:96], rDataOut[111:104], rDataOut[119:112], rDataOut[127:120], 
+assign wDataOut = wALTERA? rDataOut :{rDataOut[103:96], rDataOut[111:104], rDataOut[119:112], rDataOut[127:120],
                            rDataOut[71:64], rDataOut[79:72], rDataOut[87:80], rDataOut[95:88],
                            rDataOut[39:32], rDataOut[47:40], rDataOut[55:48], rDataOut[63:56],
                            rDataOut[07:00], rDataOut[15:08], rDataOut[23:16], rDataOut[31:24]};
@@ -202,69 +202,69 @@ assign RX_DATA_READY = 1;
 assign ENG_RD_COMPLETE = rDone;
 
 // Handle servicing write & read memory requests in a separate state machine.
-rx_engine_req #( 
+rx_engine_req #(
    .C_NUM_CHNL(C_NUM_CHNL)
 ) rxEngReq (
-   .CLK(CLK), 
-   .RST(RST), 
-   .REQ_WR(REQ_WR), 
-   .REQ_WR_DONE(REQ_WR_DONE), 
-   .REQ_RD(REQ_RD), 
-   .REQ_RD_DONE(REQ_RD_DONE), 
-   .REQ_LEN(REQ_LEN), 
-   .REQ_ADDR(REQ_ADDR), 
-   .REQ_DATA(REQ_DATA), 
-   .REQ_BE(REQ_BE), 
-   .REQ_TC(REQ_TC), 
-   .REQ_TD(REQ_TD), 
-   .REQ_EP(REQ_EP), 
-   .REQ_ATTR(REQ_ATTR), 
-   .REQ_ID(REQ_ID), 
+   .CLK(CLK),
+   .RST(RST),
+   .REQ_WR(REQ_WR),
+   .REQ_WR_DONE(REQ_WR_DONE),
+   .REQ_RD(REQ_RD),
+   .REQ_RD_DONE(REQ_RD_DONE),
+   .REQ_LEN(REQ_LEN),
+   .REQ_ADDR(REQ_ADDR),
+   .REQ_DATA(REQ_DATA),
+   .REQ_BE(REQ_BE),
+   .REQ_TC(REQ_TC),
+   .REQ_TD(REQ_TD),
+   .REQ_EP(REQ_EP),
+   .REQ_ATTR(REQ_ATTR),
+   .REQ_ID(REQ_ID),
    .REQ_TAG(REQ_TAG),
    .WEN(rReqWen),
    .RNW(rRNW),
-   .LEN(rReqLen), 
-   .ADDR(rReqAddr), 
-   .DATA(wReqData), 
-   .BE(rBE), 
-   .TC(rTC), 
-   .TD(rTD), 
-   .EP(rEP), 
-   .ATTR(rAttr), 
-   .ID(rReqId), 
+   .LEN(rReqLen),
+   .ADDR(rReqAddr),
+   .DATA(wReqData),
+   .BE(rBE),
+   .TC(rTC),
+   .TD(rTD),
+   .EP(rEP),
+   .ATTR(rAttr),
+   .ID(rReqId),
    .TAG(rReqTag)
 );
 
 
 // Handle reordering completion data.
-reorder_queue #( 
+reorder_queue #(
    .C_PCI_DATA_WIDTH(C_PCI_DATA_WIDTH),
    .C_NUM_CHNL(C_NUM_CHNL),
    .C_MAX_READ_REQ_BYTES(C_MAX_READ_REQ_BYTES),
    .C_TAG_WIDTH(C_TAG_WIDTH)
 ) reorderQueue (
-   .CLK(CLK), 
-   .RST(RST), 
-   .VALID(rDataValid), 
-   .DATA(wDataOut), 
-   .DATA_EN(rDataOutEn), 
-   .DATA_EN_COUNT(rDataOutCount), 
-   .DONE(rDataDone), 
-   .ERR(rDataErr), 
-   .TAG(rDataTag), 
-   .INT_TAG(INT_TAG), 
-   .INT_TAG_VALID(INT_TAG_VALID), 
-   .EXT_TAG(EXT_TAG), 
-   .EXT_TAG_VALID(EXT_TAG_VALID), 
-   .ENG_DATA(ENG_DATA), 
-   .MAIN_DATA_EN(MAIN_DATA_EN), 
+   .CLK(CLK),
+   .RST(RST),
+   .VALID(rDataValid),
+   .DATA(wDataOut),
+   .DATA_EN(rDataOutEn),
+   .DATA_EN_COUNT(rDataOutCount),
+   .DONE(rDataDone),
+   .ERR(rDataErr),
+   .TAG(rDataTag),
+   .INT_TAG(INT_TAG),
+   .INT_TAG_VALID(INT_TAG_VALID),
+   .EXT_TAG(EXT_TAG),
+   .EXT_TAG_VALID(EXT_TAG_VALID),
+   .ENG_DATA(ENG_DATA),
+   .MAIN_DATA_EN(MAIN_DATA_EN),
    .MAIN_DONE(MAIN_DONE),
    .MAIN_ERR(MAIN_ERR),
    .SG_RX_DATA_EN(SG_RX_DATA_EN),
    .SG_RX_DONE(SG_RX_DONE),
-   .SG_RX_ERR(SG_RX_ERR), 
-   .SG_TX_DATA_EN(SG_TX_DATA_EN), 
-   .SG_TX_DONE(SG_TX_DONE), 
+   .SG_RX_ERR(SG_RX_ERR),
+   .SG_TX_DATA_EN(SG_TX_DATA_EN),
+   .SG_TX_DONE(SG_TX_DONE),
    .SG_TX_ERR(SG_TX_ERR)
 );
 
@@ -377,7 +377,7 @@ always @ (*) begin
    _rReqData = rReqData;
    _rReqAddr = rReqAddr;
    _rReqWen = rReqWen;
-   _rNQWA = rNQWA;   
+   _rNQWA = rNQWA;
 
    _rNextTC = (rValid ? rDataIn[86:84] : rNextTC);
    _rNextTD = (rValid ? rDataIn[79] : rNextTD);
@@ -389,11 +389,11 @@ always @ (*) begin
    _rNextBE = (rValid ? rDataIn[99:96] : rNextBE);
    _rNextRNW = (rValid ? rFmtHi[0] : rNextRNW);
    _rNext4DWHeader = (rValid ? rDataIn[93] : rNext4DWHeader);
-   
+
    case (rReqState)
 
    `S_RXENG128_REQ_PARSE : begin
-        _rNQWA = RX_DATA[98] & RX_DATA[29] & wALTERA; // 98 is 3rd address bit, 29 is 4 DW header, 
+        _rNQWA = RX_DATA[98] & RX_DATA[29] & wALTERA; // 98 is 3rd address bit, 29 is 4 DW header,
       _rTC = rDataIn[22:20];
       _rTD = rDataIn[15];
       _rEP = rDataIn[14];
@@ -401,7 +401,7 @@ always @ (*) begin
       _rReqLen = rDataIn[9:0];
       _rReqId = rDataIn[63:48];
       _rReqTag = rDataIn[47:40];
-      _rBE = rDataIn[35:32];   
+      _rBE = rDataIn[35:32];
       _rRNW = rFmtLo[0];
       _rReqAddr = wDataIn64bShftA[95:66];
       _rReqData = rDataIn[127:96];
@@ -409,14 +409,14 @@ always @ (*) begin
         // (rFmtLo checks for SOF)
         _rReqWen = rLenOneLo & ((rFmtLo == 3'd1) || ((rFmtLo == 3'd2) && (rEOF == 1'b1)));
       // rFmtHi/rFmtLo non-zero if the packet is valid, only one will have a non-zero value
-      case ({rFmtHi, rFmtLo}) 
+      case ({rFmtHi, rFmtLo})
          {3'd1, 3'd0} :   _rReqState = (rLenOneHi ? `S_RXENG128_REQ_ASSIGN : `S_RXENG128_REQ_PARSE);
             {3'd0, 3'd2} :  _rReqState = (rLenOneLo & ~rEOF) ? `S_RXENG128_REQ_DATA : `S_RXENG128_REQ_PARSE;
          {3'd2, 3'd0} :   _rReqState = (rLenOneHi ? `S_RXENG128_REQ_ASSIGN : `S_RXENG128_REQ_PARSE);
          default      :   _rReqState = `S_RXENG128_REQ_PARSE;
       endcase
 
-   end 
+   end
 
    `S_RXENG128_REQ_ASSIGN : begin
       _rTC = rNextTC;
@@ -426,13 +426,13 @@ always @ (*) begin
       _rReqLen = rNextReqLen;
       _rReqId = rNextReqId;
       _rReqTag = rNextReqTag;
-      _rBE = rNextBE;   
+      _rBE = rNextBE;
       _rRNW = rNextRNW;
       _rReqAddr = wDataIn64bShftB[31:2];
       _rReqData = wDataIn64bShftB[63:32];
       _rReqWen = rValid;
       if (rValid) begin
-         case (rFmtHi) 
+         case (rFmtHi)
             3'd1 :   _rReqState = (rLenOneHi ? `S_RXENG128_REQ_ASSIGN : `S_RXENG128_REQ_PARSE);
             3'd2 :   _rReqState = (rLenOneHi ? `S_RXENG128_REQ_ASSIGN : `S_RXENG128_REQ_PARSE);
             default :   _rReqState = `S_RXENG128_REQ_PARSE;
@@ -444,7 +444,7 @@ always @ (*) begin
         _rReqData = rDataIn >> ({5'd0,rNQWA}<<5);
       _rReqWen = rValid;
       if (rValid) begin
-         case (rFmtHi) 
+         case (rFmtHi)
             3'd1 :   _rReqState = (rLenOneHi ? `S_RXENG128_REQ_ASSIGN : `S_RXENG128_REQ_PARSE);
             3'd2 :   _rReqState = (rLenOneHi ? `S_RXENG128_REQ_ASSIGN : `S_RXENG128_REQ_PARSE);
             default :   _rReqState = `S_RXENG128_REQ_PARSE;
@@ -500,14 +500,14 @@ always @ (*) begin
       // Save for S_RXENG128_CPL_DATA_CONT
       _rLastCPLD = (rDataIn[43:32] == (rDataIn[9:0]<<2)); // byte_count == length ?
       // rFmtHi/rFmtLo non-zero if the packet is valid, only one will have a non-zero value
-      case ({rFmtHi, rFmtLo}) 
+      case ({rFmtHi, rFmtLo})
          {3'd0, 3'd4} :   _rCplState = `S_RXENG128_CPL_PARSE;
          {3'd4, 3'd0} :   _rCplState = `S_RXENG128_CPL_NO_DATA;
          {3'd0, 3'd6} :   _rCplState = (`S_RXENG128_CPL_PARSE & {2{(rEOF | rCplErrLo)}}); // Changes to S_RXENG128_CPL_DATA_CONT
          {3'd6, 3'd0} :   _rCplState = `S_RXENG128_CPL_DATA;
          default      :   _rCplState = `S_RXENG128_CPL_PARSE;
       endcase
-   end 
+   end
 
    `S_RXENG128_CPL_NO_DATA : begin
       _rShft = rDataIn[15:8]; // Tag
@@ -516,7 +516,7 @@ always @ (*) begin
       _rErr = rNextCplErr;
       _rDone = 1;
       if (rValid) begin
-         case (rFmtHi) 
+         case (rFmtHi)
             3'd4 :   _rCplState = `S_RXENG128_CPL_NO_DATA;
             3'd6 :   _rCplState = `S_RXENG128_CPL_DATA;
             default :   _rCplState = `S_RXENG128_CPL_PARSE;
@@ -534,7 +534,7 @@ always @ (*) begin
       _rLastCPLD = rNextLastCPLD;
       if (rValid) begin
          if (rEOF) begin // Ends in this packet
-            case (rFmtHi) 
+            case (rFmtHi)
                3'd4 :   _rCplState = `S_RXENG128_CPL_NO_DATA;
                3'd6 :   _rCplState = `S_RXENG128_CPL_DATA;
                default :   _rCplState = `S_RXENG128_CPL_PARSE;
@@ -556,7 +556,7 @@ always @ (*) begin
       _rDone = (rEOF & rLastCPLD);
       if (rValid) begin // Process and write until last packet
          if (rEOF) begin
-            case (rFmtHi) 
+            case (rFmtHi)
                3'd4 :   _rCplState = `S_RXENG128_CPL_NO_DATA;
                3'd6 :   _rCplState = `S_RXENG128_CPL_DATA;
                default :   _rCplState = `S_RXENG128_CPL_PARSE;
@@ -564,7 +564,7 @@ always @ (*) begin
          end
       end
    end
-   
+
    endcase
 end
 

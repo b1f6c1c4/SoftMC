@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,7 +35,7 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
@@ -48,7 +48,7 @@
 //                   the RIFFA TX and RX interfaces. Receives data on the
 //                  RX interface and saves the last value received. Sends
 //                  the same amount of data back on the TX interface. The
-//                  returned data starts with the last value received, 
+//                  returned data starts with the last value received,
 //                  resets and increments to end with a value equal to the
 //                  number of (4 byte) words sent back on the TX interface.
 // Author:            Matt Jacobsen
@@ -60,24 +60,24 @@ module chnl_tester #(
 (
    input CLK,
    input RST,
-   output CHNL_RX_CLK, 
-   input CHNL_RX, 
-   output CHNL_RX_ACK, 
-   input CHNL_RX_LAST, 
-   input [31:0] CHNL_RX_LEN, 
-   input [30:0] CHNL_RX_OFF, 
-   input [C_PCI_DATA_WIDTH-1:0] CHNL_RX_DATA, 
-   input CHNL_RX_DATA_VALID, 
+   output CHNL_RX_CLK,
+   input CHNL_RX,
+   output CHNL_RX_ACK,
+   input CHNL_RX_LAST,
+   input [31:0] CHNL_RX_LEN,
+   input [30:0] CHNL_RX_OFF,
+   input [C_PCI_DATA_WIDTH-1:0] CHNL_RX_DATA,
+   input CHNL_RX_DATA_VALID,
    output CHNL_RX_DATA_REN,
-   
-   output CHNL_TX_CLK, 
-   output CHNL_TX, 
-   input CHNL_TX_ACK, 
-   output CHNL_TX_LAST, 
-   output [31:0] CHNL_TX_LEN, 
-   output [30:0] CHNL_TX_OFF, 
-   output [C_PCI_DATA_WIDTH-1:0] CHNL_TX_DATA, 
-   output CHNL_TX_DATA_VALID, 
+
+   output CHNL_TX_CLK,
+   output CHNL_TX,
+   input CHNL_TX_ACK,
+   output CHNL_TX_LAST,
+   output [31:0] CHNL_TX_LEN,
+   output [30:0] CHNL_TX_OFF,
+   output [C_PCI_DATA_WIDTH-1:0] CHNL_TX_DATA,
+   output CHNL_TX_DATA_VALID,
    input CHNL_TX_DATA_REN
 );
 
@@ -107,7 +107,7 @@ always @(posedge CLK or posedge RST) begin
    end
    else begin
       case (rState)
-      
+
       2'd0: begin // Wait for start of RX, save length
          if (CHNL_RX) begin
             rLen <= #1 CHNL_RX_LEN;
@@ -115,7 +115,7 @@ always @(posedge CLK or posedge RST) begin
             rState <= #1 2'd1;
          end
       end
-      
+
       2'd1: begin // Wait for last data in RX, save value
          if (CHNL_RX_DATA_VALID) begin
             rData <= #1 CHNL_RX_DATA;
@@ -138,7 +138,7 @@ always @(posedge CLK or posedge RST) begin
                rState <= #1 2'd0;
          end
       end
-      
+
       endcase
    end
 end

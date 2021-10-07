@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,7 +35,7 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
@@ -44,7 +44,7 @@
 // Filename:         channel_32.v
 // Version:            1.00.a
 // Verilog Standard:   Verilog-2001
-// Description:         Represents a RIFFA channel. Contains a RX port and a 
+// Description:         Represents a RIFFA channel. Contains a RX port and a
 // TX port.
 // Author:            Matt Jacobsen
 // History:            @mattj: Version 2.0
@@ -65,7 +65,7 @@ module channel_32 #(
    input [2:0] CONFIG_MAX_PAYLOAD_SIZE,         // Maximum write payload: 000=128B, 001=256B, 010=512B, 011=1024B
 
    input [31:0] PIO_DATA,                     // Single word programmed I/O data
-   input [C_DATA_WIDTH-1:0] ENG_DATA,            // Main incoming data 
+   input [C_DATA_WIDTH-1:0] ENG_DATA,            // Main incoming data
 
    output SG_RX_BUF_RECVD,                     // Scatter gather RX buffer completely read (ready for next if applicable)
    input SG_RX_BUF_LEN_VALID,                  // Scatter gather RX buffer length valid
@@ -93,7 +93,7 @@ module channel_32 #(
 
    output RX_REQ,                           // Read request
    input RX_REQ_ACK,                        // Read request accepted
-   output [1:0] RX_REQ_TAG,                  // Read request data tag 
+   output [1:0] RX_REQ_TAG,                  // Read request data tag
    output [63:0] RX_REQ_ADDR,                  // Read request address
    output [9:0] RX_REQ_LEN,                  // Read request length
 
@@ -150,40 +150,40 @@ wire                  wTxSgDataRst;
 
 // Receiving port (data to the channel)
 rx_port_32 #(
-   .C_DATA_WIDTH(C_DATA_WIDTH), 
-   .C_MAIN_FIFO_DEPTH(C_RX_FIFO_DEPTH), 
+   .C_DATA_WIDTH(C_DATA_WIDTH),
+   .C_MAIN_FIFO_DEPTH(C_RX_FIFO_DEPTH),
    .C_SG_FIFO_DEPTH(C_SG_FIFO_DEPTH),
    .C_MAX_READ_REQ(C_MAX_READ_REQ)
 ) rxPort (
-   .RST(RST), 
-   .CLK(CLK), 
-   .CONFIG_MAX_READ_REQUEST_SIZE(CONFIG_MAX_READ_REQUEST_SIZE), 
-   
+   .RST(RST),
+   .CLK(CLK),
+   .CONFIG_MAX_READ_REQUEST_SIZE(CONFIG_MAX_READ_REQUEST_SIZE),
+
    .SG_RX_BUF_RECVD(SG_RX_BUF_RECVD),
    .SG_RX_BUF_DATA(PIO_DATA),
    .SG_RX_BUF_LEN_VALID(SG_RX_BUF_LEN_VALID),
    .SG_RX_BUF_ADDR_HI_VALID(SG_RX_BUF_ADDR_HI_VALID),
    .SG_RX_BUF_ADDR_LO_VALID(SG_RX_BUF_ADDR_LO_VALID),
-   
+
    .SG_TX_BUF_RECVD(SG_TX_BUF_RECVD),
    .SG_TX_BUF_DATA(PIO_DATA),
    .SG_TX_BUF_LEN_VALID(SG_TX_BUF_LEN_VALID),
    .SG_TX_BUF_ADDR_HI_VALID(SG_TX_BUF_ADDR_HI_VALID),
    .SG_TX_BUF_ADDR_LO_VALID(SG_TX_BUF_ADDR_LO_VALID),
-   
+
    .SG_DATA(wTxSgData),
    .SG_DATA_EMPTY(wTxSgDataEmpty),
    .SG_DATA_REN(wTxSgDataRen),
    .SG_RST(wTxSgDataRst),
    .SG_ERR(wTxSgDataErr),
-   
-   .TXN_DATA(PIO_DATA), 
-   .TXN_LEN_VALID(TXN_RX_LEN_VALID), 
-   .TXN_OFF_LAST_VALID(TXN_RX_OFF_LAST_VALID), 
+
+   .TXN_DATA(PIO_DATA),
+   .TXN_LEN_VALID(TXN_RX_LEN_VALID),
+   .TXN_OFF_LAST_VALID(TXN_RX_OFF_LAST_VALID),
    .TXN_DONE_LEN(TXN_RX_DONE_LEN),
    .TXN_DONE(TXN_RX_DONE),
    .TXN_DONE_ACK(TXN_RX_DONE_ACK),
-   
+
    .RX_REQ(RX_REQ),
    .RX_REQ_ACK(RX_REQ_ACK),
    .RX_REQ_TAG(RX_REQ_TAG),
@@ -191,41 +191,41 @@ rx_port_32 #(
    .RX_REQ_LEN(RX_REQ_LEN),
 
    .MAIN_DATA(ENG_DATA),
-   .MAIN_DATA_EN(MAIN_DATA_EN), 
-   .MAIN_DONE(MAIN_DONE), 
+   .MAIN_DATA_EN(MAIN_DATA_EN),
+   .MAIN_DONE(MAIN_DONE),
    .MAIN_ERR(MAIN_ERR),
-   
+
    .SG_RX_DATA(ENG_DATA),
-   .SG_RX_DATA_EN(SG_RX_DATA_EN), 
-   .SG_RX_DONE(SG_RX_DONE), 
+   .SG_RX_DATA_EN(SG_RX_DATA_EN),
+   .SG_RX_DONE(SG_RX_DONE),
    .SG_RX_ERR(SG_RX_ERR),
 
    .SG_TX_DATA(ENG_DATA),
-   .SG_TX_DATA_EN(SG_TX_DATA_EN), 
-   .SG_TX_DONE(SG_TX_DONE), 
+   .SG_TX_DATA_EN(SG_TX_DATA_EN),
+   .SG_TX_DONE(SG_TX_DONE),
    .SG_TX_ERR(SG_TX_ERR),
 
-   .CHNL_CLK(CHNL_RX_CLK), 
-   .CHNL_RX(CHNL_RX), 
-   .CHNL_RX_ACK(CHNL_RX_ACK), 
-   .CHNL_RX_LAST(CHNL_RX_LAST), 
-   .CHNL_RX_LEN(CHNL_RX_LEN), 
-   .CHNL_RX_OFF(CHNL_RX_OFF), 
-   .CHNL_RX_DATA(CHNL_RX_DATA), 
-   .CHNL_RX_DATA_VALID(CHNL_RX_DATA_VALID), 
+   .CHNL_CLK(CHNL_RX_CLK),
+   .CHNL_RX(CHNL_RX),
+   .CHNL_RX_ACK(CHNL_RX_ACK),
+   .CHNL_RX_LAST(CHNL_RX_LAST),
+   .CHNL_RX_LEN(CHNL_RX_LEN),
+   .CHNL_RX_OFF(CHNL_RX_OFF),
+   .CHNL_RX_DATA(CHNL_RX_DATA),
+   .CHNL_RX_DATA_VALID(CHNL_RX_DATA_VALID),
    .CHNL_RX_DATA_REN(CHNL_RX_DATA_REN)
 );
 
 
 // Sending port (data from the channel)
 tx_port_32 #(
-   .C_DATA_WIDTH(C_DATA_WIDTH), 
+   .C_DATA_WIDTH(C_DATA_WIDTH),
    .C_FIFO_DEPTH(C_TX_FIFO_DEPTH)
 ) txPort (
-   .CLK(CLK), 
-   .RST(RST), 
-   .CONFIG_MAX_PAYLOAD_SIZE(CONFIG_MAX_PAYLOAD_SIZE), 
-   
+   .CLK(CLK),
+   .RST(RST),
+   .CONFIG_MAX_PAYLOAD_SIZE(CONFIG_MAX_PAYLOAD_SIZE),
+
    .TXN(TXN_TX),
    .TXN_ACK(TXN_TX_ACK),
    .TXN_LEN(TXN_TX_LEN),
@@ -233,29 +233,29 @@ tx_port_32 #(
    .TXN_DONE_LEN(TXN_TX_DONE_LEN),
    .TXN_DONE(TXN_TX_DONE),
    .TXN_DONE_ACK(TXN_TX_DONE_ACK),
-   
+
    .SG_DATA(wTxSgData),
    .SG_DATA_EMPTY(wTxSgDataEmpty),
    .SG_DATA_REN(wTxSgDataRen),
    .SG_RST(wTxSgDataRst),
    .SG_ERR(wTxSgDataErr),
-   
-   .TX_REQ(TX_REQ), 
+
+   .TX_REQ(TX_REQ),
    .TX_REQ_ACK(TX_REQ_ACK),
-   .TX_ADDR(TX_ADDR), 
-   .TX_LEN(TX_LEN), 
+   .TX_ADDR(TX_ADDR),
+   .TX_LEN(TX_LEN),
    .TX_DATA(TX_DATA),
-   .TX_DATA_REN(TX_DATA_REN), 
+   .TX_DATA_REN(TX_DATA_REN),
    .TX_SENT(TX_SENT),
 
-   .CHNL_CLK(CHNL_TX_CLK), 
-   .CHNL_TX(CHNL_TX), 
+   .CHNL_CLK(CHNL_TX_CLK),
+   .CHNL_TX(CHNL_TX),
    .CHNL_TX_ACK(CHNL_TX_ACK),
-   .CHNL_TX_LAST(CHNL_TX_LAST), 
-   .CHNL_TX_LEN(CHNL_TX_LEN), 
-   .CHNL_TX_OFF(CHNL_TX_OFF), 
-   .CHNL_TX_DATA(CHNL_TX_DATA), 
-   .CHNL_TX_DATA_VALID(CHNL_TX_DATA_VALID), 
+   .CHNL_TX_LAST(CHNL_TX_LAST),
+   .CHNL_TX_LEN(CHNL_TX_LEN),
+   .CHNL_TX_OFF(CHNL_TX_OFF),
+   .CHNL_TX_DATA(CHNL_TX_DATA),
+   .CHNL_TX_DATA_VALID(CHNL_TX_DATA_VALID),
    .CHNL_TX_DATA_REN(CHNL_TX_DATA_REN)
 );
 

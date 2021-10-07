@@ -4,21 +4,7 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <sys/time.h>
 #include <riffa.h>
-
-#define GET_TIME_INIT(num) struct timeval _timers[num]
-
-#define GET_TIME_VAL(num) gettimeofday(&_timers[num], NULL)
-
-#define TIME_VAL_TO_MS(num) (((double)_timers[num].tv_sec*1000.0) + ((double)_timers[num].tv_usec/1000.0))
-
-
-#define BANK_OFFSET 3
-#define ROW_OFFSET 16
-#define CMD_OFFSET 4
-#define COL_OFFSET 10
-#define SIGNAL_OFFSET 6
 
 // The current instruction format is 32 bits wide. But we allocate
 // 64 bits (2 words) for each instruction to keep the hardware simple.
@@ -33,10 +19,6 @@
 #define NUM_BANKS 8
 #define SUBARRAY_SIZE 512
 #define NUM_SUBARRAYS (NUM_ROWS / SUBARRAY_SIZE)
-
-
-
-
 
 typedef uint64_t Instruction;
 typedef uint32_t uint;

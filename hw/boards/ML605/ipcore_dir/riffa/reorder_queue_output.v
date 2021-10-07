@@ -1,29 +1,29 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    19:27:32 06/14/2012 
-// Design Name: 
+// Company:
+// Engineer:
+//
+// Create Date:    19:27:32 06/14/2012
+// Design Name:
 // Module Name:    reorder_queue_output
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
+// Project Name:
+// Target Devices:
+// Tool versions:
 // Description:
 // Outputs stored TLPs in increasing tag order.
 //
-// Dependencies: 
+// Dependencies:
 // reorder_queue.v
 //
-// Revision: 
+// Revision:
 // Revision 0.01 - File Created
-// Additional Comments: 
+// Additional Comments:
 //
 //////////////////////////////////////////////////////////////////////////////////
 module reorder_queue_output #(
    parameter C_PCI_DATA_WIDTH = 9'd128,
    parameter C_NUM_CHNL = 4'd12,
-   parameter C_TAG_WIDTH = 5,                   // Number of outstanding requests 
+   parameter C_TAG_WIDTH = 5,                   // Number of outstanding requests
    parameter C_TAG_DW_COUNT_WIDTH = 8,            // Width of max count DWs per packet
    parameter C_DATA_ADDR_STRIDE_WIDTH = 5,         // Width of max num stored data addr positions per tag
    parameter C_DATA_ADDR_WIDTH = 10,            // Width of stored data address
@@ -48,7 +48,7 @@ module reorder_queue_output #(
    input PKT_DONE,                                       // Packet done flag
    input PKT_ERR,                                       // Packet error flag
 
-   output [C_PCI_DATA_WIDTH-1:0] ENG_DATA,                     // Engine data 
+   output [C_PCI_DATA_WIDTH-1:0] ENG_DATA,                     // Engine data
    output [(C_NUM_CHNL*C_PCI_DATA_COUNT_WIDTH)-1:0] MAIN_DATA_EN,   // Main data enable
    output [C_NUM_CHNL-1:0] MAIN_DONE,                        // Main data complete
    output [C_NUM_CHNL-1:0] MAIN_ERR,                        // Main data completed with error
@@ -122,7 +122,7 @@ always @ (posedge CLK) begin
    else begin
       rTagFinished <= #1 TAG_FINISHED[rTag];
       case (rState)
-      
+
       2'd0: begin // Request initial data and final info, output nothing
          rDone <= #1 0;
          rErr <= #1 0;

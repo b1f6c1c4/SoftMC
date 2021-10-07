@@ -1,7 +1,11 @@
 #include "softmc.h"
 #include <assert.h>
 
-
+#define BANK_OFFSET 3
+#define ROW_OFFSET 16
+#define CMD_OFFSET 4
+#define COL_OFFSET 10
+#define SIGNAL_OFFSET 6
 
 //! Generates an instruction to \b activate the row at the given address.
 /*!
@@ -17,7 +21,7 @@ Instruction genACT(uint bank, uint row){
    instr |= bank;
    instr <<= ROW_OFFSET;
    instr |= row;
-   	
+
    return instr;
 }
 
@@ -25,7 +29,7 @@ Instruction genACT(uint bank, uint row){
 /*!
   \param \e bank is the bank number.
   \param \e pc is the precharge type with default value PRE_TYPE.SINGLE.
-Can be \e PRE_TYPE.SINGLE for a single-bank precharge, or \e PRE_TYPE.ALL 
+Can be \e PRE_TYPE.SINGLE for a single-bank precharge, or \e PRE_TYPE.ALL
 for an all-banks precharge).
   \return The generated precharge instruction
 */
@@ -52,10 +56,10 @@ Instruction genPRE(uint bank, enum PRE_TYPE pc){
   \param \e col is the column number.
   \param \e bank is the bank number.
   \param \e pattern is the byte that will be written to the entire column.
-  \param \e ap is the auto-precharge option with default value AUTO_PRECHARGE.NO_AP. 
+  \param \e ap is the auto-precharge option with default value AUTO_PRECHARGE.NO_AP.
  Can be \e AUTO_PRECHARGE.AP to perform precharge right after the write,
  or \e AUTO_PRECHARGE.NO_AP for to disable auto-precharge).
-  \param \e bl is the burst length with default value BURST_LENGTH.FIXED. 
+  \param \e bl is the burst length with default value BURST_LENGTH.FIXED.
  Can be \e BURST_LENGTH.FIXED to set burst length to 8, or BURST_LENGTH.CHOP
  to set 4. Do not forget to set MR0 appropriately to enable
  setting the burst length on-the-fly
@@ -126,18 +130,18 @@ Instruction genWR_burst(uint bank, uint col, enum AUTO_PRECHARGE ap){
 /*!
   \param \e col is the column number.
   \param \e bank is the bank number.
-  \param \e ap is the auto-precharge option with default value AUTO_PRECHARGE.NO_AP. 
+  \param \e ap is the auto-precharge option with default value AUTO_PRECHARGE.NO_AP.
  Can be \e AUTO_PRECHARGE.AP to perform precharge right after the read,
  or \e AUTO_PRECHARGE.NO_AP for to disable auto-precharge).
    \param \e bl is the burst length with default value BURST_LENGTH.FIXED.
  Can be \e BURST_LENGTH.FIXED to set burst length to 8, or BURST_LENGTH.CHOP
  to set burst length to 4. Do not forget to set MR0 appropriately to enable
- setting the burst length on-the-fly. 
+ setting the burst length on-the-fly.
   \return The generated read instruction
 */
 Instruction genRD(uint bank, uint col, enum AUTO_PRECHARGE ap, enum BURST_LENGTH bl){
    Instruction instr = 0x25; //to set CKE(1) CS(0)[assumed it should be Low] RAS(1) CAS(0) WE(1)
-   
+
    instr <<= BANK_OFFSET;
    instr |= bank;
 
@@ -171,7 +175,7 @@ Instruction genRD(uint bank, uint col, enum AUTO_PRECHARGE ap, enum BURST_LENGTH
 Instruction genWAIT(uint cycles){ //min 1, max 1023
    assert(cycles >= 1);
    assert(cycles <= 1023 && "Could not wait for more than 1023 cycles since the current hardware implementation has a 10 bit counter for this purpose.");
-       
+
    Instruction instr = (uint)INSTR_TYPE_WAIT;
    instr <<= 28;
    instr |= cycles;
@@ -236,7 +240,7 @@ Instruction genREF(){
   \param \e r is the parameter to be configured. Can be \e
 MC_CMD.SET_TREFI or MC_CMD.SET_TRFC. See DDR3 datasheet for the definition
 of tREFI and tRFC. Set tREFI to 0 to disable auto-refresh (disabled
-by default).  
+by default).
   \return The generated command for auto-refresh configuration
 */
 Instruction genREF_CONFIG(uint val, enum REGISTER r){

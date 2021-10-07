@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,7 +35,7 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
@@ -78,7 +78,7 @@ module sg_list_requester #(
    input [2:0] CONFIG_MAX_READ_REQUEST_SIZE,         // Maximum read payload: 000=128B, 001=256B, 010=512B, 011=1024B, 100=2048B, 101=4096B
 
    input USER_RST,                        // User reset, should clear FIFO data too
-   
+
    output BUF_RECVD,                     // Signals when scatter gather buffer received
    input [31:0] BUF_DATA,                  // Buffer data
    input BUF_LEN_VALID,                  // Buffer length valid
@@ -190,9 +190,9 @@ always @ (*) begin
    {_rCarry[2], _rAddr[47:32]} = (rAddrHiValid ? rData[15:0] : (rAddr[47:32] + rCarry[1]));
              _rAddr[63:48] = (rAddrHiValid ? rData[31:16] : (rAddr[63:48] + rCarry[2]));
    _rBufWords = (rLenValid ? rData : rBufWords) - ({10{RX_REQ_ACK}} & rLen);
-   _rPageRem = (wAddrLoInv + 1'd1);   
-   _rPageSpill = (rBufWords > rPageRem);   
-   _rPreLen = (rPageSpill ? rPageRem : rBufWords[10:0]);         
+   _rPageRem = (wAddrLoInv + 1'd1);
+   _rPageSpill = (rBufWords > rPageRem);
+   _rPreLen = (rPageSpill ? rPageRem : rBufWords[10:0]);
    _rMaxPayloadTrain = (CONFIG_MAX_READ_REQUEST_SIZE > 3'd4 ? 3'd4 : CONFIG_MAX_READ_REQUEST_SIZE);
    _rMaxPayloadShift = (C_MAX_READ_REQ[2:0] < rMaxPayloadTrain ? C_MAX_READ_REQ[2:0] : rMaxPayloadTrain);
    _rMaxPayload = (6'd32<<rMaxPayloadShift);
@@ -226,7 +226,7 @@ always @ (*) begin
       else if (rUserRst)
          _rState = `S_SGREQ_COUNT;
    end
-   
+
    `S_SGREQ_ISSUE: begin // Wait for read request to be serviced
       if (RX_REQ_ACK)
          _rState = `S_SGREQ_UPDATE;
@@ -272,7 +272,7 @@ always @ (*) begin
    if (rState[0]) // S_SGREQ_IDLE
       _rAckCount = 0;
    else
-      _rAckCount = rAckCount + RX_REQ_ACK - RX_DONE; 
+      _rAckCount = rAckCount + RX_REQ_ACK - RX_DONE;
 end
 
 

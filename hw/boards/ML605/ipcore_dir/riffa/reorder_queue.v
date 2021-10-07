@@ -1,34 +1,34 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    19:27:32 06/14/2012 
-// Design Name: 
+// Company:
+// Engineer:
+//
+// Create Date:    19:27:32 06/14/2012
+// Design Name:
 // Module Name:    reorder_queue
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
+// Project Name:
+// Target Devices:
+// Tool versions:
 // Description:
 // Reorders downstream TLPs to output in increasing tag sequence. Input packets
 // are stored in RAM and then read out when all previous sequence numbers have
 // arrived and been read out. This module also provides the next available tag
 // for the TX engine to use when sending memory request TLPs.
 //
-// Dependencies: 
+// Dependencies:
 // reorder_queue_input.v
 // reorder_queue_output.v
 //
-// Revision: 
+// Revision:
 // Revision 0.01 - File Created
-// Additional Comments: 
+// Additional Comments:
 //
 //////////////////////////////////////////////////////////////////////////////////
 module reorder_queue #(
    parameter C_PCI_DATA_WIDTH = 9'd128,
    parameter C_NUM_CHNL = 4'd12,
    parameter C_MAX_READ_REQ_BYTES = 512,         // Max size of read requests (in bytes)
-   parameter C_TAG_WIDTH = 5,                   // Number of outstanding requests 
+   parameter C_TAG_WIDTH = 5,                   // Number of outstanding requests
    // Local parameters
    parameter C_PCI_DATA_WORD = C_PCI_DATA_WIDTH/32,
    parameter C_PCI_DATA_COUNT_WIDTH = clog2(C_PCI_DATA_WORD+1),
@@ -50,11 +50,11 @@ module reorder_queue #(
    input [C_TAG_WIDTH-1:0] TAG,                           // Input packet tag (external tag)
 
    input [5:0] INT_TAG,                                 // Internal tag to exchange with external
-   input INT_TAG_VALID,                                 // High to signal tag exchange 
+   input INT_TAG_VALID,                                 // High to signal tag exchange
    output [C_TAG_WIDTH-1:0] EXT_TAG,                        // External tag to provide in exchange for internal tag
    output EXT_TAG_VALID,                                 // High to signal external tag is valid
 
-   output [C_PCI_DATA_WIDTH-1:0] ENG_DATA,                     // Engine data 
+   output [C_PCI_DATA_WIDTH-1:0] ENG_DATA,                     // Engine data
    output [(C_NUM_CHNL*C_PCI_DATA_COUNT_WIDTH)-1:0] MAIN_DATA_EN,   // Main data enable
    output [C_NUM_CHNL-1:0] MAIN_DONE,                        // Main data complete
    output [C_NUM_CHNL-1:0] MAIN_ERR,                        // Main data completed with error

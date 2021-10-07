@@ -1,13 +1,13 @@
-# This software is Copyright © 2012 The Regents of the University of 
+# This software is Copyright © 2012 The Regents of the University of
 # California. All Rights Reserved.
-# 
-# Permission to copy, modify, and distribute this software and its 
-# documentation for educational, research and non-profit purposes, without fee, 
-# and without a written agreement is hereby granted, provided that the above 
+#
+# Permission to copy, modify, and distribute this software and its
+# documentation for educational, research and non-profit purposes, without fee,
+# and without a written agreement is hereby granted, provided that the above
 # copyright notice, this paragraph and the following three paragraphs appear in
 # all copies.
-# 
-# Permission to make commercial use of this software may be obtained by 
+#
+# Permission to make commercial use of this software may be obtained by
 # contacting:
 # Technology Transfer Office
 # 9500 Gilman Drive, Mail Code 0910
@@ -15,15 +15,15 @@
 # La Jolla, CA 92093-0910
 # (858) 534-5815
 # invent@ucsd.edu
-# 
+#
 # This software program and documentation are copyrighted by The Regents of the
 # University of California. The software program and documentation are supplied
 # "as is", without any accompanying services from The Regents. The Regents does
 # not warrant that the operation of the program will be uninterrupted or error-
-# free. The end-user understands that the program was developed for research 
-# purposes and is advised not to rely exclusively on the program for any 
+# free. The end-user understands that the program was developed for research
+# purposes and is advised not to rely exclusively on the program for any
 # reason.
-# 
+#
 # IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 # ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 # CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -33,7 +33,7 @@
 # CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 # INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 # MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-# THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+# THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 # AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 # PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 # MODIFICATIONS.
@@ -46,7 +46,7 @@
 
 # You must specify the following variables. You can leave the defaults if you
 # like, but make sure they will work in your system.
-# The VENDOR_ID _must_ match what is configured on your FPGA's PCIe endpoint 
+# The VENDOR_ID _must_ match what is configured on your FPGA's PCIe endpoint
 # header. Xilinx has a VENDOR_ID = 10EE.
 NAME := riffa
 VENDOR_ID0 := 10EE
@@ -114,7 +114,7 @@ $(LIB_OBJS): $(LIB_SRCS)
 
 load: $(NAME).ko
    insmod $(NAME).ko
-   
+
 unload:
    rmmod $(NAME)
 
@@ -125,7 +125,7 @@ setup:
    if [ -f "$(RHR)" ]; then yum install kernel-devel-`uname -r`;\
    else apt-get install linux-headers-`uname -r`; fi
 
-install: $(NAME).so.$(LIB_VER) $(NAME).ko 
+install: $(NAME).so.$(LIB_VER) $(NAME).ko
    mkdir -p /lib/modules/$(KVER)/kernel/drivers/$(NAME)
    cp $(NAME).ko /lib/modules/$(KVER)/kernel/drivers/$(NAME)/
    if [ -f "$(RHR)" ]; then\
@@ -145,7 +145,7 @@ install: $(NAME).so.$(LIB_VER) $(NAME).ko
    ldconfig
    depmod
 
-uninstall: 
+uninstall:
    rm -f /usr/local/lib/lib$(NAME).so*
    rm -f /usr/local/include/$(LIB_HDR)
    rm -f /usr/local/include/$(DRVR_HDR)

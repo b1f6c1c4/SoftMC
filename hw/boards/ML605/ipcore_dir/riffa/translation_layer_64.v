@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,32 +35,32 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
 //----------------------------------------------------------------------------
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    19:27:32 05/15/2014 
-// Design Name: 
+// Company:
+// Engineer:
+//
+// Create Date:    19:27:32 05/15/2014
+// Design Name:
 // Module Name:    translation_layer_64
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
+// Project Name:
+// Target Devices:
+// Tool versions:
 // Description:
 // Translates AXI (Xilinx) or Avalon (Altera) signals into Unified (architecture
 // independent) streaming signals for riffa. The altera RX interface has a 1 cycle
-// latency because it needs to produce several metadata signals that are not 
+// latency because it needs to produce several metadata signals that are not
 // provided by the altera PCIe Core.
 //
 // Dependencies: None
 //
-// Revision: 
+// Revision:
 // Revision 0.01 - File Created
-// Additional Comments: 
+// Additional Comments:
 //
 //////////////////////////////////////////////////////////////////////////////////
 module translation_layer_64
@@ -68,7 +68,7 @@ module translation_layer_64
     parameter C_PCI_DATA_WIDTH = 10'd64,
     parameter C_RX_READY_LATENCY = 3'd2,
     parameter C_TX_READY_LATENCY = 3'd2)
-   (   
+   (
         input                              CLK,
        input                              RST_IN,
 
@@ -81,17 +81,17 @@ module translation_layer_64
        input [(C_PCI_DATA_WIDTH/32):0]    IS_SOF,
        input [(C_PCI_DATA_WIDTH/32):0]    IS_EOF,
        input                              RERR_FWD,
-   
+
        output [C_PCI_DATA_WIDTH-1:0]      S_AXIS_TX_TDATA,
        output [(C_PCI_DATA_WIDTH/8)-1:0]  S_AXIS_TX_TKEEP,
        output                             S_AXIS_TX_TLAST,
        output                             S_AXIS_TX_TVALID,
        output                             S_AXIS_SRC_DSC,
        input                              S_AXIS_TX_TREADY,
-   
+
        input [15:0]                       COMPLETER_ID,
-       input                              CFG_BUS_MSTR_ENABLE, 
-       input [5:0]                        CFG_LINK_WIDTH, // cfg_lstatus[9:4] (from Link Status Register): 000001=x1, 000010=x2, 000100=x4, 001000=x8, 001100=x12, 010000=x16, 100000=x32, others=? 
+       input                              CFG_BUS_MSTR_ENABLE,
+       input [5:0]                        CFG_LINK_WIDTH, // cfg_lstatus[9:4] (from Link Status Register): 000001=x1, 000010=x2, 000100=x4, 001000=x8, 001100=x12, 010000=x16, 100000=x32, others=?
        input [1:0]                        CFG_LINK_RATE, // cfg_lstatus[1:0] (from Link Status Register): 01=2.5GT/s, 10=5.0GT/s, others=?
        input [2:0]                        CFG_MAX_READ_REQUEST_SIZE, // cfg_dcommand[14:12] (from Device Control Register): 000=128B, 001=256B, 010=512B, 011=1024B, 100=2048B, 101=4096B
        input [2:0]                        CFG_MAX_PAYLOAD_SIZE, // cfg_dcommand[7:5] (from Device Control Register): 000=128B, 001=256B, 010=512B, 011=1024B
@@ -117,7 +117,7 @@ module translation_layer_64
         output [0:0]                       TX_ST_EOP,
         output [0:0]                       TX_ST_SOP,
       output [0:0]                       TX_ST_EMPTY, // NC
-        
+
         input [31:0]                       TL_CFG_CTL,
         input [3:0]                        TL_CFG_ADD,
         input [52:0]                       TL_CFG_STS,
@@ -138,18 +138,18 @@ module translation_layer_64
         output                             RX_TLP_START_FLAG,
        output [3:0]                       RX_TLP_START_OFFSET,
        output                             RX_TLP_ERROR_POISON,
-   
+
        input [C_PCI_DATA_WIDTH-1:0]       TX_DATA,
        input [(C_PCI_DATA_WIDTH/8)-1:0]   TX_DATA_BYTE_ENABLE,
        input                              TX_TLP_END_FLAG,
         input                              TX_TLP_START_FLAG,
        input                              TX_DATA_VALID,
-       input                              TX_TLP_ERROR_POISON, 
+       input                              TX_TLP_ERROR_POISON,
        output                             TX_DATA_READY,
 
        output [15:0]                      CONFIG_COMPLETER_ID,
-       output                             CONFIG_BUS_MASTER_ENABLE, 
-       output [5:0]                       CONFIG_LINK_WIDTH, // cfg_lstatus[9:4] (from Link Status Register): 000001=x1, 000010=x2, 000100=x4, 001000=x8, 001100=x12, 010000=x16, 100000=x32, others=? 
+       output                             CONFIG_BUS_MASTER_ENABLE,
+       output [5:0]                       CONFIG_LINK_WIDTH, // cfg_lstatus[9:4] (from Link Status Register): 000001=x1, 000010=x2, 000100=x4, 001000=x8, 001100=x12, 010000=x16, 100000=x32, others=?
        output [1:0]                       CONFIG_LINK_RATE, // cfg_lstatus[1:0] (from Link Status Register): 01=2.5GT/s, 10=5.0GT/s, others=?
        output [2:0]                       CONFIG_MAX_READ_REQUEST_SIZE, // cfg_dcommand[14:12] (from Device Control Register): 000=128B, 001=256B, 010=512B, 011=1024B, 100=2048B, 101=4096B
        output [2:0]                       CONFIG_MAX_PAYLOAD_SIZE, // cfg_dcommand[7:5] (from Device Control Register): 000=128B, 001=256B, 010=512B, 011=1024B
@@ -157,7 +157,7 @@ module translation_layer_64
       output [11:0]            CONFIG_MAX_CPL_DATA, // Receive credit limit for data
       output [7:0]            CONFIG_MAX_CPL_HDR, // Receive credit limit for headers
       output               CONFIG_CPL_BOUNDARY_SEL, // Read completion boundary (0=64 bytes, 1=128 byt
-   
+
        output                             INTR_MSI_RDY, // High when interrupt is able to be sent
        input                              INTR_MSI_REQUEST // High to request interrupt, when both CFG_INTERRUPT_RDY and CFG_INTERRUPT are high
         );
@@ -165,7 +165,7 @@ module translation_layer_64
       if(C_ALTERA == 1'b1) begin : altera_translator_64
          wire       wEP;
          wire [9:0] wLength; // Length field of the TLP Header
-         wire [4:0] wType; // Type field of the TLP header 
+         wire [4:0] wType; // Type field of the TLP header
          wire [3:0] wFMT;  // Format field of the TLP Header
          wire       w4DWH;
          wire       w3DWH;
@@ -190,7 +190,7 @@ module translation_layer_64
          reg [3:0]  rTlCfgAdd,_rTlCfgAdd;
          reg [31:0] rTlCfgCtl,_rTlCfgCtl;
          reg [52:0] rTlCfgSts,_rTlCfgSts;
-         
+
          reg [63:0] rRxStData;
          reg        rRxStValid;
          reg        rRxStEop;
@@ -203,7 +203,7 @@ module translation_layer_64
          reg        r4DWH,_r4DWH;
 
          reg        rTlpEndOffset, _rTlpEndOffset;
-         
+
          // Valid when RX_ST_SOP & RX_ST_VALID
          assign wEP = RX_ST_DATA[14];
          assign wLength = RX_ST_DATA[9:0];
@@ -211,7 +211,7 @@ module translation_layer_64
          assign wFMT = RX_ST_DATA[31:29];
          assign w4DWH = wFMT[0];
          assign w3DWH = ~wFMT[0];
-         
+
          assign wLenEven = ~wLength[0];
          assign wMsg = wType[4];
 
@@ -221,7 +221,7 @@ module translation_layer_64
 
          assign wQWA3DWH = ~wAddr3DWH[2];
          assign wQWA4DWH = ~wAddr4DWH[2];
-         
+
          always @(*) begin
             // We expect to recieve three different types of packets
             // 3 DWH Packets, 4 DWH Packets, and Messages (No address)
@@ -230,13 +230,13 @@ module translation_layer_64
             _rMsg = wMsg;
             _r3DWH = w3DWH;
             _r4DWH = w4DWH;
-            
+
             // If the whole TLP is of even length, then the end will be at
             // offset byte 7, otherwise the end will be at byte offset 3
-            _rTlpEndOffset = ( rMsg & rLenEven) | 
+            _rTlpEndOffset = ( rMsg & rLenEven) |
                              (~rMsg & (( rLenEven & r3DWH &  wQWA3DWH)|
                                        (~rLenEven & r3DWH & ~wQWA3DWH)|
-                                       ( rLenEven & r4DWH &  wQWA4DWH)| 
+                                       ( rLenEven & r4DWH &  wQWA4DWH)|
                                        (~rLenEven & r4DWH & ~wQWA4DWH)));
 
             _rTlCfgCtl = TL_CFG_CTL;
@@ -248,7 +248,7 @@ module translation_layer_64
             rTlCfgAdd <= _rTlCfgAdd;
             rTlCfgCtl <= _rTlCfgCtl;
             rTlCfgSts <= _rTlCfgSts;
-            
+
             rRxStData <= RX_ST_DATA;
             rRxStValid <= RX_ST_VALID;
 
@@ -268,7 +268,7 @@ module translation_layer_64
                r3DWH <= _r3DWH;
                r4DWH <= _r4DWH;
             end
-            
+
             if(rTlCfgAdd == 4'h0) begin
                rCfgMaxReadRequestSize <= rTlCfgCtl[30:28];
                rCfgMaxPayloadSize <= rTlCfgCtl[23:21];
@@ -288,7 +288,7 @@ module translation_layer_64
                rCfgCompleterId <= {rTlCfgCtl[12:0],3'b0};
             end
          end // always @ (posedge CLK)
-         
+
          // Rx Interface (To PCIe Core)
          assign RX_ST_READY = RX_DATA_READY;
 
@@ -304,9 +304,9 @@ module translation_layer_64
          assign RX_TLP_ERROR_POISON = rEP;
 
          // Configuration Interface
-         assign CONFIG_COMPLETER_ID = rCfgCompleterId; 
+         assign CONFIG_COMPLETER_ID = rCfgCompleterId;
          assign CONFIG_BUS_MASTER_ENABLE = rCfgBusMstrEnable;
-         assign CONFIG_LINK_WIDTH = rTlCfgSts[40:35]; 
+         assign CONFIG_LINK_WIDTH = rTlCfgSts[40:35];
          assign CONFIG_LINK_RATE = rTlCfgSts[32:31];
          assign CONFIG_MAX_READ_REQUEST_SIZE = rCfgMaxReadRequestSize;
          assign CONFIG_MAX_PAYLOAD_SIZE = rCfgMaxPayloadSize;
@@ -315,9 +315,9 @@ module translation_layer_64
         assign CONFIG_MAX_CPL_HDR = KO_CPL_SPC_HEADER;
         assign CONFIG_MAX_CPL_DATA = KO_CPL_SPC_DATA;
 
-         // Interrupt interface 
+         // Interrupt interface
          assign APP_MSI_REQ = INTR_MSI_REQUEST;
-         assign INTR_MSI_RDY = APP_MSI_ACK; 
+         assign INTR_MSI_RDY = APP_MSI_ACK;
 
          tx_qword_aligner_64
            #(
@@ -333,7 +333,7 @@ module translation_layer_64
             .TX_ST_VALID                (TX_ST_VALID[0:0]),
             .TX_ST_EOP                  (TX_ST_EOP[0:0]),
             .TX_ST_SOP                  (TX_ST_SOP[0:0]),
-            .TX_ST_EMPTY                (TX_ST_EMPTY), 
+            .TX_ST_EMPTY                (TX_ST_EMPTY),
             // Inputs
             .CLK                        (CLK),
             .RST_IN                     (RST_IN),
@@ -353,7 +353,7 @@ module translation_layer_64
          assign RX_TLP_START_FLAG = 1'd0;
          assign RX_TLP_START_OFFSET = 4'h0;
          assign RX_TLP_ERROR_POISON = RERR_FWD;
-         
+
          // Rx Interface (To PCIe Core)
          assign M_AXIS_RX_TREADY = RX_DATA_READY;
 

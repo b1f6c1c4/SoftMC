@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,7 +35,7 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
@@ -45,14 +45,14 @@
 // Version:            1.00.a
 // Verilog Standard:   Verilog-2001
 // Description:         Asynchronous capable parameterized FIFO. As with all
-// traditional FIFOs, the RD_DATA will be valid one cycle following a RD_EN 
-// assertion. RD_EMPTY will remain low until the cycle following the last RD_EN 
-// assertion. Note, that RD_EMPTY may actually be high on the same cycle that 
+// traditional FIFOs, the RD_DATA will be valid one cycle following a RD_EN
+// assertion. RD_EMPTY will remain low until the cycle following the last RD_EN
+// assertion. Note, that RD_EMPTY may actually be high on the same cycle that
 // RD_DATA contains valid data.
 // Author:            Matt Jacobsen
 // History:            @mattj: Version 2.0
-// Additional Comments: Based on design by CE Cummings in Simulation and 
-// Synthesis Techniques for Asynchronous FIFO Design with Asynchronous Pointer 
+// Additional Comments: Based on design by CE Cummings in Simulation and
+// Synthesis Techniques for Asynchronous FIFO Design with Asynchronous Pointer
 // Comparisons
 //-----------------------------------------------------------------------------
 
@@ -108,38 +108,38 @@ async_cmp #(.C_DEPTH_BITS(C_DEPTH_BITS)) asyncCompare (
    .RD_CLK(RD_CLK),
    .RD_VALID(RD_EN & !RD_EMPTY),
    .WR_VALID(WR_EN & !WR_FULL),
-   .EMPTY(wCmpEmpty), 
+   .EMPTY(wCmpEmpty),
    .FULL(wCmpFull),
-   .WR_PTR(wWrPtr), 
-   .WR_PTR_P1(wWrPtrP1), 
-   .RD_PTR(wRdPtr), 
+   .WR_PTR(wWrPtr),
+   .WR_PTR_P1(wWrPtrP1),
+   .RD_PTR(wRdPtr),
    .RD_PTR_P1(wRdPtrP1)
 );
 
 
 // Calculate empty
 rd_ptr_empty #(.C_DEPTH_BITS(C_DEPTH_BITS)) rdPtrEmpty (
-   .RD_EMPTY(RD_EMPTY), 
+   .RD_EMPTY(RD_EMPTY),
    .RD_PTR(wRdPtr),
    .RD_PTR_P1(wRdPtrP1),
-   .CMP_EMPTY(wCmpEmpty), 
+   .CMP_EMPTY(wCmpEmpty),
    .RD_EN(RD_EN),
-   .RD_CLK(RD_CLK), 
+   .RD_CLK(RD_CLK),
    .RD_RST(RD_RST)
 );
 
 
 // Calculate full
 wr_ptr_full #(.C_DEPTH_BITS(C_DEPTH_BITS)) wrPtrFull (
-   .WR_CLK(WR_CLK), 
+   .WR_CLK(WR_CLK),
    .WR_RST(WR_RST),
    .WR_EN(WR_EN),
-   .WR_FULL(WR_FULL), 
+   .WR_FULL(WR_FULL),
    .WR_PTR(wWrPtr),
    .WR_PTR_P1(wWrPtrP1),
    .CMP_FULL(wCmpFull)
 );
- 
+
 endmodule
 
 
@@ -155,14 +155,14 @@ module async_cmp #(
    input RD_CLK,
    input RD_VALID,
    input WR_VALID,
-   output EMPTY, 
-   output FULL, 
-   input [C_DEPTH_BITS-1:0] WR_PTR, 
-   input [C_DEPTH_BITS-1:0] RD_PTR, 
-   input [C_DEPTH_BITS-1:0] WR_PTR_P1, 
+   output EMPTY,
+   output FULL,
+   input [C_DEPTH_BITS-1:0] WR_PTR,
+   input [C_DEPTH_BITS-1:0] RD_PTR,
+   input [C_DEPTH_BITS-1:0] WR_PTR_P1,
    input [C_DEPTH_BITS-1:0] RD_PTR_P1
 );
-  
+
 reg            rDir=0;
 wire         wDirSet = (  (WR_PTR[N]^RD_PTR[N-1]) & ~(WR_PTR[N-1]^RD_PTR[N]));
 wire         wDirClr = ((~(WR_PTR[N]^RD_PTR[N-1]) &  (WR_PTR[N-1]^RD_PTR[N])) | WR_RST);
@@ -179,7 +179,7 @@ assign EMPTY = wATBEmpty || rEmpty;
 assign FULL  = wATBFull || rFull;
 
 always @(posedge wDirSet or posedge wDirClr)
-if (wDirClr) 
+if (wDirClr)
    rDir <= 1'b0;
 else
    rDir <= 1'b1;
@@ -193,20 +193,20 @@ always @(posedge WR_CLK) begin
    rFull <= (WR_RST ? 1'd0 : wFull);
 end
 
-endmodule 
- 
- 
+endmodule
+
+
 module rd_ptr_empty #(
    parameter C_DEPTH_BITS = 4
 )
 (
-   input RD_CLK, 
+   input RD_CLK,
    input RD_RST,
-   input RD_EN, 
+   input RD_EN,
    output RD_EMPTY,
    output [C_DEPTH_BITS-1:0] RD_PTR,
    output [C_DEPTH_BITS-1:0] RD_PTR_P1,
-   input CMP_EMPTY 
+   input CMP_EMPTY
 );
 
 reg                     rEmpty=1;
@@ -254,18 +254,18 @@ always @(posedge RD_CLK) begin
 end
 
 endmodule
- 
- 
+
+
 module wr_ptr_full #(
    parameter C_DEPTH_BITS = 4
 )
 (
-   input WR_CLK, 
+   input WR_CLK,
    input WR_RST,
    input WR_EN,
-   output WR_FULL, 
-   output [C_DEPTH_BITS-1:0] WR_PTR, 
-   output [C_DEPTH_BITS-1:0] WR_PTR_P1, 
+   output WR_FULL,
+   output [C_DEPTH_BITS-1:0] WR_PTR,
+   output [C_DEPTH_BITS-1:0] WR_PTR_P1,
    input CMP_FULL
 );
 
@@ -307,9 +307,9 @@ assign wGrayNext = ((wBinNext>>1) ^ wBinNext); // binary-to-gray conversion
 assign wGrayNextP1 = ((wBinNextP1>>1) ^ wBinNextP1); // binary-to-gray conversion
 
 always @(posedge WR_CLK) begin
-   if (WR_RST) 
+   if (WR_RST)
       {rFull, rFull2} <= #1 2'b00;
-   else if (CMP_FULL) 
+   else if (CMP_FULL)
       {rFull, rFull2} <= #1 2'b11;
    else
       {rFull, rFull2} <= #1 {rFull2, CMP_FULL};

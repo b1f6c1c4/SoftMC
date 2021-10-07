@@ -1,14 +1,14 @@
 /*******************************************************************************
- * This software is Copyright © 2012 The Regents of the University of 
+ * This software is Copyright © 2012 The Regents of the University of
  * California. All Rights Reserved.
- * 
- * Permission to copy, modify, and distribute this software and its 
- * documentation for educational, research and non-profit purposes, without fee, 
- * and without a written agreement is hereby granted, provided that the above 
+ *
+ * Permission to copy, modify, and distribute this software and its
+ * documentation for educational, research and non-profit purposes, without fee,
+ * and without a written agreement is hereby granted, provided that the above
  * copyright notice, this paragraph and the following three paragraphs appear in
  * all copies.
- * 
- * Permission to make commercial use of this software may be obtained by 
+ *
+ * Permission to make commercial use of this software may be obtained by
  * contacting:
  * Technology Transfer Office
  * 9500 Gilman Drive, Mail Code 0910
@@ -16,15 +16,15 @@
  * La Jolla, CA 92093-0910
  * (858) 534-5815
  * invent@ucsd.edu
- * 
+ *
  * This software program and documentation are copyrighted by The Regents of the
  * University of California. The software program and documentation are supplied
  * "as is", without any accompanying services from The Regents. The Regents does
  * not warrant that the operation of the program will be uninterrupted or error-
- * free. The end-user understands that the program was developed for research 
- * purposes and is advised not to rely exclusively on the program for any 
+ * free. The end-user understands that the program was developed for research
+ * purposes and is advised not to rely exclusively on the program for any
  * reason.
- * 
+ *
  * IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
  * ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
  * CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -34,7 +34,7 @@
  * CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
- * THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+ * THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
  * AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
  * MODIFICATIONS.
@@ -43,7 +43,7 @@
 /*
  * Filename: circ_queue.c
  * Version: 1.0
- * Description: A lock-free single-producer circular queue implementation 
+ * Description: A lock-free single-producer circular queue implementation
  *   modeled after the more elaborate C++ version from Faustino Frechilla at:
  *   http://www.codeproject.com/Articles/153898/Yet-another-implementation-of-a-lock-free-circular
  * Author: Matthew Jacobsen
@@ -68,7 +68,7 @@ circ_queue * init_circ_queue(int len)
    atomic_set(&q->readIndex, 0);
    q->len = len;
 
-   q->vals = (unsigned int**) kzalloc(len*sizeof(unsigned int*), GFP_KERNEL);  
+   q->vals = (unsigned int**) kzalloc(len*sizeof(unsigned int*), GFP_KERNEL);
    if (q->vals == NULL) {
       printk(KERN_ERR "Not enough memory to allocate circ_queue array");
       return NULL;
@@ -134,7 +134,7 @@ int pop_circ_queue(circ_queue * q, unsigned int * val1, unsigned int * val2)
       *val2 = q->vals[queue_count_to_index(currReadIndex, q->len)][1];
 
       // Try to perfrom now the CAS operation on the read index. If we succeed
-      // label & val already contain what q->readIndex pointed to before we 
+      // label & val already contain what q->readIndex pointed to before we
       // increased it.
       if (atomic_cmpxchg(&q->readIndex, currReadIndex, currReadIndex+1) == currReadIndex) {
          // The lable & val were retrieved from the queue. Note that the
@@ -144,7 +144,7 @@ int pop_circ_queue(circ_queue * q, unsigned int * val1, unsigned int * val2)
 
       // Failed to retrieve the elements off the queue. Someone else must
       // have read the element stored at countToIndex(currReadIndex)
-      // before we could perform the CAS operation.       
+      // before we could perform the CAS operation.
    } while(1); // keep looping to try again!
 
    return 1;
@@ -186,8 +186,8 @@ void free_circ_queue(circ_queue * q)
    if (q == NULL)
       return;
 
-   for (i = 0; i < q->len; i++) {  
-      kfree(q->vals[i]);  
+   for (i = 0; i < q->len; i++) {
+      kfree(q->vals[i]);
    }
    kfree(q->vals);
    kfree(q);

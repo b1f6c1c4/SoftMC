@@ -5,7 +5,7 @@
 module instr_decoder #(parameter ROW_WIDTH = 15, BANK_WIDTH = 3, CS_WIDTH = 1)(
    input en,
    input[31:0] instr,
-   
+
    output reg[ROW_WIDTH - 1:0] dfi_address,
    output reg[BANK_WIDTH - 1:0] dfi_bank,
    output reg dfi_cas_n,
@@ -13,19 +13,19 @@ module instr_decoder #(parameter ROW_WIDTH = 15, BANK_WIDTH = 3, CS_WIDTH = 1)(
    output reg dfi_ras_n,
    output reg dfi_we_n
 );
-   
+
    localparam LOW = 1'b0;
    localparam HIGH = 1'b1;
 
    always@* begin
       dfi_address = {ROW_WIDTH{1'bx}};
       dfi_bank = {BANK_WIDTH{1'bx}};
-      
+
       dfi_cas_n = HIGH;
       dfi_cs_n = {CS_WIDTH{HIGH}};
       dfi_ras_n = HIGH;
       dfi_we_n = HIGH;
-      
+
       if(en) begin
          dfi_address = instr[ROW_WIDTH - 1:0];
          dfi_bank = instr[`ROW_OFFSET +: BANK_WIDTH];

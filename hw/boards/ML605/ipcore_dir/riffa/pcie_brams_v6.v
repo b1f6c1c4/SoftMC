@@ -66,7 +66,7 @@ module pcie_brams_v6
    // supported values are:
    // 1,2,4,8,18
    parameter NUM_BRAMS               = 0,
-  
+
    // BRAM read address latency
    //
    // value     meaning
@@ -98,7 +98,7 @@ module pcie_brams_v6
   (
    input          user_clk_i,
    input          reset_i,
-  
+
    input          wen,
    input  [12:0]  waddr,
    input  [71:0]  wdata,
@@ -118,8 +118,8 @@ module pcie_brams_v6
                              (NUM_BRAMS == 8) ?  9 :
                                                  4
                             );
-   
-  
+
+
    //synthesis translate_off
    initial begin
       $display("[%t] %m NUM_BRAMS %0d  DOB_REG %0d WIDTH %0d RAM_WRITE_LATENCY %0d RAM_RADDR_LATENCY %0d RAM_RDATA_LATENCY %0d",
@@ -127,7 +127,7 @@ module pcie_brams_v6
 
       case (NUM_BRAMS)
         1,2,4,8,18:;
-        default: 
+        default:
           begin
              $display("[%t] %m Error NUM_BRAMS %0d not supported", $time, NUM_BRAMS);
              $finish;
@@ -136,8 +136,8 @@ module pcie_brams_v6
 
       case (RAM_RADDR_LATENCY)
         0,1:;
-        default: 
-          begin 
+        default:
+          begin
              $display("[%t] %m Error RAM_READ_LATENCY %0d not supported", $time, RAM_RADDR_LATENCY);
              $finish;
           end
@@ -145,8 +145,8 @@ module pcie_brams_v6
 
       case (RAM_RDATA_LATENCY)
         1,2,3:;
-        default: 
-          begin 
+        default:
+          begin
              $display("[%t] %m Error RAM_READ_LATENCY %0d not supported", $time, RAM_RDATA_LATENCY);
              $finish;
           end
@@ -169,7 +169,7 @@ module pcie_brams_v6
    wire        wen_int;
    wire [12:0] waddr_int;
    wire [71:0] wdata_int;
-         
+
    generate if (RAM_WRITE_LATENCY == 1) begin : wr_lat_2
       reg        wen_dly;
       reg [12:0] waddr_dly;
@@ -191,7 +191,7 @@ module pcie_brams_v6
       assign waddr_int = waddr_dly;
       assign wdata_int = wdata_dly;
    end // if (RAM_WRITE_LATENCY == 1)
-      
+
    else if (RAM_WRITE_LATENCY == 0) begin : wr_lat_1
       assign wen_int   = wen;
       assign waddr_int = waddr;
@@ -200,7 +200,7 @@ module pcie_brams_v6
    endgenerate
 
    // model the delays for ram read latency
-              
+
    wire        ren_int;
    wire [12:0] raddr_int;
    wire [71:0] rdata_int;
@@ -255,8 +255,8 @@ module pcie_brams_v6
       genvar i;
       for (i = 0; i < NUM_BRAMS; i = i + 1) begin : brams
          pcie_bram_v6 #(.DOB_REG(DOB_REG), .WIDTH(WIDTH))
-           ram (.user_clk_i(user_clk_i), .reset_i(reset_i), 
-                .wen_i(wen_int), .waddr_i(waddr_int), .wdata_i(wdata_int[(((i + 1) * WIDTH) - 1): (i * WIDTH)]), 
+           ram (.user_clk_i(user_clk_i), .reset_i(reset_i),
+                .wen_i(wen_int), .waddr_i(waddr_int), .wdata_i(wdata_int[(((i + 1) * WIDTH) - 1): (i * WIDTH)]),
                 .ren_i(ren_int), .raddr_i(raddr_int), .rdata_o(rdata_int[(((i + 1) * WIDTH) - 1): (i * WIDTH)]), .rce_i(rce));
       end
    end

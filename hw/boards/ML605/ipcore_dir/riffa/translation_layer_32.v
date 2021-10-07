@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,36 +35,36 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
 //----------------------------------------------------------------------------
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    19:27:32 05/15/2014 
-// Design Name: 
+// Company:
+// Engineer:
+//
+// Create Date:    19:27:32 05/15/2014
+// Design Name:
 // Module Name:    translation_layer_32
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
+// Project Name:
+// Target Devices:
+// Tool versions:
 // Description:
 // Translates AXI (Xilinx) signals into Unified (architecture
-// independent) streaming signals for riffa. 
+// independent) streaming signals for riffa.
 //
 // Dependencies: None
 //
-// Revision: 
+// Revision:
 // Revision 0.01 - File Created
-// Additional Comments: 
+// Additional Comments:
 //
 //////////////////////////////////////////////////////////////////////////////////
 module translation_layer_32
   #(parameter C_ALTERA = 1'b1,
     parameter C_PCI_DATA_WIDTH = 10'd32)
-   (   
+   (
         input                              CLK,
        input                              RST_IN,
 
@@ -77,17 +77,17 @@ module translation_layer_32
        input [(C_PCI_DATA_WIDTH/32):0]    IS_SOF,
        input [(C_PCI_DATA_WIDTH/32):0]    IS_EOF,
        input                              RERR_FWD,
-   
+
        output [C_PCI_DATA_WIDTH-1:0]      S_AXIS_TX_TDATA,
        output [(C_PCI_DATA_WIDTH/8)-1:0]  S_AXIS_TX_TKEEP,
        output                             S_AXIS_TX_TLAST,
        output                             S_AXIS_TX_TVALID,
        output                             S_AXIS_SRC_DSC,
        input                              S_AXIS_TX_TREADY,
-   
+
        input [15:0]                       COMPLETER_ID,
-       input                              CFG_BUS_MSTR_ENABLE, 
-       input [5:0]                        CFG_LINK_WIDTH, // cfg_lstatus[9:4] (from Link Status Register): 000001=x1, 000010=x2, 000100=x4, 001000=x8, 001100=x12, 010000=x16, 100000=x32, others=? 
+       input                              CFG_BUS_MSTR_ENABLE,
+       input [5:0]                        CFG_LINK_WIDTH, // cfg_lstatus[9:4] (from Link Status Register): 000001=x1, 000010=x2, 000100=x4, 001000=x8, 001100=x12, 010000=x16, 100000=x32, others=?
        input [1:0]                        CFG_LINK_RATE, // cfg_lstatus[1:0] (from Link Status Register): 01=2.5GT/s, 10=5.0GT/s, others=?
        input [2:0]                        CFG_MAX_READ_REQUEST_SIZE, // cfg_dcommand[14:12] (from Device Control Register): 000=128B, 001=256B, 010=512B, 011=1024B, 100=2048B, 101=4096B
        input [2:0]                        CFG_MAX_PAYLOAD_SIZE, // cfg_dcommand[7:5] (from Device Control Register): 000=128B, 001=256B, 010=512B, 011=1024B
@@ -134,17 +134,17 @@ module translation_layer_32
         output                             RX_TLP_START_FLAG,
        output [3:0]                       RX_TLP_START_OFFSET,
        output                             RX_TLP_ERROR_POISON,
-   
+
        input [C_PCI_DATA_WIDTH-1:0]       TX_DATA,
        input [(C_PCI_DATA_WIDTH/8)-1:0]   TX_DATA_BYTE_ENABLE,
        input                              TX_TLP_END_FLAG,
        input                              TX_DATA_VALID,
-       input                              TX_TLP_ERROR_POISON, 
+       input                              TX_TLP_ERROR_POISON,
        output                             TX_DATA_READY,
 
        output [15:0]                      CONFIG_COMPLETER_ID,
-       output                             CONFIG_BUS_MASTER_ENABLE, 
-       output [5:0]                       CONFIG_LINK_WIDTH, // cfg_lstatus[9:4] (from Link Status Register): 000001=x1, 000010=x2, 000100=x4, 001000=x8, 001100=x12, 010000=x16, 100000=x32, others=? 
+       output                             CONFIG_BUS_MASTER_ENABLE,
+       output [5:0]                       CONFIG_LINK_WIDTH, // cfg_lstatus[9:4] (from Link Status Register): 000001=x1, 000010=x2, 000100=x4, 001000=x8, 001100=x12, 010000=x16, 100000=x32, others=?
        output [1:0]                       CONFIG_LINK_RATE, // cfg_lstatus[1:0] (from Link Status Register): 01=2.5GT/s, 10=5.0GT/s, others=?
        output [2:0]                       CONFIG_MAX_READ_REQUEST_SIZE, // cfg_dcommand[14:12] (from Device Control Register): 000=128B, 001=256B, 010=512B, 011=1024B, 100=2048B, 101=4096B
        output [2:0]                       CONFIG_MAX_PAYLOAD_SIZE, // cfg_dcommand[7:5] (from Device Control Register): 000=128B, 001=256B, 010=512B, 011=1024B

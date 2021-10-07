@@ -71,7 +71,7 @@ module pcie_reset_delay_v6 # (
   input  wire        ref_clk,
   input  wire        sys_reset_n,
   output             delayed_sys_reset_n
-   
+
 );
 
 
@@ -100,13 +100,13 @@ module pcie_reset_delay_v6 # (
         reg_count_15_8  <= #TCQ (reg_count_7_0 == 8'hff)? reg_count_15_8  + 1'b1 : reg_count_15_8 ;
         reg_count_23_16 <= #TCQ ((reg_count_15_8 == 8'hff) & (reg_count_7_0 == 8'hff)) ? reg_count_23_16 + 1'b1 : reg_count_23_16;
 
-      end 
+      end
 
     end
 
   end
 
-  assign delayed_sys_reset_n = concat_count[TBIT]; 
+  assign delayed_sys_reset_n = concat_count[TBIT];
 
 endmodule
 

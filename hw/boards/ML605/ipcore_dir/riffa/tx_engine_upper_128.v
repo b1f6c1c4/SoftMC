@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,7 +35,7 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
@@ -44,7 +44,7 @@
 // Filename:         tx_engine_upper_128.v
 // Version:            1.00.a
 // Verilog Standard:   Verilog-2001
-// Description:         Formats read/write requests into PCI packets and adds 
+// Description:         Formats read/write requests into PCI packets and adds
 // them to a FIFO. The FIFO will be read by the tx_engine_lower core and transmitted
 // to the attached PCIe Endpoint.
 // Author:            Matt Jacobsen
@@ -71,10 +71,10 @@ module tx_engine_upper_128 #(
    parameter C_PCI_DATA_WIDTH = 9'd128,
    parameter C_NUM_CHNL = 4'd12,
    parameter C_FIFO_DEPTH = 512,
-   parameter C_TAG_WIDTH = 5,                      // Number of outstanding requests 
+   parameter C_TAG_WIDTH = 5,                      // Number of outstanding requests
     parameter C_ALTERA = 1'b1,
    // Local parameters
-   parameter C_FIFO_DEPTH_WIDTH = clog2((2**clog2(C_FIFO_DEPTH))+1),   
+   parameter C_FIFO_DEPTH_WIDTH = clog2((2**clog2(C_FIFO_DEPTH))+1),
    parameter C_MAX_ENTRIES = (11'd128*11'd8/C_PCI_DATA_WIDTH),
    parameter C_DATA_DELAY = 3'd6 // Delays read/write params to accommodate tx_port_buffer delay and tx_engine_formatter delay.
 )
@@ -99,7 +99,7 @@ module tx_engine_upper_128 #(
    output [C_NUM_CHNL-1:0] RD_ACK,                  // Read request has been accepted
 
    output [5:0] INT_TAG,                        // Internal tag to exchange with external
-   output INT_TAG_VALID,                        // High to signal tag exchange 
+   output INT_TAG_VALID,                        // High to signal tag exchange
    input [C_TAG_WIDTH-1:0] EXT_TAG,               // External tag to provide in exchange for internal tag
    input EXT_TAG_VALID,                        // High to signal external tag is valid
 
@@ -108,7 +108,7 @@ module tx_engine_upper_128 #(
 
    output [C_PCI_DATA_WIDTH-1:0] FIFO_DATA,          // Formatted read/write request data
    input [C_FIFO_DEPTH_WIDTH-1:0] FIFO_COUNT,          // Formatted read/write FIFO count
-   output FIFO_WEN                            // Formatted read/write FIFO read enable   
+   output FIFO_WEN                            // Formatted read/write FIFO read enable
 );
 
 `include "common_functions.v"
@@ -126,7 +126,7 @@ reg                           rCountValid=0, _rCountValid=0;
 reg      [C_NUM_CHNL-1:0]         rWrDataRen=0, _rWrDataRen=0;
 
 reg                         rTxEngRdReqAck, _rTxEngRdReqAck;
-   
+
 wire                        wRdReq;
 wire   [3:0]                  wRdReqChnl;
 wire                        wWrReq;
@@ -231,9 +231,9 @@ always @ (*) begin
    _rWrData = wWrData;
 end
 
-// Accept requests when the selector indicates. Capture the buffered 
+// Accept requests when the selector indicates. Capture the buffered
 // request parameters for hand-off to the formatting pipeline. Then
-// acknowledge the receipt to the channel so it can deassert the 
+// acknowledge the receipt to the channel so it can deassert the
 // request, and let the selector choose another channel.
 always @ (posedge CLK) begin
    rCapState <= #1 (RST ? `S_TXENGUPR128_CAP_RD_WR : _rCapState);
@@ -264,7 +264,7 @@ always @ (*) begin
    _rExtTag = rExtTag;
     _rTxEngRdReqAck = rTxEngRdReqAck;
 
-   case (rCapState) 
+   case (rCapState)
 
    `S_TXENGUPR128_CAP_RD_WR : begin
       _rIsWr = !wRdReq;
@@ -301,22 +301,22 @@ always @ (*) begin
       end
       _rCapState = `S_TXENGUPR128_CAP_REL;
    end
-   
+
    `S_TXENGUPR128_CAP_REL : begin
       // Push into the formatting pipeline when ready
       if (rSpaceAvail & !rMainState) // S_TXENGUPR128_MAIN_IDLE
          _rCapState = (`S_TXENGUPR128_CAP_WR_RD>>(rCapIsWr)); // Changes to S_TXENGUPR128_CAP_RD_WR
    end
-   
+
    default : begin
       _rCapState = `S_TXENGUPR128_CAP_RD_WR;
    end
-   
+
    endcase
 end
 
 
-// Calculate the available space in the FIFO, accounting for the 
+// Calculate the available space in the FIFO, accounting for the
 // formatting pipeline depth. This will be conservative.
 wire [9:0] wMaxEntries = (C_MAX_ENTRIES<<CONFIG_MAX_PAYLOAD_SIZE) + 3'd5 + C_DATA_DELAY;
 always @ (posedge CLK) begin
@@ -360,7 +360,7 @@ always @ (*) begin
    _rCountDone = rCountDone;
    _rCountValid = rCountValid;
    _rWrDataRen = rWrDataRen;
-   case (rMainState) 
+   case (rMainState)
 
    `S_TXENGUPR128_MAIN_IDLE : begin
       _rCountIsWr = rCapIsWr;
@@ -386,7 +386,7 @@ always @ (*) begin
          _rMainState = `S_TXENGUPR128_MAIN_IDLE;
       end
    end
-   
+
    endcase
 end
 

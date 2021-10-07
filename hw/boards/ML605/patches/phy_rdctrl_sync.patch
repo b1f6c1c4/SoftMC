@@ -21,7 +21,7 @@
 +  assign rddata_en_even = (mc_data_sel) ? dfi_rddata_en_even : phy_rddata_en;
 +  assign rddata_en_odd = (mc_data_sel) ? dfi_rddata_en_odd : phy_rddata_en;
 @@ -136,1 +146,21 @@
- 
+
 +  SRLC32E u_rddata_en_srl_even
 +    (
 +     .Q   (rddata_en_srl_out_even),

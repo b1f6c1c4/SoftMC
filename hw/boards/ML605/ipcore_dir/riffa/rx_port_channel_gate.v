@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,7 +35,7 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
@@ -44,8 +44,8 @@
 // Filename:         rx_port_channel_gate.v
 // Version:            1.00.a
 // Verilog Standard:   Verilog-2001
-// Description:         Provides cross domain synchronization for the CHNL_RX* 
-// signals between the CHNL_CLK and CLK domains. 
+// Description:         Provides cross domain synchronization for the CHNL_RX*
+// signals between the CHNL_CLK and CLK domains.
 // Author:            Matt Jacobsen
 // History:            @mattj: Version 2.0
 //-----------------------------------------------------------------------------
@@ -64,7 +64,7 @@ module rx_port_channel_gate #(
    input [31:0] RX_LEN,               // Channel read length (CLK)
    input [30:0] RX_OFF,               // Channel read offset (CLK)
    output [31:0] RX_CONSUMED,            // Channel words consumed (CLK)
-   
+
    input [C_DATA_WIDTH-1:0] RD_DATA,      // FIFO read data (CHNL_CLK)
    input RD_EMPTY,                     // FIFO is empty (CHNL_CLK)
    output RD_EN,                     // FIFO read enable (CHNL_CLK)
@@ -115,11 +115,11 @@ end
 
 // Signal receive into the channel domain.
 cross_domain_signal rxSig (
-   .CLK_A(CLK), 
-   .CLK_A_SEND(RX), 
-   .CLK_A_RECV(RX_RECVD), 
-   .CLK_B(CHNL_CLK), 
-   .CLK_B_RECV(CHNL_RX), 
+   .CLK_A(CLK),
+   .CLK_A_SEND(RX),
+   .CLK_A_RECV(RX_RECVD),
+   .CLK_B(CHNL_CLK),
+   .CLK_B_RECV(CHNL_RX),
    .CLK_B_SEND(CHNL_RX)
 );
 
@@ -160,11 +160,11 @@ end
 
 // Determine when it's safe to update the count in the CLK domain.
 cross_domain_signal countSync (
-   .CLK_A(CHNL_CLK), 
-   .CLK_A_SEND(rCountRead), 
-   .CLK_A_RECV(wCountRead), 
-   .CLK_B(CLK), 
-   .CLK_B_RECV(wCountStable), 
+   .CLK_A(CHNL_CLK),
+   .CLK_A_SEND(rCountRead),
+   .CLK_A_RECV(wCountRead),
+   .CLK_B(CLK),
+   .CLK_B_RECV(wCountStable),
    .CLK_B_SEND(wCountStable)
 );
 

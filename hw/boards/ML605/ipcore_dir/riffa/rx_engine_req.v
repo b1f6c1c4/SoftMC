@@ -1,15 +1,15 @@
 `timescale 1ns/1ns
 //----------------------------------------------------------------------------
-// This software is Copyright © 2012 The Regents of the University of 
+// This software is Copyright © 2012 The Regents of the University of
 // California. All Rights Reserved.
 //
-// Permission to copy, modify, and distribute this software and its 
-// documentation for educational, research and non-profit purposes, without 
-// fee, and without a written agreement is hereby granted, provided that the 
-// above copyright notice, this paragraph and the following three paragraphs 
+// Permission to copy, modify, and distribute this software and its
+// documentation for educational, research and non-profit purposes, without
+// fee, and without a written agreement is hereby granted, provided that the
+// above copyright notice, this paragraph and the following three paragraphs
 // appear in all copies.
 //
-// Permission to make commercial use of this software may be obtained by 
+// Permission to make commercial use of this software may be obtained by
 // contacting:
 // Technology Transfer Office
 // 9500 Gilman Drive, Mail Code 0910
@@ -17,15 +17,15 @@
 // La Jolla, CA 92093-0910
 // (858) 534-5815
 // invent@ucsd.edu
-// 
-// This software program and documentation are copyrighted by The Regents of 
-// the University of California. The software program and documentation are 
-// supplied "as is", without any accompanying services from The Regents. The 
-// Regents does not warrant that the operation of the program will be 
-// uninterrupted or error-free. The end-user understands that the program was 
-// developed for research purposes and is advised not to rely exclusively on 
+//
+// This software program and documentation are copyrighted by The Regents of
+// the University of California. The software program and documentation are
+// supplied "as is", without any accompanying services from The Regents. The
+// Regents does not warrant that the operation of the program will be
+// uninterrupted or error-free. The end-user understands that the program was
+// developed for research purposes and is advised not to rely exclusively on
 // the program for any reason.
-// 
+//
 // IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO
 // ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR
 // CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
@@ -35,7 +35,7 @@
 // CALIFORNIA SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 // MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, 
+// THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS,
 // AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATIONS TO
 // PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
 // MODIFICATIONS.
@@ -46,7 +46,7 @@
 // Verilog Standard:   Verilog-2001
 // Description:         Handles write and read memory requests for the rx_engine
 // by queuing them up and processing in a separate state machine. This allows
-// the rx_engine to process incoming TLPs at line rate. 
+// the rx_engine to process incoming TLPs at line rate.
 // Author:            Matt Jacobsen
 // History:            @mattj: Version 2.0
 // Additional Comments:
@@ -84,7 +84,7 @@ module rx_engine_req #(
    output [15:0] REQ_ID,      // Memory requestor id
    output [7:0] REQ_TAG,      // Memory packet tag
 
-   // Memory requests 
+   // Memory requests
    input WEN,               // Memory request write enable
    input RNW,               // Memory read (not write) request
    input [9:0] LEN,         // Memory length (1DW)
@@ -150,7 +150,7 @@ sync_fifo #(.C_WIDTH(C_FIFO_WIDTH), .C_DEPTH(C_FIFO_DEPTH)) fifo (
 );
 
 
-// Process writes and reads when the FIFOs are not empty. This will always 
+// Process writes and reads when the FIFOs are not empty. This will always
 // process writes over reads.
 always @ (posedge CLK) begin
    rState <= #1 (RST ? `S_RXENGREQ_IDLE : _rState);
@@ -184,9 +184,9 @@ always @ (*) begin
    _rAttr = rAttr;
    _rId = rId;
    _rTag = rTag;
-   
+
    case (rState)
-   
+
    `S_RXENGREQ_IDLE: begin
       if (!wFifoEmpty) begin
          _rRen = 1;
@@ -208,7 +208,7 @@ always @ (*) begin
       else begin
          _rAddr = wDataOut[63:34];
          _rData = wDataOut[32:1];
-      end      
+      end
       _rState = `S_RXENGREQ_WAIT;
    end
 
@@ -222,7 +222,7 @@ always @ (*) begin
          _rState = `S_RXENGREQ_IDLE;
       end
    end
-   
+
    endcase
 end
 

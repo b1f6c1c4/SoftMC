@@ -60,26 +60,26 @@
 
 module pcie_pipe_v6 #
 (
-   parameter           NO_OF_LANES = 8, 
+   parameter           NO_OF_LANES = 8,
    parameter           LINK_CAP_MAX_LINK_SPEED = 4'h1,
    parameter           PIPE_PIPELINE_STAGES = 0    // 0 - 0 stages, 1 - 1 stage, 2 - 2 stages
 )
 (
    // Pipe Per-Link Signals
    input   wire        pipe_tx_rcvr_det_i       ,
-   input   wire        pipe_tx_reset_i          ,  
-   input   wire        pipe_tx_rate_i           ,  
-   input   wire        pipe_tx_deemph_i         ,  
-   input   wire [2:0]  pipe_tx_margin_i         ,  
-   input   wire        pipe_tx_swing_i          ,  
+   input   wire        pipe_tx_reset_i          ,
+   input   wire        pipe_tx_rate_i           ,
+   input   wire        pipe_tx_deemph_i         ,
+   input   wire [2:0]  pipe_tx_margin_i         ,
+   input   wire        pipe_tx_swing_i          ,
 
    output  wire        pipe_tx_rcvr_det_o       ,
-   output  wire        pipe_tx_reset_o          ,  
-   output  wire        pipe_tx_rate_o           ,  
-   output  wire        pipe_tx_deemph_o         ,  
-   output  wire [2:0]  pipe_tx_margin_o         ,  
-   output  wire        pipe_tx_swing_o          ,  
-   
+   output  wire        pipe_tx_reset_o          ,
+   output  wire        pipe_tx_rate_o           ,
+   output  wire        pipe_tx_deemph_o         ,
+   output  wire [2:0]  pipe_tx_margin_o         ,
+   output  wire        pipe_tx_swing_o          ,
+
    // Pipe Per-Lane Signals - Lane 0
    output  wire [ 1:0] pipe_rx0_char_is_k_o     ,
    output  wire [15:0] pipe_rx0_data_o          ,
@@ -93,7 +93,7 @@ module pcie_pipe_v6 #
    input   wire [ 1:0] pipe_tx0_char_is_k_i     ,
    input   wire [15:0] pipe_tx0_data_i          ,
    input   wire        pipe_tx0_elec_idle_i     ,
-   input   wire [ 1:0] pipe_tx0_powerdown_i     , 
+   input   wire [ 1:0] pipe_tx0_powerdown_i     ,
 
    input  wire [ 1:0]  pipe_rx0_char_is_k_i     ,
    input  wire [15:0]  pipe_rx0_data_i         ,
@@ -107,8 +107,8 @@ module pcie_pipe_v6 #
    output wire [ 1:0]  pipe_tx0_char_is_k_o     ,
    output wire [15:0]  pipe_tx0_data_o          ,
    output wire         pipe_tx0_elec_idle_o     ,
-   output wire [ 1:0]  pipe_tx0_powerdown_o     , 
-   
+   output wire [ 1:0]  pipe_tx0_powerdown_o     ,
+
    // Pipe Per-Lane Signals - Lane 1
    output  wire [ 1:0] pipe_rx1_char_is_k_o     ,
    output  wire [15:0] pipe_rx1_data_o         ,
@@ -122,7 +122,7 @@ module pcie_pipe_v6 #
    input   wire [ 1:0] pipe_tx1_char_is_k_i     ,
    input   wire [15:0] pipe_tx1_data_i          ,
    input   wire        pipe_tx1_elec_idle_i     ,
-   input   wire [ 1:0] pipe_tx1_powerdown_i     , 
+   input   wire [ 1:0] pipe_tx1_powerdown_i     ,
 
    input  wire [ 1:0]  pipe_rx1_char_is_k_i     ,
    input  wire [15:0]  pipe_rx1_data_i         ,
@@ -136,7 +136,7 @@ module pcie_pipe_v6 #
    output wire [ 1:0]  pipe_tx1_char_is_k_o     ,
    output wire [15:0]  pipe_tx1_data_o          ,
    output wire         pipe_tx1_elec_idle_o     ,
-   output wire [ 1:0]  pipe_tx1_powerdown_o     , 
+   output wire [ 1:0]  pipe_tx1_powerdown_o     ,
 
    // Pipe Per-Lane Signals - Lane 2
    output  wire [ 1:0] pipe_rx2_char_is_k_o     ,
@@ -151,7 +151,7 @@ module pcie_pipe_v6 #
    input   wire [ 1:0] pipe_tx2_char_is_k_i     ,
    input   wire [15:0] pipe_tx2_data_i          ,
    input   wire        pipe_tx2_elec_idle_i     ,
-   input   wire [ 1:0] pipe_tx2_powerdown_i     , 
+   input   wire [ 1:0] pipe_tx2_powerdown_i     ,
 
    input  wire [ 1:0]  pipe_rx2_char_is_k_i     ,
    input  wire [15:0]  pipe_rx2_data_i         ,
@@ -165,7 +165,7 @@ module pcie_pipe_v6 #
    output wire [ 1:0]  pipe_tx2_char_is_k_o     ,
    output wire [15:0]  pipe_tx2_data_o          ,
    output wire         pipe_tx2_elec_idle_o     ,
-   output wire [ 1:0]  pipe_tx2_powerdown_o     , 
+   output wire [ 1:0]  pipe_tx2_powerdown_o     ,
 
    // Pipe Per-Lane Signals - Lane 3
    output  wire [ 1:0] pipe_rx3_char_is_k_o     ,
@@ -180,7 +180,7 @@ module pcie_pipe_v6 #
    input   wire [ 1:0] pipe_tx3_char_is_k_i     ,
    input   wire [15:0] pipe_tx3_data_i          ,
    input   wire        pipe_tx3_elec_idle_i     ,
-   input   wire [ 1:0] pipe_tx3_powerdown_i     , 
+   input   wire [ 1:0] pipe_tx3_powerdown_i     ,
 
    input  wire [ 1:0]  pipe_rx3_char_is_k_i     ,
    input  wire [15:0]  pipe_rx3_data_i         ,
@@ -194,8 +194,8 @@ module pcie_pipe_v6 #
    output wire [ 1:0]  pipe_tx3_char_is_k_o     ,
    output wire [15:0]  pipe_tx3_data_o          ,
    output wire         pipe_tx3_elec_idle_o     ,
-   output wire [ 1:0]  pipe_tx3_powerdown_o     , 
-   
+   output wire [ 1:0]  pipe_tx3_powerdown_o     ,
+
    // Pipe Per-Lane Signals - Lane 4
    output  wire [ 1:0] pipe_rx4_char_is_k_o     ,
    output  wire [15:0] pipe_rx4_data_o         ,
@@ -209,7 +209,7 @@ module pcie_pipe_v6 #
    input   wire [ 1:0] pipe_tx4_char_is_k_i     ,
    input   wire [15:0] pipe_tx4_data_i          ,
    input   wire        pipe_tx4_elec_idle_i     ,
-   input   wire [ 1:0] pipe_tx4_powerdown_i     , 
+   input   wire [ 1:0] pipe_tx4_powerdown_i     ,
 
    input  wire [ 1:0]  pipe_rx4_char_is_k_i     ,
    input  wire [15:0]  pipe_rx4_data_i         ,
@@ -223,8 +223,8 @@ module pcie_pipe_v6 #
    output wire [ 1:0]  pipe_tx4_char_is_k_o     ,
    output wire [15:0]  pipe_tx4_data_o          ,
    output wire         pipe_tx4_elec_idle_o     ,
-   output wire [ 1:0]  pipe_tx4_powerdown_o     , 
-   
+   output wire [ 1:0]  pipe_tx4_powerdown_o     ,
+
    // Pipe Per-Lane Signals - Lane 5
    output  wire [ 1:0] pipe_rx5_char_is_k_o     ,
    output  wire [15:0] pipe_rx5_data_o         ,
@@ -238,7 +238,7 @@ module pcie_pipe_v6 #
    input   wire [ 1:0] pipe_tx5_char_is_k_i     ,
    input   wire [15:0] pipe_tx5_data_i          ,
    input   wire        pipe_tx5_elec_idle_i     ,
-   input   wire [ 1:0] pipe_tx5_powerdown_i     , 
+   input   wire [ 1:0] pipe_tx5_powerdown_i     ,
 
    input  wire [ 1:0]  pipe_rx5_char_is_k_i     ,
    input  wire [15:0]  pipe_rx5_data_i         ,
@@ -252,8 +252,8 @@ module pcie_pipe_v6 #
    output wire [ 1:0]  pipe_tx5_char_is_k_o     ,
    output wire [15:0]  pipe_tx5_data_o          ,
    output wire         pipe_tx5_elec_idle_o     ,
-   output wire [ 1:0]  pipe_tx5_powerdown_o     , 
-   
+   output wire [ 1:0]  pipe_tx5_powerdown_o     ,
+
    // Pipe Per-Lane Signals - Lane 6
    output  wire [ 1:0] pipe_rx6_char_is_k_o     ,
    output  wire [15:0] pipe_rx6_data_o         ,
@@ -267,7 +267,7 @@ module pcie_pipe_v6 #
    input   wire [ 1:0] pipe_tx6_char_is_k_i     ,
    input   wire [15:0] pipe_tx6_data_i          ,
    input   wire        pipe_tx6_elec_idle_i     ,
-   input   wire [ 1:0] pipe_tx6_powerdown_i     , 
+   input   wire [ 1:0] pipe_tx6_powerdown_i     ,
 
    input  wire [ 1:0]  pipe_rx6_char_is_k_i     ,
    input  wire [15:0]  pipe_rx6_data_i         ,
@@ -281,8 +281,8 @@ module pcie_pipe_v6 #
    output wire [ 1:0]  pipe_tx6_char_is_k_o     ,
    output wire [15:0]  pipe_tx6_data_o          ,
    output wire         pipe_tx6_elec_idle_o     ,
-   output wire [ 1:0]  pipe_tx6_powerdown_o     , 
-   
+   output wire [ 1:0]  pipe_tx6_powerdown_o     ,
+
    // Pipe Per-Lane Signals - Lane 7
    output  wire [ 1:0] pipe_rx7_char_is_k_o     ,
    output  wire [15:0] pipe_rx7_data_o         ,
@@ -296,7 +296,7 @@ module pcie_pipe_v6 #
    input   wire [ 1:0] pipe_tx7_char_is_k_i     ,
    input   wire [15:0] pipe_tx7_data_i          ,
    input   wire        pipe_tx7_elec_idle_i     ,
-   input   wire [ 1:0] pipe_tx7_powerdown_i     , 
+   input   wire [ 1:0] pipe_tx7_powerdown_i     ,
 
    input  wire [ 1:0]  pipe_rx7_char_is_k_i     ,
    input  wire [15:0]  pipe_rx7_data_i         ,
@@ -310,12 +310,12 @@ module pcie_pipe_v6 #
    output wire [ 1:0]  pipe_tx7_char_is_k_o     ,
    output wire [15:0]  pipe_tx7_data_o          ,
    output wire         pipe_tx7_elec_idle_o     ,
-   output wire [ 1:0]  pipe_tx7_powerdown_o     , 
+   output wire [ 1:0]  pipe_tx7_powerdown_o     ,
 
    // Non PIPE signals
    input   wire [ 5:0] pl_ltssm_state         ,
-   input   wire        pipe_clk               , 
-   input   wire        rst_n 
+   input   wire        pipe_clk               ,
+   input   wire        rst_n
 );
 
 //******************************************************************//
@@ -347,7 +347,7 @@ module pcie_pipe_v6 #
 //      $display("[%t] %m NO_OF_LANES %0d  PIPE_PIPELINE_STAGES %0d", $time, NO_OF_LANES, PIPE_PIPELINE_STAGES);
 //   end
 //synthesis translate_on
-    
+
     generate
 
       pcie_pipe_misc_v6 # (
@@ -363,14 +363,14 @@ module pcie_pipe_v6 #
         .pipe_tx_deemph_i(pipe_tx_deemph_i),
         .pipe_tx_margin_i(pipe_tx_margin_i),
         .pipe_tx_swing_i(pipe_tx_swing_i),
-  
+
         .pipe_tx_rcvr_det_o(pipe_tx_rcvr_det_o),
         .pipe_tx_reset_o(pipe_tx_reset_o),
         .pipe_tx_rate_o(pipe_tx_rate_o),
         .pipe_tx_deemph_o(pipe_tx_deemph_o),
         .pipe_tx_margin_o(pipe_tx_margin_o),
         .pipe_tx_swing_o(pipe_tx_swing_o)          ,
-  
+
         .pipe_clk(pipe_clk),
         .rst_n(rst_n)
     );
@@ -380,7 +380,7 @@ module pcie_pipe_v6 #
 
         .PIPE_PIPELINE_STAGES(PIPE_PIPELINE_STAGES)
 
-      ) 
+      )
       pipe_lane_0_i (
 
         .pipe_rx_char_is_k_o(pipe_rx0_char_is_k_q),
@@ -396,7 +396,7 @@ module pcie_pipe_v6 #
         .pipe_tx_data_i(pipe_tx0_data_i),
         .pipe_tx_elec_idle_i(pipe_tx0_elec_idle_i),
         .pipe_tx_powerdown_i(pipe_tx0_powerdown_i),
-  
+
         .pipe_rx_char_is_k_i(pipe_rx0_char_is_k_i),
         .pipe_rx_data_i(pipe_rx0_data_i),
         .pipe_rx_valid_i(pipe_rx0_valid_i),
@@ -410,7 +410,7 @@ module pcie_pipe_v6 #
         .pipe_tx_data_o(pipe_tx0_data_o),
         .pipe_tx_elec_idle_o(pipe_tx0_elec_idle_o),
         .pipe_tx_powerdown_o(pipe_tx0_powerdown_o),
-  
+
         .pipe_clk(pipe_clk),
         .rst_n(rst_n)
 
@@ -419,10 +419,10 @@ module pcie_pipe_v6 #
       if (NO_OF_LANES >= 2) begin
 
         pcie_pipe_lane_v6 # (
-  
+
           .PIPE_PIPELINE_STAGES(PIPE_PIPELINE_STAGES)
 
-        ) 
+        )
         pipe_lane_1_i (
 
           .pipe_rx_char_is_k_o(pipe_rx1_char_is_k_q),
@@ -438,7 +438,7 @@ module pcie_pipe_v6 #
           .pipe_tx_data_i(pipe_tx1_data_i),
           .pipe_tx_elec_idle_i(pipe_tx1_elec_idle_i),
           .pipe_tx_powerdown_i(pipe_tx1_powerdown_i),
-  
+
           .pipe_rx_char_is_k_i(pipe_rx1_char_is_k_i),
           .pipe_rx_data_i(pipe_rx1_data_i),
           .pipe_rx_valid_i(pipe_rx1_valid_i),
@@ -452,7 +452,7 @@ module pcie_pipe_v6 #
           .pipe_tx_data_o(pipe_tx1_data_o),
           .pipe_tx_elec_idle_o(pipe_tx1_elec_idle_o),
           .pipe_tx_powerdown_o(pipe_tx1_powerdown_o),
-      
+
           .pipe_clk(pipe_clk),
           .rst_n(rst_n)
 
@@ -477,14 +477,14 @@ module pcie_pipe_v6 #
           assign pipe_tx1_powerdown_o = 2'b00;
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-      end      
+      end
 
       if (NO_OF_LANES >= 4) begin
 
         pcie_pipe_lane_v6 # (
-  
+
           .PIPE_PIPELINE_STAGES(PIPE_PIPELINE_STAGES)
-        ) 
+        )
         pipe_lane_2_i (
 
           .pipe_rx_char_is_k_o(pipe_rx2_char_is_k_q),
@@ -500,7 +500,7 @@ module pcie_pipe_v6 #
           .pipe_tx_data_i(pipe_tx2_data_i),
           .pipe_tx_elec_idle_i(pipe_tx2_elec_idle_i),
           .pipe_tx_powerdown_i(pipe_tx2_powerdown_i),
-  
+
           .pipe_rx_char_is_k_i(pipe_rx2_char_is_k_i),
           .pipe_rx_data_i(pipe_rx2_data_i),
           .pipe_rx_valid_i(pipe_rx2_valid_i),
@@ -514,17 +514,17 @@ module pcie_pipe_v6 #
           .pipe_tx_data_o(pipe_tx2_data_o),
           .pipe_tx_elec_idle_o(pipe_tx2_elec_idle_o),
           .pipe_tx_powerdown_o(pipe_tx2_powerdown_o),
-      
+
           .pipe_clk(pipe_clk),
           .rst_n(rst_n)
 
         );
 
         pcie_pipe_lane_v6 # (
-  
+
           .PIPE_PIPELINE_STAGES(PIPE_PIPELINE_STAGES)
 
-        ) 
+        )
         pipe_lane_3_i (
 
           .pipe_rx_char_is_k_o(pipe_rx3_char_is_k_q),
@@ -540,7 +540,7 @@ module pcie_pipe_v6 #
           .pipe_tx_data_i(pipe_tx3_data_i),
           .pipe_tx_elec_idle_i(pipe_tx3_elec_idle_i),
           .pipe_tx_powerdown_i(pipe_tx3_powerdown_i),
-  
+
           .pipe_rx_char_is_k_i(pipe_rx3_char_is_k_i),
           .pipe_rx_data_i(pipe_rx3_data_i),
           .pipe_rx_valid_i(pipe_rx3_valid_i),
@@ -554,7 +554,7 @@ module pcie_pipe_v6 #
           .pipe_tx_data_o(pipe_tx3_data_o),
           .pipe_tx_elec_idle_o(pipe_tx3_elec_idle_o),
           .pipe_tx_powerdown_o(pipe_tx3_powerdown_o),
-      
+
           .pipe_clk(pipe_clk),
           .rst_n(rst_n)
 
@@ -593,15 +593,15 @@ module pcie_pipe_v6 #
           assign pipe_tx3_powerdown_o = 2'b00;
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-      end      
+      end
 
       if (NO_OF_LANES >= 8) begin
 
         pcie_pipe_lane_v6 # (
-  
+
           .PIPE_PIPELINE_STAGES(PIPE_PIPELINE_STAGES)
 
-        ) 
+        )
         pipe_lane_4_i (
 
           .pipe_rx_char_is_k_o(pipe_rx4_char_is_k_q),
@@ -617,7 +617,7 @@ module pcie_pipe_v6 #
           .pipe_tx_data_i(pipe_tx4_data_i),
           .pipe_tx_elec_idle_i(pipe_tx4_elec_idle_i),
           .pipe_tx_powerdown_i(pipe_tx4_powerdown_i),
-  
+
           .pipe_rx_char_is_k_i(pipe_rx4_char_is_k_i),
           .pipe_rx_data_i(pipe_rx4_data_i),
           .pipe_rx_valid_i(pipe_rx4_valid_i),
@@ -631,17 +631,17 @@ module pcie_pipe_v6 #
           .pipe_tx_data_o(pipe_tx4_data_o),
           .pipe_tx_elec_idle_o(pipe_tx4_elec_idle_o),
           .pipe_tx_powerdown_o(pipe_tx4_powerdown_o),
-      
+
           .pipe_clk(pipe_clk),
           .rst_n(rst_n)
 
         );
 
         pcie_pipe_lane_v6 # (
-  
+
           .PIPE_PIPELINE_STAGES(PIPE_PIPELINE_STAGES)
 
-        ) 
+        )
         pipe_lane_5_i (
 
           .pipe_rx_char_is_k_o(pipe_rx5_char_is_k_q),
@@ -657,7 +657,7 @@ module pcie_pipe_v6 #
           .pipe_tx_data_i(pipe_tx5_data_i),
           .pipe_tx_elec_idle_i(pipe_tx5_elec_idle_i),
           .pipe_tx_powerdown_i(pipe_tx5_powerdown_i),
-  
+
           .pipe_rx_char_is_k_i(pipe_rx5_char_is_k_i),
           .pipe_rx_data_i(pipe_rx5_data_i),
           .pipe_rx_valid_i(pipe_rx5_valid_i),
@@ -671,17 +671,17 @@ module pcie_pipe_v6 #
           .pipe_tx_data_o(pipe_tx5_data_o),
           .pipe_tx_elec_idle_o(pipe_tx5_elec_idle_o),
           .pipe_tx_powerdown_o(pipe_tx5_powerdown_o),
-      
+
           .pipe_clk(pipe_clk),
           .rst_n(rst_n)
 
         );
 
         pcie_pipe_lane_v6 # (
-  
+
           .PIPE_PIPELINE_STAGES(PIPE_PIPELINE_STAGES)
 
-        ) 
+        )
         pipe_lane_6_i (
 
           .pipe_rx_char_is_k_o(pipe_rx6_char_is_k_q),
@@ -697,7 +697,7 @@ module pcie_pipe_v6 #
           .pipe_tx_data_i(pipe_tx6_data_i),
           .pipe_tx_elec_idle_i(pipe_tx6_elec_idle_i),
           .pipe_tx_powerdown_i(pipe_tx6_powerdown_i),
-  
+
           .pipe_rx_char_is_k_i(pipe_rx6_char_is_k_i),
           .pipe_rx_data_i(pipe_rx6_data_i),
           .pipe_rx_valid_i(pipe_rx6_valid_i),
@@ -711,17 +711,17 @@ module pcie_pipe_v6 #
           .pipe_tx_data_o(pipe_tx6_data_o),
           .pipe_tx_elec_idle_o(pipe_tx6_elec_idle_o),
           .pipe_tx_powerdown_o(pipe_tx6_powerdown_o),
-      
+
           .pipe_clk(pipe_clk),
           .rst_n(rst_n)
 
         );
 
         pcie_pipe_lane_v6 # (
-  
+
           .PIPE_PIPELINE_STAGES(PIPE_PIPELINE_STAGES)
 
-        ) 
+        )
         pipe_lane_7_i (
 
           .pipe_rx_char_is_k_o(pipe_rx7_char_is_k_q),
@@ -737,7 +737,7 @@ module pcie_pipe_v6 #
           .pipe_tx_data_i(pipe_tx7_data_i),
           .pipe_tx_elec_idle_i(pipe_tx7_elec_idle_i),
           .pipe_tx_powerdown_i(pipe_tx7_powerdown_i),
-  
+
           .pipe_rx_char_is_k_i(pipe_rx7_char_is_k_i),
           .pipe_rx_data_i(pipe_rx7_data_i),
           .pipe_rx_valid_i(pipe_rx7_valid_i),
@@ -751,7 +751,7 @@ module pcie_pipe_v6 #
           .pipe_tx_data_o(pipe_tx7_data_o),
           .pipe_tx_elec_idle_o(pipe_tx7_elec_idle_o),
           .pipe_tx_powerdown_o(pipe_tx7_powerdown_o),
-      
+
           .pipe_clk(pipe_clk),
           .rst_n(rst_n)
 
@@ -818,7 +818,7 @@ module pcie_pipe_v6 #
           assign pipe_tx7_powerdown_o = 2'b00;
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-      end      
+      end
 
     endgenerate
 
