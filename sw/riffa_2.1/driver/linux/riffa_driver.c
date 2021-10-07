@@ -355,9 +355,9 @@ static inline struct sg_mapping * fill_sg_buf(struct fpga_state * sc, int chnl,
 		}
 
 		// Page in the user pages.
-		down_read(&current->mm->mmap_sem);
-		num_pages = get_user_pages(current, current->mm, udata, num_pages_reqd, 1, 0, pages, NULL);
-		up_read(&current->mm->mmap_sem);
+		down_read(&current->mm->mmap_lock);
+		num_pages = get_user_pages(udata, num_pages_reqd, FOLL_WRITE, pages, NULL);
+		up_read(&current->mm->mmap_lock);
 		if (num_pages <= 0) {
 			printk(KERN_ERR "riffa: fpga:%d chnl:%d, %s unable to pin any pages in memory\n", sc->id, chnl, dir);
 			kfree(pages);
@@ -369,7 +369,7 @@ static inline struct sg_mapping * fill_sg_buf(struct fpga_state * sc, int chnl,
 		if ((sgl = kcalloc(num_pages, sizeof(*sgl), GFP_KERNEL)) == NULL) {
 			printk(KERN_ERR "riffa: fpga:%d chnl:%d, %s could not allocate memory for scatterlist array\n", sc->id, chnl, dir);
 			for (i = 0; i < num_pages; ++i)
-				page_cache_release(pages[i]);
+				put_page(pages[i]);
 			kfree(pages);
 			kfree(sg_map);
 			return NULL;
@@ -437,12 +437,12 @@ static inline void free_sg_buf(struct fpga_state * sc, struct sg_mapping * sg_ma
 			for (i = 0; i < sg_map->num_pages; ++i) {
 				if (!PageReserved(sg_map->pages[i]))
 					SetPageDirty(sg_map->pages[i]);
-				page_cache_release(sg_map->pages[i]);
+				put_page(sg_map->pages[i]);
 			}
 		}
 		else {
 			for (i = 0; i < sg_map->num_pages; ++i) {
-				page_cache_release(sg_map->pages[i]);
+				put_page(sg_map->pages[i]);
 			}
 		}
 	}
@@ -1338,7 +1338,7 @@ static void __devexit fpga_remove(struct pci_dev *dev)
 // MODULE INIT/EXIT FUNCTIONS
 ///////////////////////////////////////////////////////
 
-static DEFINE_PCI_DEVICE_TABLE(fpga_ids) = {
+static const struct pci_device_id fpga_ids[] = {
 	{PCI_DEVICE(VENDOR_ID0, PCI_ANY_ID)},
 	{PCI_DEVICE(VENDOR_ID1, PCI_ANY_ID)},
 	{0},
