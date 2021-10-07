@@ -33,6 +33,40 @@ void InstructionSequence::insert(const Instruction c){
 	instrs[size++] = c;
 }
 
+void InstructionSequence::write_burst_data(uint wrdata[]){
+	int j;
+	Instruction instr;
+	for (j=0; j<16; j++) {
+		if(size == capacity){
+			Instruction* tmp = new Instruction[capacity*2];
+			
+			for(int i = 0; i < size; i++)
+				tmp[i] = instrs[i];
+
+			delete[] instrs;
+			capacity *=2;
+			instrs = tmp;
+		}
+
+		instr = wrdata[j];
+		instrs[size++] = instr;
+
+    }
+}
+void InstructionSequence::print_iseq(){
+        int i;
+        for(i=0; i<size; i++)
+        {
+                printf("The %dth instruction is %x\n", i, (uint)(instrs[i]));
+        }
+}
+
+void InstructionSequence::pop(){
+    if(size != 0){
+        size --;
+    }
+}
+
 void InstructionSequence::execute(fpga_t* fpga){
 	fpga_send(fpga, 0, (void*)instrs, INSTR_SIZE*size, 0, 1, 0);
 }
@@ -117,6 +151,34 @@ Instruction genWR(uint bank, uint col, uint8_t pattern, AUTO_PRECHARGE ap, BURST
 		instr |= 0x1; // to set cmd[12] to 1 (burst length 8)
 
 	instr <<= 2;
+
+	if(ap == AUTO_PRECHARGE::AP)
+		instr |= 0x1; // to set cmd[10] to 1
+
+	instr <<= COL_OFFSET;
+	instr |= col;
+
+	return instr;
+}
+
+Instruction genWR_burst(uint bank, uint col, AUTO_PRECHARGE ap){
+	Instruction instr = (uint)INSTR_TYPE::DDR;
+	instr <<= 32 - BANK_OFFSET - ROW_OFFSET - CMD_OFFSET;
+
+	instr |= 0x24; //to set CKE(1) CS(0)[assumed it should be Low]
+	 	     //RAS(1) CAS(0) WE(0)
+	instr <<= BANK_OFFSET;
+
+	instr |= bank;
+	instr <<= 4;
+
+	instr |= 0x1; // to set cmd[12] to 1 (burst length 8)
+
+	instr <<= 1;
+
+	instr |= 0x1; // to set cmd[11] to 1 (long write)
+
+	instr <<= 1;
 
 	if(ap == AUTO_PRECHARGE::AP)
 		instr |= 0x1; // to set cmd[10] to 1

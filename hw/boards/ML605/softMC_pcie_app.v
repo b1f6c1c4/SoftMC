@@ -77,13 +77,14 @@ assign app_en = app_en_r;
 assign app_instr = rx_data_r;
 
 //SEND DATA TO HOST
-localparam RECV_IDLE = 1'b0;
-localparam RECV_BUSY = 1'b1;
+localparam RECV_IDLE = 1'b00;
+localparam RECV_BUSY = 1'b01;
+localparam RECV_ACK = 2'b11;
 
 reg sender_ack;
 reg[DQ_WIDTH*4 - 1:0] send_data_r;
 
-reg recv_state = RECV_IDLE;
+reg[1:0] recv_state = RECV_IDLE;
 assign rdback_fifo_rden = (recv_state == RECV_IDLE);
 always@(posedge clk) begin
 	if(rst) begin
@@ -100,8 +101,19 @@ always@(posedge clk) begin
 			
 			RECV_BUSY: begin
 				if(sender_ack)
-					recv_state <= RECV_IDLE;
+					recv_state <= RECV_ACK;
 			end //RECV_BUSY
+			
+			RECV_ACK: begin
+				if(CHNL_TX | ~CHNL_TX_DATA_REN) begin
+					// Didn't get the usage of TX_ACK signal. 
+					// So just use DATA_REN as an indication of the transaction ending 
+					recv_state <= RECV_IDLE;
+				end
+				else begin
+					recv_state <= RECV_ACK;
+				end
+			end
 		endcase
 	end
 end
@@ -115,6 +127,7 @@ always@* begin
 	CHNL_TX = sender_state[2];
 	
 	CHNL_TX_LEN = 16;
+	CHNL_TX_DATA_VALID = 1'b0;
 	
 	if(recv_state == RECV_BUSY) begin
 		CHNL_TX = 1'b1;
@@ -122,9 +135,9 @@ always@* begin
 		
 		if(CHNL_TX_DATA_REN) begin
 			sender_state_ns = sender_state + 3'd1;
-			
-			if(sender_state[1:0] == 2'b11)
+			if(sender_state[1:0] == 2'b11) begin
 				sender_ack = 1'b1;
+			end 
 		end
 	end
 end

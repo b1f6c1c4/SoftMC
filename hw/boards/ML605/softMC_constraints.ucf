@@ -139,6 +139,7 @@ NET "ddr_reset_n" IOSTANDARD = SSTL15;
 NET "ddr_cke[0]" IOSTANDARD = SSTL15;
 NET "ddr_odt[0]" IOSTANDARD = SSTL15;
 NET "ddr_cs_n[0]" IOSTANDARD = SSTL15;
+NET "ddr_cs1_n" IOSTANDARD = SSTL15;
 #NET  "sys_clk_p"                                IOSTANDARD = LVDS_25;
 #NET  "sys_clk_n"                                IOSTANDARD = LVDS_25;
 NET "clk_ref_p" IOSTANDARD = LVDS_25;
@@ -365,6 +366,7 @@ NET "ddr_cke[0]" LOC = M18;
 NET "ddr_odt[0]" LOC = F18;
 #Bank 25
 NET "ddr_cs_n[0]" LOC = K18;
+NET "ddr_cs1_n" LOC = K17;
 #NET  "sys_clk_p"                                 LOC = "J9" ;          #Bank 34
 #NET  "sys_clk_n"                                 LOC = "H9" ;          #Bank 34
 #Bank 34

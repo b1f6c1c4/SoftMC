@@ -69,6 +69,10 @@ module softMC #(parameter TCQ = 100, tCK = 2500, nCK_PER_CLK = 2, RANK_WIDTH = 1
 	 wire[31:0] instr1_fifo_data, instr1_fifo_out;
 	 wire instr1_fifo_rd_en;
 	 
+	 wire wrdata_fifo_en, wrdata_fifo_full, wrdata_fifo_empty;
+	 wire[511:0] wrdata_fifo_data, wrdata_fifo_out;
+	 wire wrdata_fifo_rd_en;
+
 	 wire process_iseq;
 	 
 	 //MAINTENANCE module
@@ -164,6 +168,9 @@ module softMC #(parameter TCQ = 100, tCK = 2500, nCK_PER_CLK = 2, RANK_WIDTH = 1
 		
 		.instr1_fifo_en(instr1_fifo_en),
 		.instr1_fifo_data(instr1_fifo_data),
+
+		.wrdata_fifo_en(wrdata_fifo_en),
+		.wrdata_fifo_data(wrdata_fifo_data),
 		
 		.process_iseq(process_iseq)
 	);
@@ -190,6 +197,16 @@ module softMC #(parameter TCQ = 100, tCK = 2500, nCK_PER_CLK = 2, RANK_WIDTH = 1
 	  .empty(instr1_fifo_empty) // output empty
 	);
 	
+	wrdata_fifo i_wrdata_fifo (
+	  .srst(rst), // input rst
+	  .clk(clk), // input clk
+	  .din(wrdata_fifo_data), // input [31 : 0] din
+	  .wr_en(wrdata_fifo_en), // input wr_en
+	  .rd_en(wrdata_fifo_rd_en), // input rd_en
+	  .dout(wrdata_fifo_out), // output [31 : 0] dout
+	  .full(wrdata_fifo_full), // output full
+	  .empty(wrdata_fifo_empty) // output empty
+	);
 	
 	wire dfi_ready;
 	iseq_dispatcher #(.ROW_WIDTH(ROW_WIDTH), .BANK_WIDTH(BANK_WIDTH), .CKE_WIDTH(CKE_WIDTH), 
@@ -206,9 +223,13 @@ module softMC #(parameter TCQ = 100, tCK = 2500, nCK_PER_CLK = 2, RANK_WIDTH = 1
     .instr0_fifo_empty(instr0_fifo_empty), 
     .instr0_fifo_data(instr0_fifo_out), 
 
-	 .instr1_fifo_rd(instr1_fifo_rd_en), 
+    .instr1_fifo_rd(instr1_fifo_rd_en), 
     .instr1_fifo_empty(instr1_fifo_empty), 
     .instr1_fifo_data(instr1_fifo_out), 
+
+    .wrdata_fifo_rd(wrdata_fifo_rd_en), 
+    .wrdata_fifo_empty(wrdata_fifo_empty), 
+    .wrdata_fifo_data(wrdata_fifo_out), 
 	 
 	 //DFI Interface
 	 .dfi_ready(dfi_ready),
@@ -248,7 +269,7 @@ module softMC #(parameter TCQ = 100, tCK = 2500, nCK_PER_CLK = 2, RANK_WIDTH = 1
     );
 	
 	
-	assign iq_full = instr0_fifo_full | instr1_fifo_full;
+	assign iq_full = instr0_fifo_full | instr1_fifo_full | wrdata_fifo_full;
 	assign processing_iseq = dispatcher_busy;
 	
 	wire[DQ_WIDTH*4 - 1: 0] rdback_fifo_wrdata, rdback_fifo_out;

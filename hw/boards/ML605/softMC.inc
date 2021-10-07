@@ -19,6 +19,8 @@
 `define RAS_OFFSET 21
 `define CS_OFFSET 22
 `define CKE_OFFSET 24
+`define LONG_WR_OFFSET 11
+`define BURST_OFFSET 12
 
 
 

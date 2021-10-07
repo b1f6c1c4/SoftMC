@@ -28,9 +28,16 @@
 // TODO: modify the hardware to support 32-bit instructions.
 #define INSTR_SIZE 2 //2 words
 
+#define NUM_CHIPS 8
 #define NUM_ROWS 32768
 #define NUM_COLS 1024
 #define NUM_BANKS 8
+#define SUBARRAY_SIZE 512
+#define NUM_SUBARRAYS (NUM_ROWS / SUBARRAY_SIZE)
+
+
+
+
 
 typedef uint64_t Instruction;
 typedef uint32_t uint;
@@ -78,7 +85,10 @@ class InstructionSequence{
 		virtual ~InstructionSequence();
 
 		void insert(const Instruction c);
+		void write_burst_data(uint wrdata[]);
 		void execute(fpga_t* fpga);
+		void pop();
+		void print_iseq();
 
 		uint size;
 		Instruction* instrs;
@@ -101,6 +111,7 @@ class DramAddr{
 Instruction genACT(uint bank, uint row);
 Instruction genPRE(uint bank, PRE_TYPE pt = PRE_TYPE::SINGLE);
 Instruction genWR(uint bank, uint col, uint8_t pattern, AUTO_PRECHARGE ap = AUTO_PRECHARGE::NO_AP, BURST_LENGTH bl = BURST_LENGTH::FIXED);
+Instruction genWR_burst(uint bank, uint col, AUTO_PRECHARGE ap = AUTO_PRECHARGE::NO_AP);
 Instruction genRD(uint bank, uint col, AUTO_PRECHARGE ap = AUTO_PRECHARGE::NO_AP, BURST_LENGTH bl = BURST_LENGTH::FIXED);
 Instruction genWAIT(uint cycles);
 Instruction genBUSDIR(BUSDIR dir);

@@ -19,6 +19,10 @@ module iseq_dispatcher #(parameter ROW_WIDTH = 15, BANK_WIDTH = 3, CKE_WIDTH = 1
 	input instr1_fifo_empty,
 	input[31:0] instr1_fifo_data,
 	
+	output wrdata_fifo_rd,
+	input wrdata_fifo_empty,
+	input[511:0] wrdata_fifo_data,
+	
 	//DFI Interface
 	// DFI Control/Address
 	input 										dfi_ready,
@@ -120,6 +124,11 @@ module iseq_dispatcher #(parameter ROW_WIDTH = 15, BANK_WIDTH = 3, CKE_WIDTH = 1
 	.en_in1(instr1_disp_en), 
 	.en_ack1(instr1_disp_ack),
 	.instr_in1(instr1),
+
+	.wrdata_fifo_rd(wrdata_fifo_rd),
+	.wrdata_fifo_empty(wrdata_fifo_empty),
+	.wrdata_fifo_data(wrdata_fifo_data),
+
 	
 	//DFI Interface
 	
