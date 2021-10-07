@@ -1,0 +1,5 @@
+/ipcode_dir/ linguist-vendored
+*.v linguist-language=Verilog
+*.inc linguist-language=Verilog
+*.h linguist-language=C
+*.c linguist-language=C
