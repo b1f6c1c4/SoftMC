@@ -379,13 +379,15 @@ NET "clk_ref_n" LOC = H9;
 NET "sys_rst" LOC = H10;
 #Bank 34
 NET "dfi_init_complete" LOC = AC22;
-NET "dfi_init_complete" IOSTANDARD = LVCMOS25;
+NET "dfi_init_complete" IOSTANDARD = LVCMOS18;
 NET "processing_iseq" LOC = AC24;
-NET "processing_iseq" IOSTANDARD = LVCMOS25;
+NET "processing_iseq" IOSTANDARD = LVCMOS18;
 NET "iq_full" LOC = AE22;
-NET "iq_full" IOSTANDARD = LVCMOS25;
+NET "iq_full" IOSTANDARD = LVCMOS18;
 NET "rdback_fifo_empty" LOC = AE23;
-NET "rdback_fifo_empty" IOSTANDARD = LVCMOS25;
+NET "rdback_fifo_empty" IOSTANDARD = LVCMOS18;
+NET "additional_reset" LOC = AD24;
+NET "additional_reset" IOSTANDARD = LVCMOS18;
 #Bank 26
 NET "ddr_dqs_p[0]" LOC = D12;
 #Bank 26

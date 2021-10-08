@@ -96,7 +96,7 @@ module softMC_top #
    input sys_clk_n,
    input clk_ref_p,
    input clk_ref_n,
-   input sys_rst,
+   input sys_rst, // cpu_reset button
    input sys_reset_n,
    // DDRx Output Interface
    output [CK_WIDTH-1:0]              ddr_ck_p,
@@ -121,6 +121,8 @@ module softMC_top #
    output                              processing_iseq, //led 1
    output                               iq_full, //led 2
    output                               rdback_fifo_empty, //led 3
+
+   input                              additional_reset, //led 7, external pull-down required
 
    //PCIE
 
@@ -176,7 +178,7 @@ module softMC_top #
        .clk_ref_p        (clk_ref_p), //input
        .clk_ref_n        (clk_ref_n), //input
        .clk_ref          (clk_ref), //input
-       .sys_rst          (sys_rst), //input
+       .sys_rst          (sys_rst || additional_reset), //input
        .clk_200         (mmcm_clk),
        .iodelay_ctrl_rdy (iodelay_ctrl_rdy) //output
        );
@@ -200,7 +202,7 @@ module softMC_top #
        .rstdiv0          (rst), //output
 
        .mmcm_clk         (mmcm_clk), //input
-       .sys_rst          (sys_rst), //input
+       .sys_rst          (sys_rst || additional_reset), //input
        .iodelay_ctrl_rdy (iodelay_ctrl_rdy), //input
        .PSDONE           (pd_PSDONE), //output
        .PSEN             (pd_PSEN), //input
