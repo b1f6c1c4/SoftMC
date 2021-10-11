@@ -75,14 +75,16 @@ module iseq_dispatcher #(parameter ROW_WIDTH = 15, BANK_WIDTH = 3, CKE_WIDTH = 1
    always@(posedge clk)
          dispatcher_busy_r <= dispatcher_busy_ns;
 
-   wire instr0_disp_en, instr1_disp_en;
-   wire instr0_disp_ack, instr1_disp_ack;
+   wire instr0_disp_en, instr1_disp_en, wrdata_disp_en;
+   wire instr0_disp_ack, instr1_disp_ack, wrdata_disp_ack;
    wire[31:0] instr0, instr1;
+   wire[511:0] wrdata;
 
-   wire instr0_ready, instr1_ready;
+   wire instr0_ready, instr1_ready, wrdata_ready;
 
    assign instr0_fifo_rd = instr0_ready & dispatcher_busy_r;
    assign instr1_fifo_rd = instr1_ready & dispatcher_busy_r;
+   assign wrdata_fifo_rd = wrdata_ready & dispatcher_busy_r;
 
    pipe_reg #(.WIDTH(32)) i_instr0_reg(
         .clk(clk),
@@ -108,6 +110,18 @@ module iseq_dispatcher #(parameter ROW_WIDTH = 15, BANK_WIDTH = 3, CKE_WIDTH = 1
         .ready_out(instr1_ready)
     );
 
+    pipe_reg #(.WIDTH(512)) i_wrdata_reg(
+        .clk(clk),
+        .rst(rst),
+
+        .ready_in(wrdata_disp_ack),
+        .valid_in(dispatcher_busy_r & !wrdata_fifo_empty),
+        .data_in(wrdata_fifo_data),
+        .valid_out(wrdata_disp_en),
+        .data_out(wrdata),
+        .ready_out(wrdata_ready)
+    );
+
 
    //Command Dispatcher Instantiation
    instr_dispatcher #(.ROW_WIDTH(ROW_WIDTH), .BANK_WIDTH(BANK_WIDTH), .CKE_WIDTH(CKE_WIDTH),
@@ -125,9 +139,9 @@ module iseq_dispatcher #(parameter ROW_WIDTH = 15, BANK_WIDTH = 3, CKE_WIDTH = 1
    .en_ack1(instr1_disp_ack),
    .instr_in1(instr1),
 
-   .wrdata_fifo_rd(wrdata_fifo_rd),
-   .wrdata_fifo_empty(wrdata_fifo_empty),
-   .wrdata_fifo_data(wrdata_fifo_data),
+   .wrdata_en(wrdata_disp_en),
+   .wrdata_ack(wrdata_disp_ack),
+   .wrdata_data(wrdata),
 
 
    //DFI Interface

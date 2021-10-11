@@ -19,9 +19,9 @@ module instr_dispatcher #(parameter ROW_WIDTH = 15, BANK_WIDTH = 3, CKE_WIDTH = 
    output en_ack1,
    input[31:0] instr_in1,
 
-   output reg wrdata_fifo_rd,
-   input wrdata_fifo_empty,
-   input[511:0] wrdata_fifo_data,
+   input wrdata_en,
+   output reg wrdata_ack,
+   input[511:0] wrdata_data,
 
    //DFI Interface
    // DFI Control/Address
@@ -330,11 +330,11 @@ module instr_dispatcher #(parameter ROW_WIDTH = 15, BANK_WIDTH = 3, CKE_WIDTH = 
       write_state_ns = WRITE_IDLE;
       dfi_wrdata = {4*DQ_WIDTH{1'bx}};
       dfi_wrdata_en = LOW;
-      wrdata_fifo_rd = LOW;
+      wrdata_ack = LOW;
       if (write_state_r == WRITE_IDLE) begin
          if (write_start && (~dfi_cas_n0)) begin
             write_state_ns = WRITE_SLOT0_0;
-            dfi_wrdata = {wrdata_fifo_data[127:0], 128'bx};
+            dfi_wrdata = {wrdata_data[127:0], 128'bx};
             dfi_wrdata_en = HIGH;
          end
          else if (write_start && (~dfi_cas_n1)) begin
@@ -347,23 +347,23 @@ module instr_dispatcher #(parameter ROW_WIDTH = 15, BANK_WIDTH = 3, CKE_WIDTH = 
       else if (write_state_r == WRITE_SLOT1_0) begin
          // Assert write_start != 1 for all later conditions
          write_state_ns = WRITE_SLOT1_1;
-         dfi_wrdata = wrdata_fifo_data[255:0];
+         dfi_wrdata = wrdata_data[255:0];
          dfi_wrdata_en = HIGH;
       end
       else if (write_state_r == WRITE_SLOT0_0) begin
          write_state_ns = WRITE_SLOT0_1;
-         dfi_wrdata = wrdata_fifo_data[383:128];
+         dfi_wrdata = wrdata_data[383:128];
          dfi_wrdata_en = HIGH;
       end
       else if (write_state_r == WRITE_SLOT1_1) begin
-         dfi_wrdata = wrdata_fifo_data[511:256];
+         dfi_wrdata = wrdata_data[511:256];
          dfi_wrdata_en = HIGH;
-         wrdata_fifo_rd = (~wrdata_fifo_empty); // ASSERT(wrdata_fifo_empty == 0)
+         wrdata_ack = HIGH;
       end
       else if (write_state_r == WRITE_SLOT0_1) begin
-         dfi_wrdata = {{8{8'h0x}}, {8{8'h0x}}, wrdata_fifo_data[511:384]};
+         dfi_wrdata = {{8{8'h0x}}, {8{8'h0x}}, wrdata_data[511:384]};
          dfi_wrdata_en = HIGH;
-         wrdata_fifo_rd = (~wrdata_fifo_empty); // ASSERT(wrdata_fifo_empty == 0)
+         wrdata_ack = HIGH;
       end
    end
 
