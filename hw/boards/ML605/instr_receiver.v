@@ -88,19 +88,19 @@ always@* begin
          instr_en_ns = app_en;
          instr_ns = app_instr;
          // This is a long write
-         if (instr_en_ns && instr_ns[31] && ~instr_ns[`CAS_OFFSET]
+         if (app_en && instr_ns[31] && ~instr_ns[`CAS_OFFSET]
              && ~instr_ns[`WE_OFFSET] && instr_ns[`LONG_WR_OFFSET] && instr_ns[`BURST_OFFSET]) begin
             state_ns = STATE_WRDATA;
             wrdata_count_down_ns = 15;
-            wrdata_ns = 512'h_b16b000b_abadbabe_abadcafe_b16b00b5_badbadba_beefcace_c00010ff_cafebabe_cafed00d_0d15ea5e_dead10cc_deadbabe_deadcafe_deadfa11_d00d2bad_fee1dead;
+            instr_en_ns = 1'b0;
          end
          // burst write but replicate bytes
-         else if (instr_en_ns && instr_ns[31] && ~instr_ns[`CAS_OFFSET]
+         else if (app_en && instr_ns[31] && ~instr_ns[`CAS_OFFSET]
              && ~instr_ns[`WE_OFFSET] && ~instr_ns[`LONG_WR_OFFSET] && instr_ns[`BURST_OFFSET]) begin
             wrdata_en_ns = 1'b1;
             wrdata_ns = {64{instr_ns[30:25], instr_ns[(`ROW_OFFSET - 1) -:2]}};
          end
-         else if(instr_en_ns & (instr_ns[31:28] == `END_ISEQ)) begin
+         else if(app_en & (instr_ns[31:28] == `END_ISEQ)) begin
             process_iseq_ns = 1'b1;
             state_ns = STATE_IDLE;
          end
@@ -112,6 +112,7 @@ always@* begin
             if (wrdata_count_down_r == 0) begin
                state_ns = STATE_APP;
                wrdata_en_ns = 1'b1;
+               instr_en_ns = 1'b1;
             end
             else begin
                wrdata_count_down_ns = wrdata_count_down_r - 1;
