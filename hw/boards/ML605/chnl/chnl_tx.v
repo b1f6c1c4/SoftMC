@@ -48,10 +48,10 @@ module chnl_tx #(
 );
    localparam ALIGN = 32 * CHNL_ALIGN / C_PCI_DATA_WIDTH;
 
-   localparam S_IDLE = 2'd0;
-   localparam S_SENDING = 2'd1;
+   localparam S_IDLE = 1'd0;
+   localparam S_SENDING = 1'd1;
 
-   reg [1:0] state, state_next;
+   reg state, state_next;
    reg [31:0] cnt_queued, cnt_queued_next;
    reg [31:0] cnt_left, cnt_left_next;
    reg [31:0] cnt_idle_cycles, cnt_idle_cycles_next;
@@ -107,6 +107,7 @@ module chnl_tx #(
                cnt_left_next = cnt_left - 1;
                if (cnt_left == 1) begin
                   state_next = S_IDLE;
+                  CHNL_TX = 0;
                end
             end
          end
