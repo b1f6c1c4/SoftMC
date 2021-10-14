@@ -25,7 +25,7 @@ module chnl_tx #(
    parameter C_PCI_DATA_WIDTH = 9'd32,
    parameter TX_WIDTH = 32,
    parameter GCD = 32, // = gcd(TX_WIDTH, C_PCI_DATA_WIDTH)
-   parameter CHNL_ALIGN = 1, // unit: uint32_t
+   parameter CHNL_ALIGN = 4, // unit: uint32_t
    parameter MAX_LENGTH = 32, // unit: uint32_t
    parameter MAX_IDLE_CYCLES = 128
 ) (
@@ -57,7 +57,8 @@ module chnl_tx #(
    reg [31:0] cnt_idle_cycles, cnt_idle_cycles_next;
 
    wire [C_PCI_DATA_WIDTH-1:0] fifo_i_data;
-   reg fifo_i_val, fifo_o_rdy;
+   wire fifo_i_val;
+   reg fifo_o_rdy;
    wire fifo_i_rdy, fifo_o_val;
 
    assign CHNL_TX_CLK = clk;
@@ -142,7 +143,7 @@ module chnl_tx #(
    );
 
    fifo #(
-      .WIDTH (C_PCI_DATA_WIDTH),
+      .WIDTH (C_PCI_DATA_WIDTH)
    ) i_fifo (
      .srst_i (rst),
      .clk_i (clk),

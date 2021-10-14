@@ -365,7 +365,8 @@ pcie_endpoint #(
 pcie_app_v6  #(
     .C_DATA_WIDTH( C_DATA_WIDTH ),
     .KEEP_WIDTH( KEEP_WIDTH ),
-    .DQ_WIDTH(DQ_WIDTH)
+    .RX_WIDTH(RX_WIDTH),
+    .TX_WIDTH(TX_WIDTH)
 
   )app (
 

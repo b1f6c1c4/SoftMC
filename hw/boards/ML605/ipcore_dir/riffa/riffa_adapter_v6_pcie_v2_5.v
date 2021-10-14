@@ -395,7 +395,7 @@ riffa_endpoint #(
 ////////////////////////////////////
 
 chnl_rx #(
-   .C_PCI_DATA_WIDTH (C_PCI_DATA_WIDTH),
+   .C_PCI_DATA_WIDTH (C_DATA_WIDTH),
    .RX_WIDTH         (RX_WIDTH)
 ) i_chnl_rx (
    .clk                (app_clk),
@@ -415,7 +415,7 @@ chnl_rx #(
 );
 
 chnl_tx #(
-   .C_PCI_DATA_WIDTH (C_PCI_DATA_WIDTH),
+   .C_PCI_DATA_WIDTH (C_DATA_WIDTH),
    .TX_WIDTH         (TX_WIDTH)
 ) i_chnl_tx (
    .clk                (app_clk),
