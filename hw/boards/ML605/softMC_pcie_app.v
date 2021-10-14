@@ -7,7 +7,7 @@ module softMC_pcie_app #(
    input rst,
    output CHNL_RX_CLK,
    input CHNL_RX,
-   output reg CHNL_RX_ACK,
+   output CHNL_RX_ACK,
    input CHNL_RX_LAST,
    input [31:0] CHNL_RX_LEN,
    input [30:0] CHNL_RX_OFF,
@@ -35,70 +35,70 @@ module softMC_pcie_app #(
    input[DQ_WIDTH*4 - 1:0] rdback_data
  );
 
- assign CHNL_RX_CLK = clk;
- assign CHNL_TX_CLK = clk;
- assign CHNL_TX_OFF = 0;
- assign CHNL_TX_LAST = 1'd1;
+   assign app_en = 0;
+   assign app_instr = 0;
+   assign rdback_fifo_rden = 0;
 
- reg app_en_r;
- reg[C_PCI_DATA_WIDTH-1:0] rx_data_r;
+reg [C_PCI_DATA_WIDTH-1:0] rData={C_PCI_DATA_WIDTH{1'b0}};
+reg [31:0] rLen=0;
+reg [31:0] rCount=0;
+reg [1:0] rState=0;
 
- reg old_chnl_rx;
- reg pending_ack = 0;
-
- //always acknowledge transaction
- always@(posedge clk) begin
-      old_chnl_rx <= CHNL_RX;
-
-      if(~old_chnl_rx & CHNL_RX)
-         pending_ack <= 1'b1;
-
-      if(CHNL_RX_ACK)
-         CHNL_RX_ACK <= 1'b0;
-      else begin
-         if(pending_ack /*& app_ack*/) begin
-            CHNL_RX_ACK <= 1'b1;
-            pending_ack <= 1'b0;
-         end
-      end
- end
-
- //register incoming data
- assign CHNL_RX_DATA_REN = ~app_en_r | app_ack;
- always@(posedge clk) begin
-   if(~app_en_r | app_ack) begin
-      app_en_r <= CHNL_RX_DATA_VALID;
-      rx_data_r <= CHNL_RX_DATA;
-   end
- end
-
-//send to the MC
-assign app_en = app_en_r;
-assign app_instr = rx_data_r;
-
-//SEND DATA TO HOST
-reg tx_state;
-always @(posedge clk, posedge rst) begin
-   if (rst) begin
-      tx_state <= 0;
-   end else if (tx_state == 0) begin
-      if (!rdback_fifo_empty) begin
-         tx_state <= 1;
-      end
-   end else begin
-      if (CHNL_TX_DATA_REN && CHNL_TX_DATA_VALID) begin
-         tx_state <= 0;
-      end
-   end
-end
+assign CHNL_RX_CLK = clk;
+assign CHNL_RX_ACK = (rState == 2'd1);
+assign CHNL_RX_DATA_REN = (rState == 2'd1);
 
 assign CHNL_TX_CLK = clk;
-assign CHNL_TX = tx_state == 1;
+assign CHNL_TX = (rState == 2'd3);
+assign CHNL_TX_LAST = 1'd1;
+assign CHNL_TX_LEN = rLen; // in words
 assign CHNL_TX_OFF = 0;
-assign CHNL_TX_LEN = 1;
-assign CHNL_TX_LAST = 1;
-assign CHNL_TX_DATA_VALID = tx_state == 1 && !rdback_fifo_empty;
-assign rdback_fifo_rden = tx_state == 1 && CHNL_TX_DATA_REN;
-assign CHNL_TX_DATA = rdback_data[31:0];
+assign CHNL_TX_DATA = rData;
+assign CHNL_TX_DATA_VALID = (rState == 2'd3);
+
+always @(posedge clk or posedge rst) begin
+   if (rst) begin
+      rLen <= 0;
+      rCount <= 0;
+      rState <= 0;
+      rData <= 0;
+   end
+   else begin
+      case (rState)
+
+      2'd0: begin // Wait for start of RX, save length
+         if (CHNL_RX) begin
+            rLen <= CHNL_RX_LEN;
+            rCount <= 0;
+            rState <= 2'd1;
+         end
+      end
+
+      2'd1: begin // Wait for last data in RX, save value
+         if (CHNL_RX_DATA_VALID) begin
+            rData <= CHNL_RX_DATA;
+            rCount <= rCount + (C_PCI_DATA_WIDTH/32);
+         end
+         if (rCount >= rLen)
+            rState <= 2'd2;
+      end
+
+      2'd2: begin // Prepare for TX
+         rCount <= (C_PCI_DATA_WIDTH/32);
+         rState <= 2'd3;
+      end
+
+      2'd3: begin // Start TX with save length and data value
+         if (CHNL_TX_DATA_REN & CHNL_TX_DATA_VALID) begin
+            rData <= {rCount[7:0] + 8'd4, rCount[7:0] + 8'd3, rCount[7:0] + 8'd2, rCount[7:0] + 8'd1};
+            rCount <= rCount + (C_PCI_DATA_WIDTH/32);
+            if (rCount >= rLen)
+               rState <= 2'd0;
+         end
+      end
+
+      endcase
+   end
+end
 
 endmodule
