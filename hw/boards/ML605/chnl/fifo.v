@@ -1,5 +1,5 @@
 module fifo #(
-   parameter WIDTH = 24,
+   parameter WIDTH = 32,
    parameter BURST = 0
 ) (
    input clk_i,
@@ -14,7 +14,7 @@ module fifo #(
    output [WIDTH-1:0] out_data_o,
    input out_rdy_i
 );
-   localparam W = WIDTH <= 16 ? (1 << $clog2(WIDTH)) : 32;
+   localparam W = 32;
    localparam PIECES = (WIDTH + W - 1) / W;
 
    wire [W*PIECES-1:0] wdata, rdata;
