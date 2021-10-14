@@ -382,65 +382,70 @@ module softMC_top #
 
 
    //Data read back Interface
+   wire app_rdy;
    wire rdback_fifo_rden;
    wire[DQ_WIDTH*4 - 1:0] rdback_data;
    `endif //SIM
 
+   wire rdback_fifo_empty_n;
+   wire [31:0] rdback_data_slice;
 
-    softMC #(.TCQ(TCQ), .tCK(tCK), .nCK_PER_CLK(nCK_PER_CLK), .RANK_WIDTH(RANK_WIDTH), .ROW_WIDTH(ROW_WIDTH), .BANK_WIDTH(BANK_WIDTH),
-                        .CKE_WIDTH(CKE_WIDTH), .CS_WIDTH(CS_WIDTH), .nCS_PER_RANK(nCS_PER_RANK), .DQ_WIDTH(DQ_WIDTH)) i_softmc(
-   .clk(clk),
-   .rst(rst),
+   potato i_potato(
+      .clk(clk),
+      .rst(rst),
 
-   //App Command Interface
-   .app_en(app_en),
-   .app_ack(app_ack),
-   .app_instr(app_instr),
-   .iq_full(iq_full),
-   .processing_iseq(processing_iseq),
+      .i_rdy(app_rdy),
+      .i_val(app_en),
+      .i_data(app_instr),
+
+      .o_rdy(rdback_fifo_rden),
+      .o_val(rdback_fifo_empty_n),
+      .o_data(rdback_data_slice)
+   );
+
+   assign app_ack = app_rdy && app_en && ~rst;
+   assign rdback_fifo_empty = !rdback_fifo_empty_n;
+   assign rdback_data = {8{rdback_data_slice}};
+
+   assign iq_full = 0;
+   assign processing_iseq = 0;
 
    // DFI Control/Address
-   .dfi_address0(dfi_address0),
-   .dfi_address1(dfi_address1),
-   .dfi_bank0(dfi_bank0),
-   .dfi_bank1(dfi_bank1),
-   .dfi_cas_n0(dfi_cas_n0),
-   .dfi_cas_n1(dfi_cas_n1),
-   .dfi_cke0(dfi_cke0),
-   .dfi_cke1(dfi_cke1),
-   .dfi_cs_n0(dfi_cs_n0),
-   .dfi_cs_n1(dfi_cs_n1),
-   .dfi_odt0(dfi_odt0),
-   .dfi_odt1(dfi_odt1),
-   .dfi_ras_n0(dfi_ras_n0),
-   .dfi_ras_n1(dfi_ras_n1),
-   .dfi_reset_n(dfi_reset_n),
-   .dfi_we_n0(dfi_we_n0),
-   .dfi_we_n1(dfi_we_n1),
+   assign dfi_address0 = 0;
+   assign dfi_address1 = 0;
+   assign dfi_bank0 = 0;
+   assign dfi_bank1 = 0;
+   assign dfi_cas_n0 = 1;
+   assign dfi_cas_n1 = 1;
+   assign dfi_cke0 = 0;
+   assign dfi_cke1 = 0;
+   assign dfi_cs_n0 = 1;
+   assign dfi_cs_n1 = 1;
+   assign dfi_odt0 = 0;
+   assign dfi_odt1 = 0;
+   assign dfi_ras_n0 = 1;
+   assign dfi_ras_n1 = 1;
+   // dfi_reset_n
+   assign dfi_we_n0 = 1;
+   assign dfi_we_n1 = 1;
    // DFI Write
-   .dfi_wrdata_en(dfi_wrdata_en),
-   .dfi_wrdata(dfi_wrdata),
-   .dfi_wrdata_mask(dfi_wrdata_mask),
+   assign dfi_wrdata_en = 0;
+   assign dfi_wrdata = 0;
+   assign dfi_wrdata_mask = 0;
    // DFI Read
-   .dfi_rddata_en(dfi_rddata_en),
-   .dfi_rddata_en_even(dfi_rddata_en_even),
-   .dfi_rddata_en_odd(dfi_rddata_en_odd),
-   .dfi_rddata(dfi_rddata),
-   .dfi_rddata_valid(dfi_rddata_valid),
-   .dfi_rddata_valid_even(dfi_rddata_valid_even),
-   .dfi_rddata_valid_odd(dfi_rddata_valid_odd),
+   assign dfi_rddata_en = 0;
+   assign dfi_rddata_en_even = 0;
+   assign dfi_rddata_en_odd = 0;
+   // dfi_rddata
+   // dfi_rddata_valid
+   // dfi_rddata_valid_even
+   // dfi_rddata_valid_odd
    // DFI Initialization Status / CLK Disable
-   .dfi_dram_clk_disable(dfi_dram_clk_disable),
-   .dfi_init_complete(dfi_init_complete),
+   assign dfi_dram_clk_disable = 0;
+   // dfi_init_complete
    // sideband signals
-   .io_config_strobe(io_config_strobe),
-   .io_config(io_config),
-
-   //Data read back Interface
-   .rdback_fifo_empty(rdback_fifo_empty),
-   .rdback_fifo_rden(rdback_fifo_rden),
-   .rdback_data(rdback_data)
-);
+   assign io_config_strobe = 0;
+   assign io_config = 0;
 
 `ifndef SIM
 
