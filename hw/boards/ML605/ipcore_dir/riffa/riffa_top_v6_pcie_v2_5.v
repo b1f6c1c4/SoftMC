@@ -53,7 +53,8 @@
 module riffa_top_v6_pcie_v2_5 # (
   parameter        PL_FAST_TRAIN        = "FALSE",
   parameter C_DATA_WIDTH = 32,            // RX/TX interface data width
-  parameter DQ_WIDTH = 64,
+  parameter RX_WIDTH = 32,
+  parameter TX_WIDTH = 32,
   // Do not override parameters below this line
   parameter KEEP_WIDTH = C_DATA_WIDTH / 8               // KEEP width
 )
@@ -72,15 +73,13 @@ module riffa_top_v6_pcie_v2_5 # (
   input                                       sys_clk_n,
   input                                       sys_reset_n,
 
-  input app_clk,
-  output  app_en,
-  input app_ack,
-   output[31:0] app_instr,
+  input i_val,
+  output i_rdy,
+  input [TX_WIDTH-1:0] i_data,
 
-   //Data read back Interface
-   input rdback_fifo_empty,
-   output rdback_fifo_rden,
-   input[DQ_WIDTH*4 - 1:0] rdback_data
+  output o_val,
+  input o_rdy,
+  output [RX_WIDTH-1:0] o_data
 );
 
   wire                                        user_clk;
@@ -477,16 +476,12 @@ pcie_app_v6  #(
   .pl_directed_link_width( pl_directed_link_width ),
   .pl_upstream_prefer_deemph( pl_upstream_prefer_deemph ),
 
-  .app_clk(app_clk),
-  .app_en(app_en),
-  .app_ack(app_ack),
-   .app_instr(app_instr),
-
-   //Data read back Interface
-   .rdback_fifo_empty(rdback_fifo_empty),
-   .rdback_fifo_rden(rdback_fifo_rden),
-   .rdback_data(rdback_data)
-
+  .i_val  (i_val),
+  .i_rdy  (i_rdy),
+  .i_data (i_data),
+  .o_val  (o_val),
+  .o_rdy  (o_rdy),
+  .o_data (o_data)
 );
 
 endmodule

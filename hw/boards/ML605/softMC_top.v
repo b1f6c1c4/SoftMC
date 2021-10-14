@@ -390,25 +390,30 @@ module softMC_top #
    wire rdback_fifo_empty_n;
    wire [31:0] rdback_data_slice;
 
+   wire i_val;
+   wire i_rdy;
+   wire [31:0] i_data;
+
+   wire o_val;
+   wire o_rdy;
+   wire [31:0] o_data;
+
    potato i_potato(
-      .clk(clk),
-      .rst(rst),
-
-      .i_rdy(app_rdy),
-      .i_val(app_en),
-      .i_data(app_instr),
-
-      .o_rdy(rdback_fifo_rden),
-      .o_val(rdback_fifo_empty_n),
-      .o_data(rdback_data_slice)
+      .clk    (clk),
+      .rst    (rst),
+      .i_rdy  (o_rdy),
+      .i_val  (o_val),
+      .i_data (o_data),
+      .o_rdy  (i_rdy),
+      .o_val  (i_val),
+      .o_data (i_data)
    );
 
-   assign app_ack = app_rdy && app_en && ~rst;
-   assign rdback_fifo_empty = !rdback_fifo_empty_n;
-   assign rdback_data = {8{rdback_data_slice}};
-
-   assign iq_full = 0;
-   assign processing_iseq = 0;
+   assign app_en = 0;
+   // assign dfi_init_complete = 0; //led 0
+   assign processing_iseq = o_val; //led 1
+   assign iq_full = i_rdy; //led 2
+   assign rdback_fifo_empty = i_val; //led 3
 
    // DFI Control/Address
    assign dfi_address0 = 0;
@@ -451,7 +456,8 @@ module softMC_top #
 
 riffa_top_v6_pcie_v2_5 #(
   .C_DATA_WIDTH(64),            // RX/TX interface data width
-  .DQ_WIDTH(DQ_WIDTH)
+  .RX_WIDTH(32),
+  .TX_WIDTH(32)
 ) i_pcie_top
 (
   .pci_exp_txp(pci_exp_txp),
@@ -463,15 +469,12 @@ riffa_top_v6_pcie_v2_5 #(
   .sys_clk_n(sys_clk_n),
   .sys_reset_n(sys_reset_n),
 
-   .app_clk(clk),
-   .app_en(app_en),
-   .app_ack(app_ack),
-   .app_instr(app_instr),
-
-   //Data read back Interface
-   .rdback_fifo_empty(rdback_fifo_empty),
-   .rdback_fifo_rden(rdback_fifo_rden),
-   .rdback_data(rdback_data)
+  .i_val  (i_val),
+  .i_rdy  (i_rdy),
+  .i_data (i_data),
+  .o_val  (o_val),
+  .o_rdy  (o_rdy),
+  .o_data (o_data)
 );
 
 `endif //SIM

@@ -47,9 +47,6 @@
     <file xil_pn:name="softMC_constraints.ucf" xil_pn:type="FILE_UCF">
       <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
     </file>
-    <file xil_pn:name="softMC_pcie_app.v" xil_pn:type="FILE_VERILOG">
-      <association xil_pn:name="Implementation" xil_pn:seqID="72"/>
-    </file>
     <file xil_pn:name="softMC_top.v" xil_pn:type="FILE_VERILOG">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="14"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="89"/>
@@ -504,6 +501,18 @@
     </file>
     <file xil_pn:name="ipcore_dir/wrdata_fifo.xise" xil_pn:type="FILE_COREGENISE">
       <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
+    </file>
+    <file xil_pn:name="chnl/fifo.v" xil_pn:type="FILE_VERILOG">
+      <association xil_pn:name="Implementation" xil_pn:seqID="300"/>
+    </file>
+    <file xil_pn:name="chnl/repacker.v" xil_pn:type="FILE_VERILOG">
+      <association xil_pn:name="Implementation" xil_pn:seqID="300"/>
+    </file>
+    <file xil_pn:name="chnl/chnl_rx.v" xil_pn:type="FILE_VERILOG">
+      <association xil_pn:name="Implementation" xil_pn:seqID="301"/>
+    </file>
+    <file xil_pn:name="chnl/chnl_tx.v" xil_pn:type="FILE_VERILOG">
+      <association xil_pn:name="Implementation" xil_pn:seqID="301"/>
     </file>
   </files>
 

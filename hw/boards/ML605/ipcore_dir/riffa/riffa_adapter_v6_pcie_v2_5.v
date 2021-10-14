@@ -60,7 +60,8 @@
 `define PCI_EXP_EP_DSN_2   32'h00000001
 
 module pcie_app_v6 #(
-   parameter DQ_WIDTH = 64,
+   parameter RX_WIDTH = 32,
+   parameter TX_WIDTH = 32,
    parameter C_DATA_WIDTH = 9'd64,
    parameter KEEP_WIDTH = (C_DATA_WIDTH/8),
    parameter C_NUM_CHNL = 4'd1,          // Number of RIFFA channels (set as needed: 1-12)
@@ -164,15 +165,13 @@ module pcie_app_v6 #(
 
    output   [63:0]            cfg_dsn,
 
-   input app_clk,
-   output  app_en,
-   input app_ack,
-   output[31:0] app_instr,
+   input i_val,
+   output i_rdy,
+   input [TX_WIDTH-1:0] i_data,
 
-   //Data read back Interface
-   input rdback_fifo_empty,
-   output rdback_fifo_rden,
-   input[DQ_WIDTH*4 - 1:0] rdback_data
+   output o_val,
+   input o_rdy,
+   output [RX_WIDTH-1:0] o_data
 );
 
 ////////////////////////////////////
@@ -395,78 +394,45 @@ riffa_endpoint #(
 // START USER CODE (do edit)
 ////////////////////////////////////
 
-// Instantiate and assign modules to RIFFA channels.
+chnl_rx #(
+   .C_PCI_DATA_WIDTH (C_PCI_DATA_WIDTH),
+   .RX_WIDTH         (RX_WIDTH)
+) i_chnl_rx (
+   .clk                (app_clk),
+   .rst                (riffa_reset),
+   .o_val              (o_val),
+   .o_rdy              (o_rdy),
+   .o_data             (o_data),
+   .CHNL_RX_CLK        (chnl_rx_clk),
+   .CHNL_RX            (chnl_rx),
+   .CHNL_RX_ACK        (chnl_rx_ack),
+   .CHNL_RX_LAST       (chnl_rx_last),
+   .CHNL_RX_LEN        (chnl_rx_len[0 +:32]),
+   .CHNL_RX_OFF        (chnl_rx_off[0 +:31]),
+   .CHNL_RX_DATA       (chnl_rx_data[0 +:C_DATA_WIDTH]),
+   .CHNL_RX_DATA_VALID (chnl_rx_data_valid),
+   .CHNL_RX_DATA_REN   (chnl_rx_data_ren)
+);
 
-// The example below connects C_NUM_CHNL instances of the same
-// module to each RIFFA channel. Your design will likely not
-// do the same. You should feel free to manually instantiate
-// your custom IP cores here and remove the code below.
-/*
-genvar i;
-generate
-   for (i = 0; i < C_NUM_CHNL; i = i + 1) begin : test_channels
-      chnl_tester #(C_DATA_WIDTH) module1 (
-         .CLK(user_clk),
-         .RST(riffa_reset),   // riffa_reset includes riffa_endpoint resets
-         // Rx interface
-         .CHNL_RX_CLK(chnl_rx_clk[i]),
-         .CHNL_RX(chnl_rx[i]),
-         .CHNL_RX_ACK(chnl_rx_ack[i]),
-         .CHNL_RX_LAST(chnl_rx_last[i]),
-         .CHNL_RX_LEN(chnl_rx_len[32*i +:32]),
-         .CHNL_RX_OFF(chnl_rx_off[31*i +:31]),
-         .CHNL_RX_DATA(chnl_rx_data[C_DATA_WIDTH*i +:C_DATA_WIDTH]),
-         .CHNL_RX_DATA_VALID(chnl_rx_data_valid[i]),
-         .CHNL_RX_DATA_REN(chnl_rx_data_ren[i]),
-         // Tx interface
-         .CHNL_TX_CLK(chnl_tx_clk[i]),
-         .CHNL_TX(chnl_tx[i]),
-         .CHNL_TX_ACK(chnl_tx_ack[i]),
-         .CHNL_TX_LAST(chnl_tx_last[i]),
-         .CHNL_TX_LEN(chnl_tx_len[32*i +:32]),
-         .CHNL_TX_OFF(chnl_tx_off[31*i +:31]),
-         .CHNL_TX_DATA(chnl_tx_data[C_DATA_WIDTH*i +:C_DATA_WIDTH]),
-         .CHNL_TX_DATA_VALID(chnl_tx_data_valid[i]),
-         .CHNL_TX_DATA_REN(chnl_tx_data_ren[i])
-      );
-   end
-endgenerate*/
-
-softMC_pcie_app #(.C_PCI_DATA_WIDTH(C_DATA_WIDTH), .DQ_WIDTH(DQ_WIDTH)
-) i_soft_pcie(
-   .clk(app_clk),
-   .rst(riffa_reset),
-
-   .CHNL_RX_CLK(chnl_rx_clk),
-   .CHNL_RX(chnl_rx),
-   .CHNL_RX_ACK(chnl_rx_ack),
-   .CHNL_RX_LAST(chnl_rx_last),
-   .CHNL_RX_LEN(chnl_rx_len[0 +:32]),
-   .CHNL_RX_OFF(chnl_rx_off[0 +:31]),
-   .CHNL_RX_DATA(chnl_rx_data[0 +:C_DATA_WIDTH]),
-   .CHNL_RX_DATA_VALID(chnl_rx_data_valid),
-   .CHNL_RX_DATA_REN(chnl_rx_data_ren),
-   // Tx interface
-   .CHNL_TX_CLK(chnl_tx_clk),
-   .CHNL_TX(chnl_tx),
-   .CHNL_TX_ACK(chnl_tx_ack),
-   .CHNL_TX_LAST(chnl_tx_last),
-   .CHNL_TX_LEN(chnl_tx_len[0 +:32]),
-   .CHNL_TX_OFF(chnl_tx_off[0 +:31]),
-   .CHNL_TX_DATA(chnl_tx_data[0 +:C_DATA_WIDTH]),
-   .CHNL_TX_DATA_VALID(chnl_tx_data_valid),
-   .CHNL_TX_DATA_REN(chnl_tx_data_ren),
-
-
-   .app_en(app_en),
-   .app_ack(app_ack),
-   .app_instr(app_instr),
-
-   //Data read back Interface
-   .rdback_fifo_empty(rdback_fifo_empty),
-   .rdback_fifo_rden(rdback_fifo_rden),
-   .rdback_data(rdback_data)
- );
+chnl_tx #(
+   .C_PCI_DATA_WIDTH (C_PCI_DATA_WIDTH),
+   .TX_WIDTH         (TX_WIDTH)
+) i_chnl_tx (
+   .clk                (app_clk),
+   .rst                (riffa_reset),
+   .i_val              (i_val),
+   .i_rdy              (i_rdy),
+   .i_data             (i_data),
+   .CHNL_TX_CLK        (chnl_tx_clk),
+   .CHNL_TX            (chnl_tx),
+   .CHNL_TX_ACK        (chnl_tx_ack),
+   .CHNL_TX_LAST       (chnl_tx_last),
+   .CHNL_TX_LEN        (chnl_tx_len[0 +:32]),
+   .CHNL_TX_OFF        (chnl_tx_off[0 +:31]),
+   .CHNL_TX_DATA       (chnl_tx_data[0 +:C_DATA_WIDTH]),
+   .CHNL_TX_DATA_VALID (chnl_tx_data_valid),
+   .CHNL_TX_DATA_REN   (chnl_tx_data_ren)
+);
 
 ////////////////////////////////////
 // END USER CODE
