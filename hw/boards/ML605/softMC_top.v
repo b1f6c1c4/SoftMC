@@ -393,7 +393,6 @@ module softMC_top #
    wire i_val;
    wire i_rdy;
    wire [31:0] i_data;
-
    wire o_val;
    wire o_rdy;
    wire [31:0] o_data;
@@ -469,12 +468,13 @@ riffa_top_v6_pcie_v2_5 #(
   .sys_clk_n(sys_clk_n),
   .sys_reset_n(sys_reset_n),
 
-  .i_val  (i_val),
-  .i_rdy  (i_rdy),
-  .i_data (i_data),
-  .o_val  (o_val),
-  .o_rdy  (o_rdy),
-  .o_data (o_data)
+  .app_clk (clk),
+  .i_val   (i_val),
+  .i_rdy   (i_rdy),
+  .i_data  (i_data),
+  .o_val   (o_val),
+  .o_rdy   (o_rdy),
+  .o_data  (o_data)
 );
 
 `endif //SIM

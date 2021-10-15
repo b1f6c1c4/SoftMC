@@ -165,10 +165,10 @@ module pcie_app_v6 #(
 
    output   [63:0]            cfg_dsn,
 
+   input app_clk,
    input i_val,
    output i_rdy,
    input [TX_WIDTH-1:0] i_data,
-
    output o_val,
    input o_rdy,
    output [RX_WIDTH-1:0] o_data

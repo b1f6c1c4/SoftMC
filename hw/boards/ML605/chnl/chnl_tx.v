@@ -148,7 +148,7 @@ module chnl_tx #(
    ) i_fifo (
      .srst_i (rst),
      .clk_i (clk),
-     .en_i (1),
+     .en_i (1'b1),
      .in_val_i (fifo_i_val),
      .in_data_i (fifo_i_data),
      .in_rdy_o (fifo_i_rdy),

@@ -73,10 +73,10 @@ module riffa_top_v6_pcie_v2_5 # (
   input                                       sys_clk_n,
   input                                       sys_reset_n,
 
+  input app_clk,
   input i_val,
   output i_rdy,
   input [TX_WIDTH-1:0] i_data,
-
   output o_val,
   input o_rdy,
   output [RX_WIDTH-1:0] o_data
@@ -477,12 +477,13 @@ pcie_app_v6  #(
   .pl_directed_link_width( pl_directed_link_width ),
   .pl_upstream_prefer_deemph( pl_upstream_prefer_deemph ),
 
-  .i_val  (i_val),
-  .i_rdy  (i_rdy),
-  .i_data (i_data),
-  .o_val  (o_val),
-  .o_rdy  (o_rdy),
-  .o_data (o_data)
+  .app_clk (app_clk),
+  .i_val   (i_val),
+  .i_rdy   (i_rdy),
+  .i_data  (i_data),
+  .o_val   (o_val),
+  .o_rdy   (o_rdy),
+  .o_data  (o_data)
 );
 
 endmodule
