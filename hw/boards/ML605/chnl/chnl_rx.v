@@ -89,8 +89,8 @@ module chnl_rx #(
    end
 
    repacker #(
-      .IN (RX_WIDTH / GCD),
-      .OUT (C_PCI_DATA_WIDTH / GCD),
+      .IN (C_PCI_DATA_WIDTH / GCD),
+      .OUT (RX_WIDTH / GCD),
       .W (GCD)
    ) i_repacker (
       .clk_i (clk),

@@ -13,7 +13,9 @@
 //   - TX_WIDTH % GCD == 0
 //   - C_PCI_DATA_WIDTH % GCD == 0
 //   - CHNL_ALIGN >= C_PCI_DATA_WIDTH / 32
+//   - MAX_LENGTH >= CHNL_ALIGN
 //   - MAX_LENGTH <= 1024 * (C_PCI_DATA_WIDTH / 32)
+//   - MAX_LENGTH % CHNL_ALIGN == 0
 //
 // Usage:
 //   uint32_t buf[MAX_LENGTH];
@@ -22,7 +24,7 @@
 //       process_data(buf + i);
 
 module chnl_tx #(
-   parameter C_PCI_DATA_WIDTH = 9'd32,
+   parameter C_PCI_DATA_WIDTH = 32,
    parameter TX_WIDTH = 32,
    parameter GCD = 32, // = gcd(TX_WIDTH, C_PCI_DATA_WIDTH)
    parameter CHNL_ALIGN = 4, // unit: uint32_t
@@ -46,7 +48,7 @@ module chnl_tx #(
    output reg CHNL_TX_DATA_VALID,
    input CHNL_TX_DATA_REN
 );
-   localparam ALIGN = 32 * CHNL_ALIGN / C_PCI_DATA_WIDTH;
+   localparam ALIGN = 32 * CHNL_ALIGN / C_PCI_DATA_WIDTH; // unit: C_PCI_DATA_WIDTH
 
    localparam S_IDLE = 1'd0;
    localparam S_SENDING = 1'd1;
@@ -61,6 +63,9 @@ module chnl_tx #(
    reg fifo_o_rdy;
    wire fifo_i_rdy, fifo_o_val;
 
+   // equals to cnt_queue - cnt_left_next when S_IDLE->S_SENDING
+   reg [31:0] cnt_queued_left;
+
    assign CHNL_TX_CLK = clk;
    assign CHNL_TX_LAST = 1;
    assign CHNL_TX_OFF = 0;
@@ -70,10 +75,10 @@ module chnl_tx #(
 
    // Receiving data from i_val/rdy/data
    always @(*) begin
-      cnt_queued_next = cnt_queued;
+      cnt_queued_next = cnt_queued_left;
       cnt_idle_cycles_next = cnt_idle_cycles;
       if (fifo_i_val && fifo_i_rdy) begin
-         cnt_queued_next = cnt_queued + 1;
+         cnt_queued_next = cnt_queued_left + 1;
          cnt_idle_cycles_next = 0;
       end else if (!fifo_i_val && cnt_idle_cycles < MAX_IDLE_CYCLES) begin // avoid overflow
          cnt_idle_cycles_next = cnt_idle_cycles + 1;
@@ -85,6 +90,7 @@ module chnl_tx #(
       cnt_left_next = cnt_left;
 
       fifo_o_rdy = 0;
+      cnt_queued_left = cnt_queued;
 
       CHNL_TX = 0;
       CHNL_TX_DATA_VALID = 0;
@@ -93,12 +99,14 @@ module chnl_tx #(
          S_IDLE: begin
             if (cnt_queued * C_PCI_DATA_WIDTH >= MAX_LENGTH * 32) begin
                state_next = S_SENDING;
-               cnt_left_next = cnt_queued;
+               cnt_left_next = MAX_LENGTH * 32 / C_PCI_DATA_WIDTH;
+               cnt_queued_left = cnt_queued - cnt_left_next;
                CHNL_TX = 1;
             end else if (|cnt_queued && cnt_queued >= ALIGN) begin
                if (|MAX_IDLE_CYCLES && cnt_idle_cycles >= MAX_IDLE_CYCLES) begin
                   state_next = S_SENDING;
-                  cnt_left_next = cnt_queued - cnt_queued % ALIGN;
+                  cnt_queued_left = cnt_queued % ALIGN;
+                  cnt_left_next = cnt_queued - cnt_queued_left;
                   CHNL_TX = 1;
                end
             end
