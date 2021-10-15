@@ -22,9 +22,9 @@ module chnl_rx #(
    input clk,
    input rst,
 
-   input o_val,
-   output o_rdy,
-   input [RX_WIDTH-1:0] o_data,
+   output o_val,
+   input o_rdy,
+   output [RX_WIDTH-1:0] o_data,
 
    output CHNL_RX_CLK,
    input CHNL_RX,
