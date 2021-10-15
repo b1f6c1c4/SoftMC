@@ -64,26 +64,30 @@ module chnl_tx #(
    assign CHNL_TX_CLK = clk;
    assign CHNL_TX_LAST = 1;
    assign CHNL_TX_OFF = 0;
-   assign CHNL_TX_LEN = cnt_left * C_PCI_DATA_WIDTH / 32; // unit: uint32_t
+   // Notice: CHNL_TX is asserted before S_IDLE->S_SENDING, at the same time
+   // of setting cnt_left_next; thus cnt_left is not ready yet
+   assign CHNL_TX_LEN = cnt_left_next * C_PCI_DATA_WIDTH / 32; // unit: uint32_t
 
+   // Receiving data from i_val/rdy/data
    always @(*) begin
-      state_next = state;
       cnt_queued_next = cnt_queued;
-      cnt_left_next = cnt_left;
       cnt_idle_cycles_next = cnt_idle_cycles;
-
-      fifo_o_rdy = 0;
-
-      CHNL_TX = 0;
-      CHNL_TX_DATA_VALID = 0;
-
-      // Data receiving happens in all states
       if (fifo_i_val && fifo_i_rdy) begin
          cnt_queued_next = cnt_queued + 1;
          cnt_idle_cycles_next = 0;
       end else if (!fifo_i_val && cnt_idle_cycles < MAX_IDLE_CYCLES) begin // avoid overflow
          cnt_idle_cycles_next = cnt_idle_cycles + 1;
       end
+   end
+
+   always @(*) begin
+      state_next = state;
+      cnt_left_next = cnt_left;
+
+      fifo_o_rdy = 0;
+
+      CHNL_TX = 0;
+      CHNL_TX_DATA_VALID = 0;
 
       case (state)
          S_IDLE: begin
