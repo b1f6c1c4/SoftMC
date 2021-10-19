@@ -42,8 +42,10 @@ module chnl_rx #(
 
    reg state, state_next;
    reg [31:0] cnt_left, cnt_left_next;
-   reg repacker_i_val;
-   wire repacker_i_rdy;
+   reg buffer_i_val;
+   wire buffer_i_rdy;
+   wire repacker_i_val, repacker_i_rdy;
+   wire [C_PCI_DATA_WIDTH-1:0] repacker_i_data;
 
    assign CHNL_RX_CLK = clk;
 
@@ -51,7 +53,7 @@ module chnl_rx #(
       state_next = state;
       cnt_left_next = cnt_left;
 
-      repacker_i_val = 0;
+      buffer_i_val = 0;
 
       CHNL_RX_ACK = 0;
       CHNL_RX_DATA_REN = 0;
@@ -68,9 +70,9 @@ module chnl_rx #(
             if (~|cnt_left) begin
                state_next = S_IDLE;
             end else begin
-               repacker_i_val = CHNL_RX_DATA_VALID;
-               CHNL_RX_DATA_REN = repacker_i_rdy;
-               if (CHNL_RX_DATA_VALID && repacker_i_rdy) begin
+               buffer_i_val = CHNL_RX_DATA_VALID;
+               CHNL_RX_DATA_REN = buffer_i_rdy;
+               if (CHNL_RX_DATA_VALID && buffer_i_rdy) begin
                   cnt_left_next = cnt_left - 1;
                end
             end
@@ -88,6 +90,19 @@ module chnl_rx #(
       end
    end
 
+   buffer #(
+      .WIDTH (C_PCI_DATA_WIDTH)
+   ) i_buffer (
+      .clk (clk),
+      .rst (rst),
+      .i_val (buffer_i_val),
+      .i_rdy (buffer_i_rdy),
+      .i_data (CHNL_RX_DATA),
+      .o_val (repacker_i_val),
+      .o_rdy (repacker_i_rdy),
+      .o_data (repacker_i_data)
+   );
+
    repacker #(
       .IN (C_PCI_DATA_WIDTH / GCD),
       .OUT (RX_WIDTH / GCD),
@@ -96,7 +111,7 @@ module chnl_rx #(
       .clk_i (clk),
       .rst_ni (!rst),
       .in_val_i (repacker_i_val),
-      .in_data_i (CHNL_RX_DATA),
+      .in_data_i (repacker_i_data),
       .in_rdy_o (repacker_i_rdy),
       .out_val_o (o_val),
       .out_data_o (o_data),
