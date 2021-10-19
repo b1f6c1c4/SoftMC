@@ -50,13 +50,13 @@ module fifo #(
             .DO_REG (0)
          ) inst (
             .RST (srst),
-            .RSTREG (0),
-            .REGCE (0),
+            .RSTREG (1'b0),
+            .REGCE (1'b0),
 
             .WRCLK (clk),
             .WREN (~srst && i_val && i_rdy),
             .DI (wd),
-            .DIP (0),
+            .DIP (8'b0),
             .FULL (fulls[i]),
             .ALMOSTFULL (),
             .WRCOUNT (), .WRERR (),
@@ -69,7 +69,7 @@ module fifo #(
             .ALMOSTEMPTY (aemptys[i]),
             .RDCOUNT (), .RDERR (),
 
-            .INJECTDBITERR (0), .INJECTSBITERR (0),
+            .INJECTDBITERR (1'b0), .INJECTSBITERR (1'b0),
             .DBITERR (), .SBITERR (), .ECCPARITY ()
          );
       end
