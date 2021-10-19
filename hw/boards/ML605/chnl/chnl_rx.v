@@ -37,11 +37,11 @@ module chnl_rx #(
    output reg CHNL_RX_DATA_REN
 );
 
-   localparam S_IDLE = 2'd0;
-   localparam S_OPENING = 2'd1;
-   localparam S_OPEN = 2'd2;
+   localparam S_IDLE = 1'd0;
+   localparam S_RECEIVING = 1'd1;
 
-   reg [1:0] state, state_next;
+   reg state, state_next;
+   reg [31:0] cnt_left, cnt_left_next;
    reg repacker_i_val;
    wire repacker_i_rdy;
 
@@ -49,6 +49,7 @@ module chnl_rx #(
 
    always @(*) begin
       state_next = state;
+      cnt_left_next = cnt_left;
 
       repacker_i_val = 0;
 
@@ -58,23 +59,20 @@ module chnl_rx #(
       case (state)
          S_IDLE: begin
             if (CHNL_RX) begin
-               state_next = S_OPENING;
+               state_next = S_RECEIVING;
+               cnt_left_next = CHNL_RX_LEN;
             end
          end
-         S_OPENING: begin
-            if (CHNL_RX) begin
-               state_next = S_OPEN;
-               CHNL_RX_ACK = 1;
-            end else begin
+         S_RECEIVING: begin
+            CHNL_RX_ACK = 1;
+            if (~|cnt_left) begin
                state_next = S_IDLE;
-            end
-         end
-         S_OPEN: begin
-            if (CHNL_RX) begin
+            end else begin
                repacker_i_val = CHNL_RX_DATA_VALID;
-               CHNL_RX_DATA_REN = CHNL_RX_DATA_VALID && repacker_i_rdy;
-            end else begin
-               state_next = S_IDLE;
+               CHNL_RX_DATA_REN = repacker_i_rdy;
+               if (CHNL_RX_DATA_VALID && repacker_i_rdy) begin
+                  cnt_left_next = cnt_left - 1;
+               end
             end
          end
       endcase
@@ -83,8 +81,10 @@ module chnl_rx #(
    always @(posedge clk, posedge rst) begin
       if (rst) begin
          state <= S_IDLE;
+         cnt_left <= 0;
       end else begin
          state <= state_next;
+         cnt_left <= cnt_left_next;
       end
    end
 
