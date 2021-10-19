@@ -19,7 +19,7 @@ module repacker #(
    wire push = in_val_i && in_rdy_o;
    wire pop = out_val_o && out_rdy_i;
 
-   reg [$clog2(BUFF+IN+1)-1:0] v;
+   reg [31:0] v;
 
    assign in_rdy_o = pop ? v + IN <= BUFF + OUT : v + IN <= BUFF;
    assign out_val_o = v >= OUT;
