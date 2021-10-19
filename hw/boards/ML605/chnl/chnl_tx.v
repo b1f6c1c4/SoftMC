@@ -58,6 +58,8 @@ module chnl_tx #(
    reg [31:0] cnt_left, cnt_left_next;
    reg [31:0] cnt_idle_cycles, cnt_idle_cycles_next;
 
+   wire repacker_i_val, repacker_i_rdy;
+   wire [TX_WIDTH-1:0] repacker_i_data;
    wire [C_PCI_DATA_WIDTH-1:0] fifo_i_data;
    wire fifo_i_val;
    reg fifo_o_rdy;
@@ -140,6 +142,19 @@ module chnl_tx #(
       end
    end
 
+   buffer #(
+      .WIDTH (TX_WIDTH)
+   ) i_buffer (
+      .clk (clk),
+      .rst (rst),
+      .i_val (i_val),
+      .i_rdy (i_rdy),
+      .i_data (i_data),
+      .o_val (repacker_i_val),
+      .o_rdy (repacker_i_rdy),
+      .o_data (repacker_i_data)
+   );
+
    repacker #(
       .IN (TX_WIDTH / GCD),
       .OUT (C_PCI_DATA_WIDTH / GCD),
@@ -147,9 +162,9 @@ module chnl_tx #(
    ) i_repacker (
       .clk (clk),
       .rst (rst),
-      .i_val (i_val),
-      .i_rdy (i_rdy),
-      .i_data (i_data),
+      .i_val (repacker_i_val),
+      .i_rdy (repacker_i_rdy),
+      .i_data (repacker_i_data),
       .o_val (fifo_i_val),
       .o_rdy (fifo_i_rdy),
       .o_data (fifo_i_data)
