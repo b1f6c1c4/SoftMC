@@ -1,38 +1,40 @@
 module repacker #(
-   parameter IN = 3,
-   parameter OUT = 8,
-   parameter W = 8
+   parameter IN = 3, // number of chunks to receive at a time
+   parameter OUT = 8, // number of chunks to emit at a time
+   parameter W = 8 // size of a chunk
 ) (
-   input clk_i,
-   input rst_ni,
+   input clk,
+   input rst,
 
-   input in_val_i,
-   input [W*IN-1:0] in_data_i,
-   output in_rdy_o,
+   input i_val,
+   output i_rdy,
+   input [W*IN-1:0] i_data,
 
-   output out_val_o,
-   output [W*OUT-1:0] out_data_o,
-   input out_rdy_i
+   output o_val,
+   input o_rdy,
+   output [W*OUT-1:0] o_data
 );
-   localparam BUFF = IN + OUT - 1;
 
-   wire push = in_val_i && in_rdy_o;
-   wire pop = out_val_o && out_rdy_i;
+   localparam BUFF = IN + OUT - 1; // max number of chunks buffered
 
-   reg [31:0] v;
+   reg [31:0] v; // number of chunks buffered
+   reg [W-1:0] mem[0:BUFF-1]; // the buffered chunks
+   reg [W-1:0] mx[0:IN+BUFF-1]; // the chunks after receiving
 
-   assign in_rdy_o = pop ? v + IN <= BUFF + OUT : v + IN <= BUFF;
-   assign out_val_o = v >= OUT;
-
-   reg [W-1:0] mem[0:BUFF-1];
-   reg [W-1:0] mx[0:IN+BUFF-1];
+   // I/O control
+   wire push, pop;
+   assign i_rdy = pop ? v + IN <= BUFF + OUT : v + IN <= BUFF;
+   assign o_val = v >= OUT;
+   assign push = i_val && i_rdy;
+   assign pop = o_val && o_rdy;
 
    genvar i;
    generate
+      // Receiving
       for (i = 0; i < IN + BUFF; i = i + 1) begin : gi
          always @(*) begin
             if (v <= i && i < v + IN && push) begin
-               mx[i] = in_data_i >> (W*(i - v));
+               mx[i] = i_data >> (W*(i - v));
             end else if (i < BUFF && i < v) begin
                mx[i] = mem[i];
             end else begin
@@ -40,9 +42,10 @@ module repacker #(
             end
          end
       end
+      // Emitting
       for (i = 0; i < BUFF; i = i + 1) begin : gm
-         always @(posedge clk_i, negedge rst_ni) begin
-            if (~rst_ni) begin
+         always @(posedge clk, posedge rst) begin
+            if (rst) begin
                mem[i] <= 0;
             end else if (pop) begin
                if (i + OUT < IN + BUFF) begin
@@ -56,12 +59,13 @@ module repacker #(
          end
       end
       for (i = 0; i < OUT; i = i + 1) begin : go
-         assign out_data_o[W*i+W-1:W*i] = mem[i];
+         assign o_data[W*i+W-1:W*i] = mem[i];
       end
    endgenerate
 
-   always @(posedge clk_i, negedge rst_ni) begin
-      if (~rst_ni) begin
+   // Updating counter
+   always @(posedge clk, posedge rst) begin
+      if (rst) begin
          v <= 0;
       end else begin
          v <= v + (push ? IN : 0) - (pop ? OUT : 0);

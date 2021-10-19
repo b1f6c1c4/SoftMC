@@ -108,14 +108,14 @@ module chnl_rx #(
       .OUT (RX_WIDTH / GCD),
       .W (GCD)
    ) i_repacker (
-      .clk_i (clk),
-      .rst_ni (!rst),
-      .in_val_i (repacker_i_val),
-      .in_data_i (repacker_i_data),
-      .in_rdy_o (repacker_i_rdy),
-      .out_val_o (o_val),
-      .out_data_o (o_data),
-      .out_rdy_i (o_rdy)
+      .clk (clk),
+      .rst (rst),
+      .i_val (repacker_i_val),
+      .i_rdy (repacker_i_rdy),
+      .i_data (repacker_i_data),
+      .o_val (o_val),
+      .o_rdy (o_rdy),
+      .o_data (o_data)
    );
 
 endmodule

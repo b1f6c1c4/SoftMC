@@ -145,14 +145,14 @@ module chnl_tx #(
       .OUT (C_PCI_DATA_WIDTH / GCD),
       .W (GCD)
    ) i_repacker (
-      .clk_i (clk),
-      .rst_ni (!rst),
-      .in_val_i (i_val),
-      .in_data_i (i_data),
-      .in_rdy_o (i_rdy),
-      .out_val_o (fifo_i_val),
-      .out_data_o (fifo_i_data),
-      .out_rdy_i (fifo_i_rdy)
+      .clk (clk),
+      .rst (rst),
+      .i_val (i_val),
+      .i_rdy (i_rdy),
+      .i_data (i_data),
+      .o_val (fifo_i_val),
+      .o_rdy (fifo_i_rdy),
+      .o_data (fifo_i_data)
    );
 
    fifo #(
