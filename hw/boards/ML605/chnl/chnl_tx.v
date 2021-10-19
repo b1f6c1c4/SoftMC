@@ -158,15 +158,14 @@ module chnl_tx #(
    fifo #(
       .WIDTH (C_PCI_DATA_WIDTH)
    ) i_fifo (
-     .srst_i (rst),
-     .clk_i (clk),
-     .en_i (1'b1),
-     .in_val_i (fifo_i_val),
-     .in_data_i (fifo_i_data),
-     .in_rdy_o (fifo_i_rdy),
-     .out_val_o (fifo_o_val),
-     .out_data_o (CHNL_TX_DATA),
-     .out_rdy_i (fifo_o_rdy)
+     .clk (clk),
+     .srst (rst),
+     .i_val (fifo_i_val),
+     .i_rdy (fifo_i_rdy),
+     .i_data (fifo_i_data),
+     .o_val (fifo_o_val),
+     .o_rdy (fifo_o_rdy),
+     .o_data (CHNL_TX_DATA)
    );
 
 endmodule

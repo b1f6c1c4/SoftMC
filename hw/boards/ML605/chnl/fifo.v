@@ -1,18 +1,16 @@
 module fifo #(
-   parameter WIDTH = 32,
-   parameter BURST = 0
+   parameter WIDTH = 32
 ) (
-   input clk_i,
-   input srst_i,
-   input en_i,
+   input clk,
+   input srst,
 
-   input in_val_i,
-   input [WIDTH-1:0] in_data_i,
-   output in_rdy_o,
+   input i_val,
+   output i_rdy,
+   input [WIDTH-1:0] i_data,
 
-   output reg out_val_o,
-   output [WIDTH-1:0] out_data_o,
-   input out_rdy_i
+   output o_val,
+   input o_rdy,
+   output [WIDTH-1:0] o_data
 );
    localparam W = 32;
    localparam PIECES = (WIDTH + W - 1) / W;
@@ -25,117 +23,70 @@ module fifo #(
    reg rden;
 
    reg rbuf, rbuf_next;
-   always @(posedge clk_i) begin
-      rbuf <= rbuf_next;
+   always @(posedge clk) begin
+      if (srst) begin
+         rbuf <= 0;
+      end else begin
+         rbuf <= rbuf_next;
+      end
    end
 
-   assign in_rdy_o = ~full;
-   assign wdata = in_data_i;
-   assign out_data_o = rdata[WIDTH-1:0];
+   assign i_rdy = ~full;
+   assign wdata = i_data;
+   assign o_val = rbuf;
+   assign o_data = rdata[WIDTH-1:0];
 
    genvar i;
    generate
       for (i = 0; i < PIECES; i = i + 1) begin : g
-         wire [W:0] w = wdata[i*W+W-1:i*W];
-         if (W > 16) begin
-            wire [63:0] ro;
-            assign rdata[i*W+W-1:i*W] = ro[W-1:0];
-            FIFO36E1 #(
-               .ALMOST_FULL_OFFSET (1),
-               .ALMOST_EMPTY_OFFSET (BURST > 0 ? BURST - 1 : 1),
-               .EN_SYN ("TRUE"),
-               .DATA_WIDTH (36),
-               .DO_REG (0)
-            ) inst (
-               .RST (srst_i),
-               .RSTREG (0),
-               .REGCE (0),
+         wire [63:0] wd, rd;
+         assign wd = {32'b0,wdata[i*W+W-1:i*W]};
+         assign rdata[i*W+W-1:i*W] = rd[W-1:0];
+         FIFO36E1 #(
+            .ALMOST_FULL_OFFSET (1),
+            .ALMOST_EMPTY_OFFSET (1),
+            .EN_SYN ("TRUE"),
+            .DATA_WIDTH (36),
+            .DO_REG (0)
+         ) inst (
+            .RST (srst),
+            .RSTREG (0),
+            .REGCE (0),
 
-               .WRCLK (clk_i),
-               .WREN (en_i && ~srst_i && in_val_i && in_rdy_o),
-               .DI ({{(64-W){1'b0}},w[W-1:0]}),
-               .DIP (0),
-               .FULL (fulls[i]),
-               .ALMOSTFULL (),
-               .WRCOUNT (), .WRERR (),
+            .WRCLK (clk),
+            .WREN (~srst && i_val && i_rdy),
+            .DI (wd),
+            .DIP (0),
+            .FULL (fulls[i]),
+            .ALMOSTFULL (),
+            .WRCOUNT (), .WRERR (),
 
-               .RDCLK (clk_i),
-               .RDEN (rden),
-               .DO (ro),
-               .DOP (),
-               .EMPTY (emptys[i]),
-               .ALMOSTEMPTY (aemptys[i]),
-               .RDCOUNT (), .RDERR (),
+            .RDCLK (clk),
+            .RDEN (rden),
+            .DO (rd),
+            .DOP (),
+            .EMPTY (emptys[i]),
+            .ALMOSTEMPTY (aemptys[i]),
+            .RDCOUNT (), .RDERR (),
 
-               .INJECTDBITERR (0), .INJECTSBITERR (0),
-               .DBITERR (), .SBITERR (), .ECCPARITY ()
-            );
-         end else begin
-            wire [31:0] ro;
-            assign rdata[i*W+W-1:i*W] = ro[W-1:0];
-            FIFO18E1 #(
-               .ALMOST_FULL_OFFSET (1),
-               .ALMOST_EMPTY_OFFSET (BURST > 0 ? BURST - 1 : 1),
-               .EN_SYN ("TRUE"),
-               .DATA_WIDTH (W <= 4 ? W : W <= 8 ? 9 : 18),
-               .DO_REG (0)
-            ) inst (
-               .RST (srst_i),
-               .RSTREG (0),
-               .REGCE (0),
-
-               .WRCLK (clk_i),
-               .WREN (en_i && ~srst_i && in_val_i && in_rdy_o),
-               .DI ({{(32-W){1'b0}},w[W-1:0]}),
-               .DIP (0),
-               .FULL (fulls[i]),
-               .ALMOSTFULL (),
-               .WRCOUNT (), .WRERR (),
-
-               .RDCLK (clk_i),
-               .RDEN (rden),
-               .DO (ro),
-               .DOP (),
-               .EMPTY (emptys[i]),
-               .ALMOSTEMPTY (aemptys[i]),
-               .RDCOUNT (), .RDERR ()
-            );
-         end
+            .INJECTDBITERR (0), .INJECTSBITERR (0),
+            .DBITERR (), .SBITERR (), .ECCPARITY ()
+         );
       end
    endgenerate
 
    always @(*) begin
-      if (srst_i || ~en_i) begin
+      if (srst) begin
          rden = 0;
-         out_val_o = 0;
          rbuf_next = 0;
-      end else if (BURST == 0) begin
-         if (empty) begin
-            rden = 0;
-            out_val_o = rbuf;
-            rbuf_next = rbuf && ~out_rdy_i;
-         end else if (~rbuf) begin
-            rden = 1; // prefetch
-            out_val_o = 0;
-            rbuf_next = 1;
-         end else if (out_rdy_i) begin
-            rden = 1; // prefetch next
-            out_val_o = rbuf;
-            rbuf_next = 1;
-         end else begin
-            rden = 0; // keep
-            out_val_o = 1;
-            rbuf_next = 1;
-         end
       end else begin
-         out_val_o = ~aempty;
          if (empty) begin
             rden = 0;
-            rbuf_next = rbuf && ~out_rdy_i;
+            rbuf_next = rbuf && ~o_rdy;
          end else if (~rbuf) begin
             rden = 1; // prefetch
             rbuf_next = 1;
-         end else if (out_rdy_i) begin
+         end else if (o_rdy) begin
             rden = 1; // prefetch next
             rbuf_next = 1;
          end else begin
