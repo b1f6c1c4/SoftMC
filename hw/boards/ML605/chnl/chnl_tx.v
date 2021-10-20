@@ -53,17 +53,17 @@ module chnl_tx #(
    localparam S_IDLE = 1'd0;
    localparam S_SENDING = 1'd1;
 
-   reg state, state_next;
-   reg [31:0] cnt_queued, cnt_queued_next;
-   reg [31:0] cnt_left, cnt_left_next;
-   reg [31:0] cnt_idle_cycles, cnt_idle_cycles_next;
+   (* keep = "true" *) reg state, state_next;
+   (* keep = "true" *) reg [31:0] cnt_queued, cnt_queued_next;
+   (* keep = "true" *) reg [31:0] cnt_left, cnt_left_next;
+   (* keep = "true" *) reg [31:0] cnt_idle_cycles, cnt_idle_cycles_next;
 
-   wire repacker_i_val, repacker_i_rdy;
-   wire [TX_WIDTH-1:0] repacker_i_data;
-   wire [C_PCI_DATA_WIDTH-1:0] fifo_i_data;
-   wire fifo_i_val;
-   reg fifo_o_rdy;
-   wire fifo_i_rdy, fifo_o_val;
+   (* keep = "true" *) wire repacker_i_val, repacker_i_rdy;
+   (* keep = "true" *) wire [TX_WIDTH-1:0] repacker_i_data;
+   (* keep = "true" *) wire [C_PCI_DATA_WIDTH-1:0] fifo_i_data;
+   (* keep = "true" *) wire fifo_i_val;
+   (* keep = "true" *) reg fifo_o_rdy;
+   (* keep = "true" *) wire fifo_i_rdy, fifo_o_val;
 
    // equals to cnt_queue - cnt_left_next when S_IDLE->S_SENDING
    reg [31:0] cnt_queued_left;

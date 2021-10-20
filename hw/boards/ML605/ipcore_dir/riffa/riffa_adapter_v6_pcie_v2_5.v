@@ -239,25 +239,25 @@ assign cfg_pm_wake = 1'b0;                   // Not supporting PM_PME Message
 assign cfg_turnoff_ok = 1'b0;               // Currently don't support power down
 
 // RIFFA channel interface
-wire   [C_NUM_CHNL-1:0]                  chnl_rx_clk;
-wire   [C_NUM_CHNL-1:0]                  chnl_rx;
-wire   [C_NUM_CHNL-1:0]                  chnl_rx_ack;
-wire   [C_NUM_CHNL-1:0]                  chnl_rx_last;
-wire   [(C_NUM_CHNL*32)-1:0]               chnl_rx_len;
-wire   [(C_NUM_CHNL*31)-1:0]               chnl_rx_off;
-wire   [(C_NUM_CHNL*C_DATA_WIDTH)-1:0]         chnl_rx_data;
-wire   [C_NUM_CHNL-1:0]                  chnl_rx_data_valid;
-wire   [C_NUM_CHNL-1:0]                  chnl_rx_data_ren;
+(* keep = "true" *) wire   [C_NUM_CHNL-1:0]                  chnl_rx_clk;
+(* keep = "true" *) wire   [C_NUM_CHNL-1:0]                  chnl_rx;
+(* keep = "true" *) wire   [C_NUM_CHNL-1:0]                  chnl_rx_ack;
+(* keep = "true" *) wire   [C_NUM_CHNL-1:0]                  chnl_rx_last;
+(* keep = "true" *) wire   [(C_NUM_CHNL*32)-1:0]               chnl_rx_len;
+(* keep = "true" *) wire   [(C_NUM_CHNL*31)-1:0]               chnl_rx_off;
+(* keep = "true" *) wire   [(C_NUM_CHNL*C_DATA_WIDTH)-1:0]         chnl_rx_data;
+(* keep = "true" *) wire   [C_NUM_CHNL-1:0]                  chnl_rx_data_valid;
+(* keep = "true" *) wire   [C_NUM_CHNL-1:0]                  chnl_rx_data_ren;
 
-wire   [C_NUM_CHNL-1:0]                  chnl_tx_clk;
-wire   [C_NUM_CHNL-1:0]                  chnl_tx;
-wire   [C_NUM_CHNL-1:0]                  chnl_tx_ack;
-wire   [C_NUM_CHNL-1:0]                  chnl_tx_last;
-wire   [(C_NUM_CHNL*32)-1:0]               chnl_tx_len;
-wire   [(C_NUM_CHNL*31)-1:0]               chnl_tx_off;
-wire   [(C_NUM_CHNL*C_DATA_WIDTH)-1:0]         chnl_tx_data;
-wire   [C_NUM_CHNL-1:0]                  chnl_tx_data_valid;
-wire   [C_NUM_CHNL-1:0]                  chnl_tx_data_ren;
+(* keep = "true" *) wire   [C_NUM_CHNL-1:0]                  chnl_tx_clk;
+(* keep = "true" *) wire   [C_NUM_CHNL-1:0]                  chnl_tx;
+(* keep = "true" *) wire   [C_NUM_CHNL-1:0]                  chnl_tx_ack;
+(* keep = "true" *) wire   [C_NUM_CHNL-1:0]                  chnl_tx_last;
+(* keep = "true" *) wire   [(C_NUM_CHNL*32)-1:0]               chnl_tx_len;
+(* keep = "true" *) wire   [(C_NUM_CHNL*31)-1:0]               chnl_tx_off;
+(* keep = "true" *) wire   [(C_NUM_CHNL*C_DATA_WIDTH)-1:0]         chnl_tx_data;
+(* keep = "true" *) wire   [C_NUM_CHNL-1:0]                  chnl_tx_data_valid;
+(* keep = "true" *) wire   [C_NUM_CHNL-1:0]                  chnl_tx_data_ren;
 
 // Create a synchronous reset
 wire         user_lnk_up_int1;

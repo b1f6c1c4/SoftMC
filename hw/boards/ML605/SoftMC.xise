@@ -502,6 +502,9 @@
     <file xil_pn:name="chnl/chnl_tx.v" xil_pn:type="FILE_VERILOG">
       <association xil_pn:name="Implementation" xil_pn:seqID="75"/>
     </file>
+    <file xil_pn:name="dbg.cdc" xil_pn:type="FILE_CDC">
+      <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
+    </file>
     <file xil_pn:name="ipcore_dir/rdback_fifo.xise" xil_pn:type="FILE_COREGENISE">
       <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
     </file>
@@ -848,6 +851,7 @@
 
   <bindings>
     <binding xil_pn:location="/softMC_top" xil_pn:name="softMC_constraints.ucf"/>
+    <binding xil_pn:location="/softMC_top" xil_pn:name="dbg.cdc"/>
   </bindings>
 
   <libraries/>

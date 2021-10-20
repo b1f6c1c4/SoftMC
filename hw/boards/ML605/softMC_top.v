@@ -390,12 +390,12 @@ module softMC_top #
    wire rdback_fifo_empty_n;
    wire [31:0] rdback_data_slice;
 
-   wire i_val;
-   wire i_rdy;
-   wire [31:0] i_data;
-   wire o_val;
-   wire o_rdy;
-   wire [31:0] o_data;
+   (* keep = "true" *) wire i_val;
+   (* keep = "true" *) wire i_rdy;
+   (* keep = "true" *) wire [31:0] i_data;
+   (* keep = "true" *) wire o_val;
+   (* keep = "true" *) wire o_rdy;
+   (* keep = "true" *) wire [31:0] o_data;
 
    potato i_potato(
       .clk    (clk),

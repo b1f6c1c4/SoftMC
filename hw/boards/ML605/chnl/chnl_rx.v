@@ -40,12 +40,12 @@ module chnl_rx #(
    localparam S_IDLE = 1'd0;
    localparam S_RECEIVING = 1'd1;
 
-   reg state, state_next;
-   reg [31:0] cnt_left, cnt_left_next;
-   reg buffer_i_val;
-   wire buffer_i_rdy;
-   wire repacker_i_val, repacker_i_rdy;
-   wire [C_PCI_DATA_WIDTH-1:0] repacker_i_data;
+   (* keep = "true" *) reg state, state_next;
+   (* keep = "true" *) reg [31:0] cnt_left, cnt_left_next;
+   (* keep = "true" *) reg buffer_i_val;
+   (* keep = "true" *) wire buffer_i_rdy;
+   (* keep = "true" *) wire repacker_i_val, repacker_i_rdy;
+   (* keep = "true" *) wire [C_PCI_DATA_WIDTH-1:0] repacker_i_data;
 
    assign CHNL_RX_CLK = clk;
 
