@@ -15,9 +15,18 @@ module repacker #(
    output [W*OUT-1:0] o_data
 );
 
+   function integer clog2;
+      input integer value;
+      begin
+         value = value - 1;
+         for (clog2 = 0; value > 0; clog2 = clog2 + 1)
+            value = value >> 1;
+      end
+   endfunction
+
    localparam BUFF = IN + OUT - 1; // max number of chunks buffered
 
-   reg [31:0] v; // number of chunks buffered
+   reg [clog2(BUFF+IN+1)-1:0] v; // number of chunks buffered
    reg [W-1:0] mem[0:BUFF-1]; // the buffered chunks
    reg [W-1:0] mx[0:IN+BUFF-1]; // the chunks after receiving
 
