@@ -36,6 +36,8 @@ always @(posedge clk, posedge rst) begin
     end else if (en1) begin
         m_val <= i_val;
         m_data <= i_data;
+    end else if (m_rdy) begin
+        m_val <= 1'b0;
     end
 end
 
@@ -46,6 +48,8 @@ always @(posedge clk, posedge rst) begin
     end else if (en2) begin
         o_val <= m_val;
         o_data <= o_data_ns;
+    end else if (o_rdy) begin
+        o_val <= 1'b0;
     end
 end
 
