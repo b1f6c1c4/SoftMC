@@ -24,13 +24,13 @@
       <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
     </file>
     <file xil_pn:name="ipcore_dir/pcie_endpoint.xco" xil_pn:type="FILE_COREGEN">
-      <association xil_pn:name="Implementation" xil_pn:seqID="78"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="79"/>
     </file>
     <file xil_pn:name="ipcore_dir/riffa/riffa_adapter_v6_pcie_v2_5.v" xil_pn:type="FILE_VERILOG">
-      <association xil_pn:name="Implementation" xil_pn:seqID="77"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="78"/>
     </file>
     <file xil_pn:name="ipcore_dir/riffa/riffa_top_v6_pcie_v2_5.v" xil_pn:type="FILE_VERILOG">
-      <association xil_pn:name="Implementation" xil_pn:seqID="80"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="81"/>
     </file>
     <file xil_pn:name="maint_ctrl.v" xil_pn:type="FILE_VERILOG">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="6"/>
@@ -49,7 +49,7 @@
     </file>
     <file xil_pn:name="softMC_top.v" xil_pn:type="FILE_VERILOG">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="14"/>
-      <association xil_pn:name="Implementation" xil_pn:seqID="81"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="82"/>
     </file>
     <file xil_pn:name="softMC.v" xil_pn:type="FILE_VERILOG">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="13"/>
@@ -101,7 +101,7 @@
     </file>
     <file xil_pn:name="ipcore_dir/riffa/riffa_endpoint.v" xil_pn:type="FILE_VERILOG">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="0"/>
-      <association xil_pn:name="Implementation" xil_pn:seqID="74"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="75"/>
     </file>
     <file xil_pn:name="ipcore_dir/riffa/async_fifo_fwft.v" xil_pn:type="FILE_VERILOG">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="0"/>
@@ -277,15 +277,15 @@
     </file>
     <file xil_pn:name="ipcore_dir/riffa/riffa_endpoint_32.v" xil_pn:type="FILE_VERILOG">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="0"/>
-      <association xil_pn:name="Implementation" xil_pn:seqID="69"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="70"/>
     </file>
     <file xil_pn:name="ipcore_dir/riffa/riffa_endpoint_64.v" xil_pn:type="FILE_VERILOG">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="0"/>
-      <association xil_pn:name="Implementation" xil_pn:seqID="68"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="69"/>
     </file>
     <file xil_pn:name="ipcore_dir/riffa/riffa_endpoint_128.v" xil_pn:type="FILE_VERILOG">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="0"/>
-      <association xil_pn:name="Implementation" xil_pn:seqID="70"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="71"/>
     </file>
     <file xil_pn:name="ipcore_dir/riffa/rx_engine_32.v" xil_pn:type="FILE_VERILOG">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="0"/>
@@ -365,7 +365,7 @@
     </file>
     <file xil_pn:name="ipcore_dir/riffa/translation_layer.v" xil_pn:type="FILE_VERILOG">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="0"/>
-      <association xil_pn:name="Implementation" xil_pn:seqID="67"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="68"/>
     </file>
     <file xil_pn:name="ipcore_dir/riffa/tx_engine_32.v" xil_pn:type="FILE_VERILOG">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="0"/>
@@ -485,22 +485,26 @@
     </file>
     <file xil_pn:name="potato.v" xil_pn:type="FILE_VERILOG">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="280"/>
-      <association xil_pn:name="Implementation" xil_pn:seqID="79"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="80"/>
     </file>
     <file xil_pn:name="chnl/fifo.v" xil_pn:type="FILE_VERILOG">
-      <association xil_pn:name="Implementation" xil_pn:seqID="72"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="67"/>
     </file>
     <file xil_pn:name="chnl/buffer.v" xil_pn:type="FILE_VERILOG">
-      <association xil_pn:name="Implementation" xil_pn:seqID="73"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="74"/>
     </file>
     <file xil_pn:name="chnl/repacker.v" xil_pn:type="FILE_VERILOG">
-      <association xil_pn:name="Implementation" xil_pn:seqID="71"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="72"/>
     </file>
     <file xil_pn:name="chnl/chnl_rx.v" xil_pn:type="FILE_VERILOG">
-      <association xil_pn:name="Implementation" xil_pn:seqID="76"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="77"/>
     </file>
     <file xil_pn:name="chnl/chnl_tx.v" xil_pn:type="FILE_VERILOG">
-      <association xil_pn:name="Implementation" xil_pn:seqID="75"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="76"/>
+    </file>
+    <file xil_pn:name="chnl/deep_fifo.v" xil_pn:type="FILE_VERILOG">
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="283"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="73"/>
     </file>
     <file xil_pn:name="ipcore_dir/rdback_fifo.xise" xil_pn:type="FILE_COREGENISE">
       <association xil_pn:name="Implementation" xil_pn:seqID="0"/>

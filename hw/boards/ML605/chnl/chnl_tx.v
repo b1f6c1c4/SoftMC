@@ -14,7 +14,6 @@
 //   - C_PCI_DATA_WIDTH % GCD == 0
 //   - CHNL_ALIGN >= C_PCI_DATA_WIDTH / 32
 //   - MAX_LENGTH >= CHNL_ALIGN
-//   - MAX_LENGTH <= 1024 * (C_PCI_DATA_WIDTH / 32)
 //   - MAX_LENGTH % CHNL_ALIGN == 0
 //
 // Usage:
@@ -28,7 +27,7 @@ module chnl_tx #(
    parameter TX_WIDTH = 32,
    parameter GCD = 32, // = gcd(TX_WIDTH, C_PCI_DATA_WIDTH)
    parameter CHNL_ALIGN = 4, // unit: uint32_t
-   parameter MAX_LENGTH = 32, // unit: uint32_t
+   parameter MAX_LENGTH = 16384, // unit: uint32_t
    parameter MAX_IDLE_CYCLES = 128
 ) (
    input clk,
@@ -49,6 +48,7 @@ module chnl_tx #(
    input CHNL_TX_DATA_REN
 );
    localparam ALIGN = 32 * CHNL_ALIGN / C_PCI_DATA_WIDTH; // unit: C_PCI_DATA_WIDTH
+   localparam DEPTH = (MAX_LENGTH / (C_PCI_DATA_WIDTH / 32) + 1024 - 1) / 1024;
 
    localparam S_IDLE = 1'd0;
    localparam S_SENDING = 1'd1;
@@ -170,8 +170,9 @@ module chnl_tx #(
       .o_data (fifo_i_data)
    );
 
-   fifo #(
-      .WIDTH (C_PCI_DATA_WIDTH)
+   deep_fifo #(
+      .WIDTH (C_PCI_DATA_WIDTH),
+      .DEPTH (DEPTH)
    ) i_fifo (
      .clk (clk),
      .srst (rst),
